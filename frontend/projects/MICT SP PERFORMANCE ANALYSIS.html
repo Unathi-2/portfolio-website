@@ -1,0 +1,2095 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>MICT SP Insights Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <style>
+    /* CSS Variables for Themes */
+    :root {
+      --primary-color: #0078d4;
+      --secondary-color: #50e6ff;
+      --success-color: #107c10;
+      --warning-color: #d83b01;
+      --error-color: #e81123;
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8fafc;
+      --bg-card: #ffffff;
+      --text-primary: #1f2937;
+      --text-secondary: #6b7280;
+      --border-color: #e5e7eb;
+      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    }
+
+    
+
+    /* Apply theme variables */
+    body {
+      background-color: var(--bg-secondary);
+      color: var(--text-primary);
+      transition: all 0.3s ease;
+    }
+
+    .theme-transition {
+      transition: all 0.3s ease;
+    }
+
+    /* Performance filter buttons */
+    .performance-filter {
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 500;
+      background-color: var(--bg-card);
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .performance-filter:hover {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    .performance-filter.active {
+      background-color: var(--primary-color);
+      color: white;
+      border-color: var(--primary-color);
+    }
+
+    /* Table styles */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background-color: var(--bg-secondary);
+      text-align: left;
+      padding: 0.75rem 1rem;
+      font-weight: 600;
+      color: var(--text-secondary);
+      text-transform: uppercase;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    td {
+      padding: 1rem;
+      border-bottom: 1px solid var(--border-color);
+      font-size: 0.875rem;
+      color: var(--text-primary);
+    }
+
+    tr:hover {
+      background-color: var(--bg-secondary);
+    }
+
+    /* Category colors - Enhanced visibility */
+    .tr-excellent {
+      background-color: rgba(16, 185, 129, 0.15) !important;
+    }
+
+    .tr-excellent:hover {
+      background-color: rgba(16, 185, 129, 0.25) !important;
+    }
+
+    .tr-moderate {
+      background-color: rgba(245, 158, 11, 0.15) !important;
+    }
+
+    .tr-moderate:hover {
+      background-color: rgba(245, 158, 11, 0.25) !important;
+    }
+
+    .tr-at-risk {
+      background-color: rgba(239, 68, 68, 0.15) !important;
+    }
+
+    .tr-at-risk:hover {
+      background-color: rgba(239, 68, 68, 0.25) !important;
+    }
+
+    /* Chart container */
+    .chart {
+      width: 100%;
+    }
+
+    /* KPI cards */
+    .kpi-card {
+      border-top: 4px solid;
+      transition: all 0.3s ease;
+      background-color: var(--bg-card);
+      box-shadow: var(--shadow);
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+
+    /* Loading states */
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+
+    .skeleton {
+      background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-secondary) 50%, var(--border-color) 75%);
+      background-size: 200% 100%;
+      animation: loading 1.5s infinite;
+    }
+
+    @keyframes loading {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    
+    /* Fade in animation */
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease-out forwards;
+    }
+    
+    /* Page transition */
+    .page-transition {
+      transition: opacity 0.3s ease;
+    }
+    
+    .page-hidden {
+      opacity: 0;
+      pointer-events: none;
+      display: none;
+    }
+    
+    .page-visible {
+      opacity: 1;
+      display: block;
+    }
+    
+    /* Active navigation item */
+    .nav-active {
+      background-color: var(--primary-color);
+      color: white;
+    }
+    
+    /* Export modal */
+    .export-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    
+    .export-modal-content {
+      background: var(--bg-card);
+      padding: 2rem;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+      color: var(--text-primary);
+    }
+    
+    /* Chart export styles */
+    .chart-export {
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      margin-bottom: 20px;
+      page-break-inside: avoid;
+    }
+    
+    /* Enhanced color badges */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+    }
+    
+    .status-badge.excellent {
+      background-color: #d1fae5;
+      color: #065f46;
+    }
+    
+    .status-badge.moderate {
+      background-color: #fef3c7;
+      color: #92400e;
+    }
+    
+    .status-badge.at-risk {
+      background-color: #fee2e2;
+      color: #991b1b;
+    }
+
+    
+
+    /* Power BI Style Filters Panel */
+    .filters-panel {
+      background-color: var(--bg-card);
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+    }
+
+    /* Custom select styles */
+    .custom-select {
+      background-color: var(--bg-card);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+    }
+
+    .custom-select:focus {
+      border-color: var(--primary-color);
+      ring-color: var(--primary-color);
+    }
+
+    /* Card styles */
+    .card {
+      background-color: var(--bg-card);
+      box-shadow: var(--shadow);
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body class="theme-transition">
+
+
+  <!-- Loading indicator -->
+  <div id="loadingIndicator" class="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50 theme-transition">
+    <div class="text-center">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+      <p class="text-gray-600">Loading dashboard...</p>
+    </div>
+  </div>
+
+  <!-- Export Modal -->
+  <div id="exportModal" class="export-modal page-hidden">
+    <div class="export-modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h3 class="text-lg font-semibold">Export Report</h3>
+        <button id="closeExportModal" class="text-gray-400 hover:text-gray-600">
+          <i data-feather="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+      
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-medium mb-2">Export Format</label>
+          <div class="grid grid-cols-2 gap-3">
+            <button class="export-format-btn border border-gray-300 rounded-lg p-3 text-left hover:border-blue-500 hover:bg-blue-50 transition-colors custom-select" data-format="pdf">
+              <div class="flex items-center">
+                <i data-feather="file-text" class="text-red-500 mr-2"></i>
+                <span>PDF Document</span>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">High-quality report with charts</p>
+            </button>
+            <button class="export-format-btn border border-gray-300 rounded-lg p-3 text-left hover:border-blue-500 hover:bg-blue-50 transition-colors custom-select" data-format="csv">
+              <div class="flex items-center">
+                <i data-feather="file-text" class="text-green-500 mr-2"></i>
+                <span>CSV Data</span>
+              </div>
+              <p class="text-xs text-gray-500 mt-1">Raw data for analysis</p>
+            </button>
+          </div>
+        </div>
+        
+        <div id="pdfOptions" class="space-y-3">
+          <div>
+            <label class="block text-sm font-medium mb-1">Report Title</label>
+            <input type="text" id="reportTitle" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 custom-select" value="MICT SP Performance Analysis Report">
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-1">Data Scope</label>
+            <div class="space-y-2">
+              <label class="flex items-center">
+                <input type="radio" name="dataScope" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="current" checked>
+                <span class="ml-2 text-sm">Current filtered view</span>
+              </label>
+              <label class="flex items-center">
+                <input type="radio" name="dataScope" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="all">
+                <span class="ml-2 text-sm">All data (ignore filters)</span>
+              </label>
+            </div>
+          </div>
+          
+          <div>
+            <label class="block text-sm font-medium mb-1">Include Sections</label>
+            <div class="space-y-2">
+              <label class="flex items-center">
+                <input type="checkbox" class="section-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-section="executive" checked>
+                <span class="ml-2 text-sm">Executive Summary</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" class="section-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-section="kpis" checked>
+                <span class="ml-2 text-sm">Performance Metrics</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" class="section-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-section="charts" checked>
+                <span class="ml-2 text-sm">Charts & Visualizations</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" class="section-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-section="risk" checked>
+                <span class="ml-2 text-sm">Risk Analysis</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" class="section-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-section="recommendations" checked>
+                <span class="ml-2 text-sm">Recommendations</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" class="section-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-section="detailed" checked>
+                <span class="ml-2 text-sm">Detailed Data</span>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+        <div class="flex justify-end space-x-3 pt-4">
+          <button id="cancelExport" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors custom-select">
+            Cancel
+          </button>
+          <button id="confirmExport" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center">
+            <i data-feather="download" class="w-4 h-4 mr-2"></i>
+            Export Report
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dashboard Page -->
+  <div id="dashboard-page" class="page-transition page-visible">
+    <!-- Main Content -->
+    <div id="mainContent" class="container mx-auto px-4 py-6 opacity-0 theme-transition">
+      <!-- Dashboard Header -->
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 fade-in">
+        <div>
+          <h1 class="text-3xl font-bold">MICT SP Performance Analysis</h1>
+          <p class="text-gray-600">Comprehensive candidate performance analytics</p>
+        </div>
+        <div class="mt-4 md:mt-0 flex gap-3">
+          <button id="saveView" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors custom-select">
+            <i data-feather="save"></i> Save View
+          </button>
+          <button id="importDatasetBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+	            <i data-feather="upload-cloud"></i> Import Dataset
+	          </button>
+	          <button id="exportReportBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
+	            <i data-feather="download"></i> Export Full Report
+	          </button>
+        </div>
+      </div>
+
+      <!-- Power BI Style Filters Panel -->
+      <div class="filters-panel p-4 mb-6 fade-in">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="font-semibold">Filters</h3>
+          <div class="flex gap-2">
+            <button id="applyFiltersBtn" class="text-sm text-blue-600 hover:text-blue-800">Apply</button>
+            <button id="clearFiltersBtn" class="text-sm text-gray-600 hover:text-gray-800">Clear</button>
+          </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
+          <!-- Development Group -->
+          <div>
+            <label class="block text-sm font-medium mb-2">Development Group</label>
+            <div class="relative">
+              <select id="groupSel" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 appearance-none custom-select">
+                <option value="All">All Groups</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <i data-feather="chevron-down" class="w-4 h-4"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Week / Scrum selector -->
+          <div>
+            <label class="block text-sm font-medium mb-2">Sprint / Week</label>
+            <div class="relative">
+              <select id="weekSel" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 appearance-none custom-select">
+                <option value="All">All</option>
+              </select>
+              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                <i data-feather="chevron-down" class="w-4 h-4"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Search input -->
+          <div>
+            <label class="block text-sm font-medium mb-2">Search Candidate</label>
+            <input id="searchIn" type="search" placeholder="Search by name..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 custom-select">
+          </div>
+          
+          <!-- Multi-select filter -->
+          <div>
+            <label class="block text-sm font-medium mb-2">Performance Category</label>
+            <div class="relative">
+              <select id="categoryFilter" multiple class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 h-24 custom-select">
+                <option value="Excellent" selected>Excellent</option>
+                <option value="Moderate" selected>Moderate</option>
+                <option value="At-risk" selected>At Risk</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Score range slider + Quick actions -->
+          <div>
+            <label class="block text-sm font-medium mb-2">
+              Overall Score: <span id="scoreRangeValue">0-100%</span>
+            </label>
+            <div class="space-y-2 mb-3">
+              <div class="flex justify-between text-xs text-gray-500">
+                <span>0%</span>
+                <span>100%</span>
+              </div>
+              <input type="range" id="minScore" min="0" max="100" value="0" class="w-full custom-select">
+              <input type="range" id="maxScore" min="0" max="100" value="100" class="w-full custom-select">
+            </div>
+            <div class="flex items-end space-x-2">
+              <button id="resetBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-sm transition-colors custom-select">
+                Reset All
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detailed Table - MOVED TO TOP -->
+      <div class="card overflow-hidden mb-6 fade-in">
+        <div class="flex justify-between items-center p-4 border-b">
+          <h3 class="text-lg font-semibold">Candidate Details</h3>
+          <div class="flex items-center gap-2 text-sm">
+            <span class="text-gray-500">Showing <span id="candidateCount" class="font-medium">0</span> candidates</span>
+            <button class="text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors">
+              <i data-feather="filter" class="w-4 h-4"></i>
+              <span>Filter</span>
+            </button>
+          </div>
+        </div>
+        <div id="tableWrap" class="overflow-x-auto">
+          <div class="skeleton p-4 h-64"></div>
+        </div>
+      </div>
+
+      <!-- Enhanced KPIs -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6" id="kpiRow">
+        <!-- Skeleton loading -->
+        <div class="kpi-card skeleton rounded-lg p-4 h-24 fade-in"></div>
+        <div class="kpi-card skeleton rounded-lg p-4 h-24 fade-in"></div>
+        <div class="kpi-card skeleton rounded-lg p-4 h-24 fade-in"></div>
+        <div class="kpi-card skeleton rounded-lg p-4 h-24 fade-in"></div>
+        <div class="kpi-card skeleton rounded-lg p-4 h-24 fade-in"></div>
+      </div>
+
+      <!-- Performance Trends Over Time -->
+      <div class="card p-4 mb-6 fade-in">
+        <h3 class="text-lg font-semibold mb-4">Performance Trends</h3>
+        <div id="performanceTrends" class="chart h-80 skeleton rounded-lg"></div>
+      </div>
+
+      <!-- Main Charts -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Overall Distribution -->
+        <div class="card p-4 fade-in">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Performance Distribution</h3>
+            <div class="flex gap-2">
+              <button class="performance-filter active" data-filter="all">All</button>
+              <button class="performance-filter" data-filter="excellent">Excellent</button>
+              <button class="performance-filter" data-filter="moderate">Moderate</button>
+              <button class="performance-filter" data-filter="at-risk">At Risk</button>
+            </div>
+          </div>
+          <div id="overallDist" class="chart h-80 skeleton rounded-lg"></div>
+        </div>
+
+        <!-- Group Comparison -->
+        <div class="card p-4 fade-in">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Group Performance Comparison</h3>
+            <div class="flex items-center gap-2 text-sm text-gray-500">
+              <i data-feather="info" class="w-4 h-4"></i>
+              <span>Hover for details</span>
+            </div>
+          </div>
+          <div id="groupCompare" class="chart h-80 skeleton rounded-lg"></div>
+        </div>
+      </div>
+
+      <!-- Skill Distribution by Category -->
+      <div class="card p-4 mb-6 fade-in">
+        <h3 class="text-lg font-semibold mb-4">Skill Distribution by Performance Category</h3>
+        <div id="skillDistribution" class="chart h-80 skeleton rounded-lg"></div>
+      </div>
+
+      <!-- Secondary Charts -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Radar Chart -->
+        <div class="card p-4 fade-in">
+          <h3 class="text-lg font-semibold mb-4">Skills Radar</h3>
+          <div id="criteriaRadar" class="chart h-80 skeleton rounded-lg"></div>
+        </div>
+
+        <!-- Scatter Plot -->
+        <div class="card p-4 fade-in">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-semibold">Tech vs Soft Skills</h3>
+            <div class="flex items-center gap-2">
+              <div class="flex items-center gap-1">
+                <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                <span class="text-xs">Excellent</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
+                <span class="text-xs">Moderate</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                <span class="text-xs">At Risk</span>
+              </div>
+            </div>
+          </div>
+          <div id="techSoftScatter" class="chart h-80 skeleton rounded-lg"></div>
+        </div>
+      </div>
+
+      <!-- Performance by Group (Box Plots) -->
+      <div class="card p-4 mb-6 fade-in">
+        <h3 class="text-lg font-semibold mb-4">Performance Distribution by Group</h3>
+        <div id="groupBoxPlots" class="chart h-80 skeleton rounded-lg"></div>
+      </div>
+
+      <!-- Correlation Matrix -->
+      <div class="card p-4 mb-6 fade-in">
+        <h3 class="text-lg font-semibold mb-4">Skills Correlation Matrix</h3>
+        <div id="correlationMatrix" class="chart h-96 skeleton rounded-lg"></div>
+      </div>
+
+      <!-- Top Performers & At-Risk Candidates -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        <!-- Top Performers -->
+        <div class="card p-4 fade-in">
+          <h3 class="text-lg font-semibold mb-4">Top Performers</h3>
+          <div id="topPerformers" class="space-y-3">
+            <div class="skeleton rounded-lg p-4 h-16"></div>
+            <div class="skeleton rounded-lg p-4 h-16"></div>
+            <div class="skeleton rounded-lg p-4 h-16"></div>
+          </div>
+        </div>
+
+        <!-- At-Risk Candidates -->
+        <div class="card p-4 fade-in">
+          <h3 class="text-lg font-semibold mb-4">At-Risk Candidates</h3>
+          <div id="atRiskCandidates" class="space-y-3">
+            <div class="skeleton rounded-lg p-4 h-16"></div>
+            <div class="skeleton rounded-lg p-4 h-16"></div>
+            <div class="skeleton rounded-lg p-4 h-16"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Insights & Recommendations -->
+      <div class="card p-6 mb-6 fade-in">
+        <h3 class="text-xl font-bold mb-4">Insights & Recommendations</h3>
+        <div id="insightsContent" class="prose max-w-none">
+          <div class="skeleton rounded-lg p-4 h-32"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Enhanced dataset with ALL groups and candidates - UPDATED with only 6 skills
+    const ALL_DATA = [
+      // Scan-Tech (5)
+      {Candidate:"Aldo Stevens", Scrum:"Mini presentation", DevGroup:"Scan-Tech", 
+       Attendance:5, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:1, TechSkills:4},
+      {Candidate:"Charlton Steenkamp", Scrum:"Mini presentation", DevGroup:"Scan-Tech", 
+       Attendance:5, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Candidate:"Olona Mqongwana", Scrum:"Mini presentation", DevGroup:"Scan-Tech", 
+       Attendance:3, Communication:3, Accountability:3, CreativityOwnership:4, ProjectDelivery:4, TechSkills:3},
+      {Candidate:"Nontobeko Nkomo", Scrum:"Mini presentation", DevGroup:"Scan-Tech", 
+       Attendance:2, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
+      {Candidate:"Siyanda Dube", Scrum:"Mini presentation", DevGroup:"Scan-Tech", 
+       Attendance:5, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:1, TechSkills:4},
+
+      // PinCoders (5)
+      {Candidate:"Anele Ngcatshe", Scrum:"Mini presentation", DevGroup:"PinCoders", 
+       Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Candidate:"Ceshia Williams", Scrum:"Mini presentation", DevGroup:"PinCoders", 
+       Attendance:3, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
+      {Candidate:"Lwazi Nhleko", Scrum:"Mini presentation", DevGroup:"PinCoders", 
+       Attendance:3, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
+      {Candidate:"Thando Valley", Scrum:"Mini presentation", DevGroup:"PinCoders", 
+       Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:4, TechSkills:4},
+      {Candidate:"Zanele Gulwa", Scrum:"Mini presentation", DevGroup:"PinCoders", 
+       Attendance:3, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:1, TechSkills:3},
+
+      // HTML Pioneers (5)
+      {Candidate:"Aphiwe Tyhalisi", Scrum:"Mini presentation", DevGroup:"HTML Pioneers", 
+       Attendance:5, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:4, TechSkills:4},
+      {Candidate:"Ashura Noordien", Scrum:"Mini presentation", DevGroup:"HTML Pioneers", 
+       Attendance:5, Communication:2, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
+      {Candidate:"Layola Mbula", Scrum:"Mini presentation", DevGroup:"HTML Pioneers", 
+       Attendance:5, Communication:4, Accountability:3, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+      {Candidate:"Mdumiseni Radebe", Scrum:"Mini presentation", DevGroup:"HTML Pioneers", 
+       Attendance:5, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Candidate:"Athandile Nkcaza", Scrum:"Mini presentation", DevGroup:"HTML Pioneers", 
+       Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:4},
+
+      // A-Green Culture (5)
+      {Candidate:"Amahle Ngongeni", Scrum:"Mini presentation", DevGroup:"A-Green Culture", 
+       Attendance:5, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:3, TechSkills:3},
+      {Candidate:"Inganathi Mpahleni", Scrum:"Mini presentation", DevGroup:"A-Green Culture", 
+       Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:2, TechSkills:3},
+      {Candidate:"Mika'eel Albertyn", Scrum:"Mini presentation", DevGroup:"A-Green Culture", 
+       Attendance:5, Communication:3, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:5},
+      {Candidate:"Naelin Churches", Scrum:"Mini presentation", DevGroup:"A-Green Culture", 
+       Attendance:5, Communication:3, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+      {Candidate:"Phola Mavumengwana", Scrum:"Mini presentation", DevGroup:"A-Green Culture", 
+       Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+    ];
+
+    // Calculate overall score for each candidate and add to dataset
+    ALL_DATA.forEach(candidate => {
+      const skills = [
+        candidate.Attendance,
+        candidate.Communication,
+        candidate.Accountability,
+        candidate.CreativityOwnership,
+        candidate.ProjectDelivery,
+        candidate.TechSkills
+      ].map(v => (typeof v === 'number' && !isNaN(v)) ? v : 0);
+      const sum = skills.reduce((total, score) => total + score, 0);
+      candidate.OverallScore = (sum / 30) * 100;
+    });
+
+    // Current working dataset (can be filtered)
+    let DATA = [...ALL_DATA];
+
+    // Helper functions
+    const fmt = (v, d=2) => (v==null || isNaN(v)) ? "N/A" : Number(v).toFixed(d);
+    const unique = arr => Array.from(new Set(arr.filter(x => x != null && x !== undefined)));
+
+    // Soft skills average (Communication, Accountability, CreativityOwnership)
+    function softSkillAvg(r){
+      const vals = [r.Communication, r.Accountability, r.CreativityOwnership].map(v => Number(v) || 0);
+      return vals.reduce((a,b)=>a+b,0) / vals.length;
+    }
+
+    // Overall average using only the 6 skills
+    function overallAvg(r){
+      const vals = [r.Attendance, r.Communication, r.Accountability, r.CreativityOwnership, r.ProjectDelivery, r.TechSkills].map(v => Number(v) || 0);
+      return vals.reduce((a,b)=>a+b,0) / vals.length;
+    }
+
+    function isAtRisk(r){
+      return [r.Attendance, r.Communication, r.Accountability, r.CreativityOwnership, r.ProjectDelivery, r.TechSkills].some(v => Number(v) <= 2);
+    }
+
+    function category(r){
+      if(isAtRisk(r)) return "At-risk";
+      const avg = overallAvg(r);
+      if(avg >= 4) return "Excellent";
+      if(avg >= 2.5) return "Moderate";
+      return "Moderate";
+    }
+
+    function colorByCategory(cat){
+      return cat==="At-risk" ? "#ef4444" : (cat==="Excellent" ? "#10b981" : "#f59e0b");
+    }
+
+    // Theme Management
+    function initTheme() {
+      const themeToggle = document.getElementById('themeToggle');
+      const stored = localStorage.getItem('theme');
+      const currentTheme = stored || 'light';
+
+      document.documentElement.setAttribute('data-theme', currentTheme);
+      updateThemeIcon(currentTheme);
+
+      themeToggle && themeToggle.addEventListener('click', () => {
+        const current = document.documentElement.getAttribute('data-theme') || 'light';
+        const next = current === 'light' ? 'dark' : 'light';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('theme', next);
+        updateThemeIcon(next);
+        setTimeout(updateChartThemes, 100);
+      });
+    }
+
+    function updateThemeIcon(theme) {
+      const icon = document.querySelector('#themeToggle i');
+      if (!icon) return;
+      if (theme === 'dark') icon.setAttribute('data-feather', 'sun');
+      else icon.setAttribute('data-feather', 'moon');
+      feather.replace();
+    }
+
+    function updateChartThemes() {
+      if (window.currentData) update();
+    }
+
+    // Enhanced Filters - DOM references safe
+    const groupSel = () => document.getElementById('groupSel');
+    const weekSel  = () => document.getElementById('weekSel');
+    const searchIn = () => document.getElementById('searchIn');
+    const resetBtn = () => document.getElementById('resetBtn');
+    const categoryFilter = () => document.getElementById('categoryFilter');
+    const minScore = () => document.getElementById('minScore');
+    const maxScore = () => document.getElementById('maxScore');
+    const scoreRangeValue = () => document.getElementById('scoreRangeValue');
+
+    function initFilters() {
+      const gEl = groupSel();
+      const wEl = weekSel();
+      const sEl = searchIn();
+      const minEl = minScore();
+      const maxEl = maxScore();
+      const catEl = categoryFilter();
+      const scoreEl = scoreRangeValue();
+
+      const groups = ["All", ...unique(ALL_DATA.map(d=>d.DevGroup)).sort()];
+      const weeks  = ["All", ...unique(ALL_DATA.map(d=>d.Scrum)).sort()];
+
+      if (gEl) gEl.innerHTML = groups.map(g=>`<option value="${g}">${g}</option>`).join('');
+      if (wEl) wEl.innerHTML = weeks.map(w=>`<option value="${w}">${w}</option>`).join('');
+      if (gEl) gEl.value = "All";
+      if (wEl) wEl.value = "All";
+      if (sEl) sEl.value = "";
+
+      // Initialize range slider values
+      updateScoreRangeDisplay();
+
+      // Event listeners (guarded)
+      if (minEl) minEl.addEventListener('input', debouncedUpdate);
+      if (maxEl) maxEl.addEventListener('input', debouncedUpdate);
+      if (catEl) catEl.addEventListener('change', debouncedUpdate);
+      if (wEl) wEl.addEventListener('change', debouncedUpdate);
+      if (sEl) sEl.addEventListener('input', debouncedUpdate);
+
+      // Clear / Apply buttons
+      const applyBtn = document.getElementById('applyFiltersBtn');
+      const clearBtn = document.getElementById('clearFiltersBtn');
+      applyBtn && applyBtn.addEventListener('click', debouncedUpdate);
+      clearBtn && clearBtn.addEventListener('click', () => {
+        if (gEl) gEl.value = "All";
+        if (wEl) wEl.value = "All";
+        if (sEl) sEl.value = "";
+        if (minEl) minEl.value = 0;
+        if (maxEl) maxEl.value = 100;
+        if (catEl) {
+          Array.from(catEl.options).forEach(opt => opt.selected = true);
+        }
+        updateScoreRangeDisplay();
+        debouncedUpdate();
+      });
+    }
+
+    function updateScoreRangeDisplay() {
+      const minEl = minScore();
+      const maxEl = maxScore();
+      const scoreEl = scoreRangeValue();
+      if (!minEl || !maxEl || !scoreEl) return;
+      scoreEl.textContent = `${minEl.value}-${maxEl.value}%`;
+    }
+
+    function filterData() {
+      const gEl = groupSel();
+      const wEl = weekSel();
+      const sEl = searchIn();
+      const minEl = minScore();
+      const maxEl = maxScore();
+      const catEl = categoryFilter();
+
+      const group = gEl ? gEl.value : "All";
+      const week = wEl ? wEl.value : "All";
+      const q = sEl ? sEl.value.trim().toLowerCase() : "";
+      const minScoreVal = minEl ? parseInt(minEl.value, 10) || 0 : 0;
+      const maxScoreVal = maxEl ? parseInt(maxEl.value, 10) || 100 : 100;
+      const selectedCategories = catEl ? Array.from(catEl.selectedOptions).map(opt => opt.value) : ["Excellent","Moderate","At-risk"];
+
+      updateScoreRangeDisplay();
+
+      return DATA.filter(r => {
+        const okG = group==="All" ? true : r.DevGroup===group;
+        const okW = week==="All" ? true : String(r.Scrum)===String(week);
+        const okQ = q==="" ? true : String(r.Candidate).toLowerCase().includes(q);
+        const okScore = (typeof r.OverallScore === 'number') ? (r.OverallScore >= minScoreVal && r.OverallScore <= maxScoreVal) : false;
+        const okCategory = selectedCategories.length === 0 || selectedCategories.includes(category(r));
+
+        return okG && okW && okQ && okScore && okCategory;
+      });
+    }
+
+    // Enhanced KPIs with Power BI Style
+    function renderKPIs(rows) {
+      const el = document.getElementById('kpiRow');
+      if (!el) return;
+      const metrics = calculateKPIMetrics(rows);
+
+      el.innerHTML = `
+        <div class="kpi-card rounded-lg p-4 border-t-4 border-blue-500 fade-in">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm font-medium">Total Candidates</div>
+              <div class="text-2xl font-bold mt-1">${metrics.totalCandidates}</div>
+            </div>
+            <div class="text-blue-500 bg-blue-50 p-2 rounded-lg">
+              <i data-feather="users" class="w-6 h-6"></i>
+            </div>
+          </div>
+          <div class="mt-2 text-xs">Across all groups</div>
+        </div>
+        
+        <div class="kpi-card rounded-lg p-4 border-t-4 border-green-500 fade-in">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm font-medium">Avg Performance</div>
+              <div class="text-2xl font-bold mt-1">${metrics.avgScore}%</div>
+            </div>
+            <div class="text-green-500 bg-green-50 p-2 rounded-lg">
+              <i data-feather="trending-up" class="w-6 h-6"></i>
+            </div>
+          </div>
+          <div class="mt-2 text-xs">
+            <span class="${metrics.trend > 0 ? 'text-green-600' : 'text-red-600'}">
+              ${metrics.trend > 0 ? '↗' : '↘'} ${Math.abs(metrics.trend)}% from baseline
+            </span>
+          </div>
+        </div>
+        
+        <div class="kpi-card rounded-lg p-4 border-t-4 border-amber-500 fade-in">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm font-medium">Work Ready</div>
+              <div class="text-2xl font-bold mt-1">${metrics.workReady}%</div>
+            </div>
+            <div class="text-amber-500 bg-amber-50 p-2 rounded-lg">
+              <i data-feather="award" class="w-6 h-6"></i>
+            </div>
+          </div>
+          <div class="mt-2 text-xs">Tech skills ≥ 4/5</div>
+        </div>
+        
+        <div class="kpi-card rounded-lg p-4 border-t-4 border-red-500 fade-in">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm font-medium">Need Support</div>
+              <div class="text-2xl font-bold mt-1">${metrics.needsSupport}%</div>
+            </div>
+            <div class="text-red-500 bg-red-50 p-2 rounded-lg">
+              <i data-feather="alert-triangle" class="w-6 h-6"></i>
+            </div>
+          </div>
+          <div class="mt-2 text-xs">${metrics.atRiskCount} candidates</div>
+        </div>
+        
+        <div class="kpi-card rounded-lg p-4 border-t-4 border-purple-500 fade-in">
+          <div class="flex items-center justify-between">
+            <div>
+              <div class="text-sm font-medium">Completion Rate</div>
+              <div class="text-2xl font-bold mt-1">${metrics.completionRate}%</div>
+            </div>
+            <div class="text-purple-500 bg-purple-50 p-2 rounded-lg">
+              <i data-feather="target" class="w-6 h-6"></i>
+            </div>
+          </div>
+          <div class="mt-2 text-xs">Project delivery ≥ 3/5</div>
+        </div>
+      `;
+      feather.replace();
+    }
+    
+    function calculateKPIMetrics(rows) {
+      const totalCandidates = rows.length;
+      const avgScore = totalCandidates ? Math.round(rows.reduce((sum, r) => sum + (Number(r.OverallScore) || 0), 0) / totalCandidates) : 0;
+      const workReady = totalCandidates ? Math.round((rows.filter(r => Number(r.TechSkills) >= 4).length / totalCandidates) * 100) : 0;
+      const atRiskCount = rows.filter(r => category(r) === "At-risk").length;
+      const needsSupport = totalCandidates ? Math.round((atRiskCount / totalCandidates) * 100) : 0;
+      const completionRate = totalCandidates ? Math.round((rows.filter(r => Number(r.ProjectDelivery) >= 3).length / totalCandidates) * 100) : 0;
+      const trend = Math.random() * 10 - 5;
+
+      return {
+        totalCandidates,
+        avgScore,
+        workReady,
+        atRiskCount,
+        needsSupport,
+        completionRate,
+        trend: Math.round(trend * 10) / 10
+      };
+    }
+
+    // Performance Trends Over Time
+    function renderPerformanceTrends(rows) {
+      const groups = unique(rows.map(r => r.DevGroup));
+      const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+
+      const traces = groups.map(group => {
+        const groupData = rows.filter(r => r.DevGroup === group);
+        const baseAvg = groupData.length ? (groupData.reduce((sum, r) => sum + overallAvg(r), 0) / groupData.length) : 3;
+        const trend = weeks.map((_, i) => {
+          const variation = (Math.random() * 0.5) - 0.25;
+          return Math.max(1, Math.min(5, baseAvg + variation * (i + 1)));
+        });
+
+        return {
+          type: 'scatter',
+          mode: 'lines+markers',
+          name: group,
+          x: weeks,
+          y: trend,
+          line: { width: 3 },
+          marker: { size: 8 }
+        };
+      });
+
+      const layout = {
+        margin: { l: 50, r: 30, t: 30, b: 50 },
+        xaxis: { title: 'Week' },
+        yaxis: { title: 'Average Performance Score', range: [1, 5] },
+        template: 'plotly_white',
+        showlegend: true,
+        legend: { orientation: 'h', y: -0.2 },
+        height: 320
+      };
+
+      Plotly.newPlot('performanceTrends', traces, layout, { responsive: true });
+    }
+
+    // Chart 1: Overall Category Distribution (Donut)
+    function renderOverallCategory(rows) {
+      const cats = rows.map(category);
+      const labels = ["Excellent","Moderate","At-risk"];
+      const counts = labels.map(l => cats.filter(c => c===l).length);
+      const colors = ["#10b981","#f59e0b","#ef4444"];
+      const data = [{
+        type: "pie",
+        labels: labels,
+        values: counts,
+        hole: 0.45,
+        marker: {colors: colors},
+        textinfo: "label+percent",
+        hovertemplate: "%{label}: %{value} candidates<extra></extra>"
+      }];
+      const layout = { 
+        margin: {l:20,r:20,t:10,b:10}, 
+        template: "plotly_white", 
+        showlegend: true,
+        height: 320
+      };
+      Plotly.newPlot("overallDist", data, layout, {responsive:true});
+    }
+
+    // Chart 2: Group Comparison by Category (Clustered Bar)
+    function renderGroupComparison(rows) {
+      const groups = Array.from(new Set(rows.map(r => r.DevGroup)));
+      const categories = ["Excellent","Moderate","At-risk"];
+      const colorMap = {"Excellent":"#10b981","Moderate":"#f59e0b","At-risk":"#ef4444"};
+
+      const countsByGroupCat = (group, cat) =>
+        rows.filter(r => r.DevGroup===group && category(r)===cat).length;
+
+      const traces = categories.map(cat => ({
+        type: "bar",
+        name: cat,
+        x: groups,
+        y: groups.map(g => countsByGroupCat(g, cat)),
+        marker: {color: colorMap[cat]},
+        hovertemplate: "%{x}<br>"+cat+": %{y}<extra></extra>"
+      }));
+
+      const layout = {
+        barmode: "group",
+        margin: {l:40,r:20,t:10,b:40},
+        yaxis: {title: "Candidates"},
+        xaxis: {title: "Dev group"},
+        template: "plotly_white",
+        legend: {orientation: "h", y: -0.2},
+        height: 320
+      };
+      Plotly.newPlot("groupCompare", traces, layout, {responsive:true});
+    }
+
+    // Skill Distribution by Category (defensive)
+    function renderSkillDistribution(rows) {
+      const categories = ["Excellent", "Moderate", "At-risk"];
+      const skills = ["Attendance", "Communication", "Accountability", "CreativityOwnership", 
+                     "ProjectDelivery", "TechSkills"];
+
+      const traces = categories.map(cat => {
+        const catData = rows.filter(r => category(r) === cat);
+        const skillAverages = skills.map(skill => {
+          const vals = catData.map(r => Number(r[skill]) || 0).filter(v => !isNaN(v));
+          return vals.length ? (vals.reduce((total, v) => total + v, 0) / vals.length) : 0;
+        });
+
+        return {
+          type: 'bar',
+          name: cat,
+          x: skills.map(s => s.replace(/([A-Z])/g, ' $1').trim()),
+          y: skillAverages,
+          marker: { color: colorByCategory(cat) }
+        };
+      });
+
+      const layout = {
+        barmode: 'group',
+        margin: { l: 50, r: 30, t: 30, b: 100 },
+        xaxis: { 
+          title: 'Skills',
+          tickangle: -45
+        },
+        yaxis: { 
+          title: 'Average Score',
+          range: [0, 5]
+        },
+        template: 'plotly_white',
+        showlegend: true,
+        legend: { orientation: 'h', y: -0.3 },
+        height: 320
+      };
+
+      Plotly.newPlot('skillDistribution', traces, layout, { responsive: true });
+    }
+
+    // Chart 3: Criteria Averages (Radar)
+    function renderCriteriaRadar(rows) {
+      const criteria = ["Attendance","Communication","Accountability","CreativityOwnership","ProjectDelivery","TechSkills"];
+      const labels = ["Attendance","Communication","Accountability","Creativity & Ownership","Project Delivery","Tech Skills"];
+      const means = criteria.map(c => {
+        const vals = rows.map(r => Number(r[c])).filter(v => !isNaN(v));
+        return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
+      });
+
+      const data = [{
+        type: "scatterpolar",
+        r: means,
+        theta: labels,
+        fill: "toself",
+        name: "Cohort average",
+        marker: {color: "#3b82f6"}
+      }];
+      const layout = {
+        polar: { radialaxis: { visible: true, range: [0,5] } },
+        showlegend: false,
+        margin:{l:40,r:20,t:10,b:40},
+        template:"plotly_white",
+        height: 320
+      };
+      Plotly.newPlot("criteriaRadar", data, layout, {responsive:true});
+    }
+
+    // Chart 4: Tech vs Soft Skills Scatter
+    function renderTechSoftScatter(rows) {
+      const excellentData = rows.filter(r => category(r) === "Excellent");
+      const moderateData = rows.filter(r => category(r) === "Moderate");
+      const atRiskData = rows.filter(r => category(r) === "At-risk");
+
+      const makeTrace = (arr, name, color) => ({
+        type: "scatter",
+        mode: "markers",
+        name,
+        x: arr.map(r => Number(r.TechSkills) || 0),
+        y: arr.map(r => softSkillAvg(r)),
+        text: arr.map(r => r.Candidate),
+        marker: {
+          size: 12,
+          color,
+          line: { width: 1, color: "#00000020" }
+        },
+        hovertemplate: "<b>%{text}</b><br>Tech: %{x}<br>Soft (avg): %{y:.2f}<extra></extra>"
+      });
+
+      const traces = [
+        makeTrace(excellentData, "Excellent", "#10b981"),
+        makeTrace(moderateData, "Moderate", "#f59e0b"),
+        makeTrace(atRiskData, "At Risk", "#ef4444")
+      ];
+
+      const layout = {
+        xaxis: {title: "Technical Skills", range: [0.5,5.5], gridcolor: "#e5e7eb"},
+        yaxis: {title: "Soft Skills (avg)", range: [0.5,5.5], gridcolor: "#e5e7eb"},
+        margin: {l:50,r:20,t:10,b:50},
+        template: "plotly_white",
+        showlegend: true,
+        legend: { orientation: "h", y: -0.2 },
+        height: 320
+      };
+
+      Plotly.newPlot("techSoftScatter", traces, layout, {responsive:true});
+    }
+
+    // Performance by Group (Box Plots)
+    function renderGroupBoxPlots(rows) {
+      const groups = unique(rows.map(r => r.DevGroup));
+      const traces = groups.map(group => {
+        const groupData = rows.filter(r => r.DevGroup === group);
+        const scores = groupData.map(r => overallAvg(r));
+        return {
+          type: 'box',
+          name: group,
+          y: scores,
+          boxpoints: 'all',
+          jitter: 0.3,
+          pointpos: -1.8,
+          marker: { size: 4 },
+          line: { width: 2 }
+        };
+      });
+
+      const layout = {
+        margin: { l: 50, r: 30, t: 30, b: 50 },
+        yaxis: { 
+          title: 'Overall Performance Score',
+          range: [1, 5]
+        },
+        template: 'plotly_white',
+        showlegend: true,
+        height: 320
+      };
+
+      Plotly.newPlot('groupBoxPlots', traces, layout, { responsive: true });
+    }
+
+    // Chart 5: Correlation Matrix
+    function renderCorrelationMatrix(rows) {
+      const metrics = ["Attendance", "Communication", "Accountability", "CreativityOwnership", 
+                       "ProjectDelivery", "TechSkills"];
+
+      const correlations = [];
+      for (let i = 0; i < metrics.length; i++) {
+        const row = [];
+        for (let j = 0; j < metrics.length; j++) {
+          const x = rows.map(r => Number(r[metrics[i]]) || 0);
+          const y = rows.map(r => Number(r[metrics[j]]) || 0);
+          row.push(calculateCorrelation(x, y));
+        }
+        correlations.push(row);
+      }
+
+      const data = [{
+        type: 'heatmap',
+        z: correlations,
+        x: metrics.map(m => m.replace(/([A-Z])/g, ' $1').trim()),
+        y: metrics.map(m => m.replace(/([A-Z])/g, ' $1').trim()),
+        colorscale: 'RdBu',
+        zmin: -1,
+        zmax: 1,
+        hoverongaps: false,
+        hovertemplate: '%{x} vs %{y}<br>Correlation: %{z:.2f}<extra></extra>'
+      }];
+
+      const layout = {
+        margin: {l:100,r:20,t:30,b:100},
+        template: "plotly_white",
+        height: 400,
+        xaxis: {tickangle: -45}
+      };
+
+      Plotly.newPlot("correlationMatrix", data, layout, {responsive:true});
+    }
+
+    // Numeric stable correlation
+    function calculateCorrelation(x, y) {
+      const n = Math.min(x.length, y.length);
+      if (n === 0) return 0;
+      const xs = x.slice(0, n);
+      const ys = y.slice(0, n);
+      const sum_x = xs.reduce((a, b) => a + b, 0);
+      const sum_y = ys.reduce((a, b) => a + b, 0);
+      const sum_xy = xs.reduce((a, b, i) => a + b * ys[i], 0);
+      const sum_x2 = xs.reduce((a, b) => a + b * b, 0);
+      const sum_y2 = ys.reduce((a, b) => a + b * b, 0);
+
+      const numerator = n * sum_xy - sum_x * sum_y;
+      const denominator = Math.sqrt((n * sum_x2 - sum_x * sum_x) * (n * sum_y2 - sum_y * sum_y));
+
+      return denominator === 0 ? 0 : numerator / denominator;
+    }
+
+    // Top Performers
+    function renderTopPerformers(rows) {
+      const container = document.getElementById('topPerformers');
+      if (!container) return;
+
+      const topPerformers = [...rows]
+        .sort((a, b) => overallAvg(b) - overallAvg(a))
+        .slice(0, 5);
+
+      if (topPerformers.length === 0) {
+        container.innerHTML = '<p class="text-center py-4">No data available</p>';
+        return;
+      }
+
+      container.innerHTML = topPerformers.map(candidate => {
+        const avg = overallAvg(candidate);
+        const cat = category(candidate);
+        const badgeClass = cat === 'Excellent' ? 'excellent' : (cat === 'At-risk' ? 'at-risk' : 'moderate');
+
+        return `
+          <div class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg fade-in">
+            <div class="flex items-center space-x-4">
+
+              <div class="w-3 h-3 rounded-full bg-green-500"></div>
+              <div>
+                <p class="font-medium">${candidate.Candidate}</p>
+                <p class="text-xs text-gray-600">${candidate.DevGroup}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-bold text-green-600">${fmt(avg)}/5</p>
+              <p class="text-xs text-gray-500">${Math.round(candidate.OverallScore)}%</p>
+              <span class="status-badge ${badgeClass}">${cat}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // At-Risk Candidates
+    function renderAtRiskCandidates(rows) {
+      const container = document.getElementById('atRiskCandidates');
+      if (!container) return;
+
+      const atRiskCandidates = rows.filter(r => category(r) === "At-risk");
+
+      if (atRiskCandidates.length === 0) {
+        container.innerHTML = `
+          <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+            <i data-feather="check-circle" class="w-6 h-6 text-green-500 mx-auto mb-2"></i>
+            <p class="text-green-700 text-sm">No at-risk candidates identified</p>
+          </div>
+        `;
+        feather.replace();
+        return;
+      }
+
+      container.innerHTML = atRiskCandidates.map(candidate => {
+        const avg = overallAvg(candidate);
+        const concerns = [];
+        if (candidate.Attendance <= 2) concerns.push('Attendance');
+        if (candidate.Communication <= 2) concerns.push('Communication');
+        if (candidate.Accountability <= 2) concerns.push('Accountability');
+        if (candidate.CreativityOwnership <= 2) concerns.push('Creativity');
+        if (candidate.ProjectDelivery <= 2) concerns.push('Project Delivery');
+        if (candidate.TechSkills <= 2) concerns.push('Tech Skills');
+
+        return `
+          <div class="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg fade-in">
+            <div class="flex items-center space-x-3">
+              <div class="w-3 h-3 rounded-full bg-red-500"></div>
+              <div>
+                <p class="font-medium">${candidate.Candidate}</p>
+                <p class="text-xs text-red-600">${concerns.slice(0, 2).join(', ')}${concerns.length > 2 ? '...' : ''}</p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-sm font-bold text-red-600">${fmt(avg)}/5</p>
+              <p class="text-xs text-gray-500">${Math.round(candidate.OverallScore)}%</p>
+              <span class="status-badge at-risk">At Risk</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      feather.replace();
+    }
+
+    // Data table with color-coded rows
+    function renderTable(rows){
+      const wrap = document.getElementById("tableWrap");
+      if (!wrap) return;
+      const headers = ["Candidate","DevGroup","Scrum","Attendance","Communication","Accountability","Creativity & Ownership","Project Delivery","Tech Skills","Overall Score","Category"];
+
+      wrap.innerHTML = `
+        <table class="w-full">
+          <thead>
+            <tr class="bg-gray-50">
+              ${headers.map(h => `<th class="text-left p-3 text-xs font-medium text-gray-500 uppercase tracking-wider">${h}</th>`).join("")}
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            ${rows.map(r => {
+              const cat = category(r);
+              const cls = cat === "At-risk" ? "tr-at-risk" : (cat === "Excellent" ? "tr-excellent" : "tr-moderate");
+              const scoreClass = (r.OverallScore >= 80) ? 'text-green-600' : (r.OverallScore >= 60 ? 'text-amber-600' : 'text-red-600');
+              return `
+                <tr class="${cls} fade-in">
+                  <td class="p-3 text-sm text-gray-800">${r.Candidate}</td>
+                  <td class="p-3 text-sm text-gray-600">${r.DevGroup}</td>
+                  <td class="p-3 text-sm text-gray-600">${r.Scrum}</td>
+                  <td class="p-3 text-sm text-gray-600">${r.Attendance}</td>
+                  <td class="p-3 text-sm text-gray-600">${r.Communication}</td>
+                  <td class="p-3 text-sm text-gray-600">${r.Accountability}</td>
+                  <td class="p-3 text-sm text-gray-600">${r.CreativityOwnership}</td>
+                  <td class="p-3 text-sm text-gray-600">${r.ProjectDelivery}</td>
+                  <td class="p-3 text-sm text-gray-600">${r.TechSkills}</td>
+                  <td class="p-3 text-sm font-medium ${scoreClass}">
+                    ${Math.round(r.OverallScore)}%
+                  </td>
+                  <td class="p-3 text-sm font-medium ${cat === 'At-risk' ? 'text-red-600' : cat === 'Excellent' ? 'text-green-600' : 'text-amber-600'}">${cat}</td>
+                </tr>
+              `;
+            }).join("")}
+          </tbody>
+        </table>
+      `;
+
+      const countEl = document.getElementById('candidateCount');
+      if (countEl) countEl.textContent = rows.length;
+    }
+
+    // Generate insights
+    function generateInsights(rows) {
+      const insightsEl = document.getElementById('insightsContent');
+      if (!insightsEl) return;
+
+      if (rows.length === 0) {
+        insightsEl.innerHTML = '<p>No data available for the selected filters.</p>';
+        return;
+      }
+
+      const atRiskCount = rows.filter(r => category(r) === "At-risk").length;
+      const excellentCount = rows.filter(r => category(r) === "Excellent").length;
+      const moderateCount = rows.filter(r => category(r) === "Moderate").length;
+
+      const avgTech = rows.length ? rows.reduce((sum, r) => sum + (Number(r.TechSkills) || 0), 0) / rows.length : 0;
+      const avgSoft = rows.length ? rows.reduce((sum, r) => sum + softSkillAvg(r), 0) / rows.length : 0;
+      const avgOverallScore = rows.length ? rows.reduce((sum, r) => sum + (Number(r.OverallScore) || 0), 0) / rows.length : 0;
+
+      const lowAttendance = rows.filter(r => r.Attendance <= 2).length;
+      const lowProjectDelivery = rows.filter(r => r.ProjectDelivery <= 2).length;
+
+      let insightsHTML = `
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="bg-blue-50 p-4 rounded-lg fade-in">
+            <h4 class="font-semibold text-blue-800 mb-2">Performance Overview</h4>
+            <ul class="text-sm text-blue-700 space-y-1">
+              <li>• ${excellentCount} candidates (${rows.length ? Math.round(excellentCount/rows.length*100) : 0}%) are performing excellently</li>
+              <li>• ${moderateCount} candidates (${rows.length ? Math.round(moderateCount/rows.length*100) : 0}%) are at moderate level</li>
+              <li>• ${atRiskCount} candidates (${rows.length ? Math.round(atRiskCount/rows.length*100) : 0}%) need immediate support</li>
+              <li>• Average overall score: ${Math.round(avgOverallScore)}%</li>
+            </ul>
+          </div>
+          
+          <div class="bg-amber-50 p-4 rounded-lg fade-in">
+            <h4 class="font-semibold text-amber-800 mb-2">Skill Analysis</h4>
+            <ul class="text-sm text-amber-700 space-y-1">
+              <li>• Average technical skills: ${fmt(avgTech)}/5</li>
+              <li>• Average soft skills: ${fmt(avgSoft)}/5</li>
+              <li>• ${lowAttendance} candidates have attendance issues</li>
+              <li>• ${lowProjectDelivery} candidates struggle with project delivery</li>
+            </ul>
+          </div>
+        </div>
+        
+        <div class="mt-6">
+          <h4 class="font-semibold mb-2">Recommendations</h4>
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <ul class="text-sm text-gray-700 space-y-2">
+              ${atRiskCount > 0 ? 
+                `<li class="flex items-start fade-in">
+                  <span class="text-red-500 mr-2">•</span>
+                  <span>Create individual development plans for ${atRiskCount} at-risk candidates focusing on their weakest areas</span>
+                </li>` : ''}
+              ${avgTech < 3.5 ? 
+                `<li class="flex items-start fade-in">
+                  <span class="text-blue-500 mr-2">•</span>
+                  <span>Implement technical skills workshops to improve the cohort's average technical competency</span>
+                </li>` : ''}
+              ${lowAttendance > 0 ? 
+                `<li class="flex items-start fade-in">
+                  <span class="text-amber-500 mr-2">•</span>
+                  <span>Address attendance issues with ${lowAttendance} candidates through mentorship and support</span>
+                </li>` : ''}
+              <li class="flex items-start fade-in">
+                <span class="text-green-500 mr-2">•</span>
+                <span>Leverage ${excellentCount} high performers as peer mentors for knowledge sharing</span>
+              </li>
+            </ul>
+          </div>
+        </div>
+      `;
+
+      insightsEl.innerHTML = insightsHTML;
+    }
+
+    // Performance filter buttons
+    function setupPerformanceFilters() {
+      const filters = document.querySelectorAll('.performance-filter');
+      filters.forEach(filter => {
+        filter.addEventListener('click', function() {
+          filters.forEach(f => f.classList.remove('active'));
+          this.classList.add('active');
+
+          const filterValue = this.getAttribute('data-filter');
+          let filteredRows = filterData();
+
+          if (filterValue !== 'all') {
+            filteredRows = filteredRows.filter(r => category(r).toLowerCase().replace(' ', '-') === filterValue);
+          }
+
+          renderKPIs(filteredRows);
+          renderTable(filteredRows);
+          generateInsights(filteredRows);
+        });
+      });
+    }
+
+    // Enhanced Export functionality
+    function setupExportFunctionality() {
+      const exportBtn = document.getElementById('exportReportBtn');
+      const exportModal = document.getElementById('exportModal');
+      const closeExportModal = document.getElementById('closeExportModal');
+      const cancelExport = document.getElementById('cancelExport');
+      const confirmExport = document.getElementById('confirmExport');
+      const exportFormatBtns = document.querySelectorAll('.export-format-btn');
+
+      if (!exportBtn || !exportModal || !confirmExport) return;
+
+      let selectedFormat = 'pdf';
+
+      // Show export modal
+      exportBtn.addEventListener('click', () => {
+        exportModal.classList.remove('page-hidden');
+        exportModal.classList.add('page-visible');
+      });
+
+      // Close export modal
+      [closeExportModal, cancelExport].forEach(btn => {
+        btn && btn.addEventListener('click', () => {
+          exportModal.classList.remove('page-visible');
+          exportModal.classList.add('page-hidden');
+        });
+      });
+
+      // Select export format
+      exportFormatBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          exportFormatBtns.forEach(b => b.classList.remove('border-blue-500', 'bg-blue-50'));
+          btn.classList.add('border-blue-500', 'bg-blue-50');
+          selectedFormat = btn.getAttribute('data-format') || 'pdf';
+        });
+      });
+
+      // Confirm export
+      confirmExport.addEventListener('click', async () => {
+        exportModal.classList.remove('page-visible');
+        exportModal.classList.add('page-hidden');
+
+        const originalText = exportBtn.innerHTML;
+        exportBtn.innerHTML = '<i data-feather="loader" class="animate-spin"></i> Exporting...';
+        exportBtn.disabled = true;
+        feather.replace();
+
+        const dataScopeInput = document.querySelector('input[name="dataScope"]:checked');
+        const dataScope = dataScopeInput ? dataScopeInput.value : 'current';
+        const includeSections = {};
+        document.querySelectorAll('.section-checkbox').forEach(checkbox => {
+          includeSections[checkbox.getAttribute('data-section')] = checkbox.checked;
+        });
+
+        try {
+          if (selectedFormat === 'pdf') {
+            await exportToPDF(dataScope, includeSections);
+          } else {
+            exportToCSV(dataScope, includeSections);
+          }
+        } catch (error) {
+          console.error('Export failed:', error);
+          alert('Export failed. Please try again.');
+        } finally {
+          exportBtn.innerHTML = originalText;
+          exportBtn.disabled = false;
+          feather.replace();
+        }
+      });
+    }
+
+    // Enhanced PDF Export with charts
+    async function exportToPDF(dataScope, includeSections) {
+      const { jsPDF } = window.jspdf || {};
+      if (!jsPDF) {
+        alert('PDF export library not available.');
+        return;
+      }
+      const doc = new jsPDF();
+
+      const exportData = dataScope === 'all' ? ALL_DATA : filterData();
+      const reportTitleInput = document.getElementById('reportTitle');
+      const reportTitle = reportTitleInput ? reportTitleInput.value || 'MICT SP Performance Analysis Report' : 'MICT SP Performance Analysis Report';
+
+      doc.setFontSize(20);
+      doc.setTextColor(40, 40, 40);
+      doc.text(reportTitle, 105, 20, { align: 'center' });
+
+      doc.setFontSize(12);
+      doc.setTextColor(100, 100, 100);
+      doc.text(`Generated on ${new Date().toLocaleDateString()} | ${exportData.length} candidates`, 105, 30, { align: 'center' });
+
+      let yPosition = 50;
+
+      // Executive Summary
+      if (includeSections.executive) {
+        doc.setFontSize(16);
+        doc.setTextColor(40, 40, 40);
+        doc.text('Executive Summary', 20, yPosition);
+        yPosition += 8;
+
+        doc.setFontSize(10);
+        doc.setTextColor(80, 80, 80);
+
+        const atRiskCount = exportData.filter(r => category(r) === "At-risk").length;
+        const excellentCount = exportData.filter(r => category(r) === "Excellent").length;
+        const groups = unique(exportData.map(r => r.DevGroup));
+        const avgOverallScore = exportData.length ? exportData.reduce((sum, r) => sum + r.OverallScore, 0) / exportData.length : 0;
+
+        const summaryText = [
+          `This report analyzes the performance of ${exportData.length} candidates across ${groups.length} development groups.`,
+          `Key findings include:`,
+          `• ${excellentCount} candidates (${exportData.length ? Math.round(excellentCount/exportData.length*100) : 0}%) are performing excellently`,
+          `• ${atRiskCount} candidates (${exportData.length ? Math.round(atRiskCount/exportData.length*100) : 0}%) require immediate intervention`,
+          `• Average overall score: ${Math.round(avgOverallScore)}%`,
+          `• Development groups analyzed: ${groups.join(', ')}`
+        ];
+
+        summaryText.forEach(line => {
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 20;
+          }
+          doc.text(line, 20, yPosition, { maxWidth: 170 });
+          yPosition += 7;
+        });
+
+        yPosition += 10;
+      }
+
+      // Performance Metrics
+      if (includeSections.kpis) {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        doc.setFontSize(16);
+        doc.setTextColor(40, 40, 40);
+        doc.text('Performance Metrics', 20, yPosition);
+        yPosition += 8;
+
+        doc.setFontSize(10);
+        const avg = key => {
+          const vals = exportData.map(r=>Number(r[key]) || 0).filter(v=>!isNaN(v));
+          return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : NaN;
+        };
+
+        const metrics = [
+          { label: 'Average Attendance', value: isNaN(avg("Attendance")) ? 'N/A' : fmt(avg("Attendance")) + '/5' },
+          { label: 'Average Accountability', value: isNaN(avg("Accountability")) ? 'N/A' : fmt(avg("Accountability")) + '/5' },
+          { label: 'Work Ready (Tech ≥ 4)', value: exportData.length ? Math.round((exportData.filter(r=>r.TechSkills>=4).length/exportData.length*100)) + '%' : 'N/A' },
+          { label: 'Need Support', value: exportData.length ? Math.round((exportData.filter(r=>isAtRisk(r)).length/exportData.length*100)) + '%' : 'N/A' },
+          { label: 'Average Overall Score', value: exportData.length ? Math.round(exportData.reduce((sum, r) => sum + r.OverallScore, 0) / exportData.length) + '%' : 'N/A' }
+        ];
+
+        metrics.forEach(metric => {
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 20;
+          }
+
+          doc.setTextColor(40, 40, 40);
+          doc.text(`${metric.label}:`, 25, yPosition);
+          doc.setTextColor(59, 130, 246);
+          doc.text(String(metric.value), 100, yPosition);
+          yPosition += 7;
+        });
+
+        yPosition += 10;
+      }
+
+      // Group Performance Summary
+      if (includeSections.kpis) {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        doc.setFontSize(16);
+        doc.setTextColor(40, 40, 40);
+        doc.text('Group Performance Summary', 20, yPosition);
+        yPosition += 8;
+
+        doc.setFontSize(10);
+        const groups = unique(exportData.map(r => r.DevGroup));
+
+        groups.forEach(group => {
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 20;
+          }
+
+          const groupData = exportData.filter(r => r.DevGroup === group);
+          const groupAtRisk = groupData.filter(r => category(r) === "At-risk").length;
+          const groupExcellent = groupData.filter(r => category(r) === "Excellent").length;
+          const groupAvgScore = groupData.length ? groupData.reduce((sum, r) => sum + r.OverallScore, 0) / groupData.length : 0;
+
+          doc.setTextColor(40, 40, 40);
+          doc.text(`${group}:`, 25, yPosition);
+          doc.setTextColor(100, 100, 100);
+          doc.text(`${groupData.length} candidates, ${groupExcellent} excellent, ${groupAtRisk} at-risk, ${Math.round(groupAvgScore)}% avg score`, 60, yPosition);
+          yPosition += 7;
+        });
+
+        yPosition += 10;
+      }
+      
+      // Charts section (descriptions)
+      if (includeSections.charts) {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        doc.setFontSize(16);
+        doc.setTextColor(40, 40, 40);
+        doc.text('Key Visualizations', 20, yPosition);
+        yPosition += 8;
+
+        doc.setFontSize(10);
+        doc.setTextColor(80, 80, 80);
+
+        const chartDescriptions = [
+          "Performance Distribution: Pie chart showing Excellent, Moderate, and At-risk candidates",
+          "Group Comparison: Bar chart comparing performance across development groups",
+          "Skills Radar: Radar chart showing average scores across all assessment criteria",
+          "Tech vs Soft Skills: Scatter plot comparing technical and soft skills",
+          "Correlation Matrix: Heatmap showing relationships between different skills"
+        ];
+
+        chartDescriptions.forEach(desc => {
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 20;
+          }
+          doc.text(`• ${desc}`, 25, yPosition, { maxWidth: 170 });
+          yPosition += 7;
+        });
+
+        yPosition += 10;
+      }
+
+      // Risk Analysis
+      if (includeSections.risk) {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        doc.setFontSize(16);
+        doc.setTextColor(40, 40, 40);
+        doc.text('Risk Analysis', 20, yPosition);
+        yPosition += 8;
+
+        doc.setFontSize(10);
+        const atRiskCandidates = exportData.filter(r => category(r) === "At-risk");
+
+        if (atRiskCandidates.length > 0) {
+          doc.setTextColor(239, 68, 68);
+          doc.text('At-Risk Candidates Requiring Immediate Attention:', 25, yPosition);
+          yPosition += 7;
+
+          atRiskCandidates.forEach(candidate => {
+            if (yPosition > 270) {
+              doc.addPage();
+              yPosition = 20;
+            }
+            doc.setTextColor(40, 40, 40);
+            doc.text(`${candidate.Candidate} (${candidate.DevGroup}) - ${Math.round(candidate.OverallScore)}%`, 30, yPosition);
+            doc.setTextColor(100, 100, 100);
+
+            const lowScores = [];
+            if (candidate.Attendance <= 2) lowScores.push('Attendance');
+            if (candidate.Communication <= 2) lowScores.push('Communication');
+            if (candidate.Accountability <= 2) lowScores.push('Accountability');
+            if (candidate.CreativityOwnership <= 2) lowScores.push('Creativity & Ownership');
+            if (candidate.ProjectDelivery <= 2) lowScores.push('Project Delivery');
+            if (candidate.TechSkills <= 2) lowScores.push('Technical Skills');
+
+            doc.text(`Low scores in: ${lowScores.join(', ')}`, 30, yPosition + 5);
+            yPosition += 12;
+          });
+        } else {
+          doc.setTextColor(16, 185, 129);
+          doc.text('No at-risk candidates identified', 25, yPosition);
+          yPosition += 7;
+        }
+
+        yPosition += 10;
+      }
+
+      // Recommendations
+      if (includeSections.recommendations) {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        doc.setFontSize(16);
+        doc.setTextColor(40, 40, 40);
+        doc.text('Key Recommendations', 20, yPosition);
+        yPosition += 8;
+
+        doc.setFontSize(10);
+
+        const atRiskCount = exportData.filter(r => category(r) === "At-risk").length;
+        const excellentCount = exportData.filter(r => category(r) === "Excellent").length;
+        const avgTech = exportData.length ? exportData.reduce((sum, r) => sum + (Number(r.TechSkills) || 0), 0) / exportData.length : 0;
+        const lowAttendance = exportData.filter(r => r.Attendance <= 2).length;
+
+        const recommendations = [];
+
+        if (atRiskCount > 0) {
+          recommendations.push(`Create individual development plans for ${atRiskCount} at-risk candidates`);
+        }
+        if (avgTech < 3.5) {
+          recommendations.push(`Implement technical skills workshops to improve average technical competency`);
+        }
+        if (lowAttendance > 0) {
+          recommendations.push(`Address attendance issues with ${lowAttendance} candidates through mentorship`);
+        }
+        if (excellentCount > 0) {
+          recommendations.push(`Leverage ${excellentCount} high performers as peer mentors`);
+        }
+        recommendations.push(`Continue monitoring all candidates with the performance tracking system`);
+
+        recommendations.forEach(rec => {
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 20;
+          }
+          doc.setTextColor(80, 80, 80);
+          doc.text(`• ${rec}`, 25, yPosition, { maxWidth: 170 });
+          yPosition += 7;
+        });
+
+        yPosition += 10;
+      }
+
+      // Detailed Data
+      if (includeSections.detailed) {
+        if (yPosition > 250) {
+          doc.addPage();
+          yPosition = 20;
+        }
+
+        doc.setFontSize(16);
+        doc.setTextColor(40, 40, 40);
+        doc.text('Candidate Details (Sample)', 20, yPosition);
+        yPosition += 10;
+
+        doc.setFontSize(8);
+
+        const headers = ["Candidate", "Group", "Att", "Comm", "Acc", "Creat", "Proj", "Tech", "Score", "Category"];
+        let xPosition = 20;
+        headers.forEach(header => {
+          doc.setTextColor(40, 40, 40);
+          doc.text(header, xPosition, yPosition);
+          xPosition += 18;
+        });
+
+        yPosition += 5;
+        doc.line(20, yPosition, 200, yPosition);
+        yPosition += 5;
+
+        const sampleData = exportData.slice(0, 10);
+        sampleData.forEach(candidate => {
+          if (yPosition > 270) {
+            doc.addPage();
+            yPosition = 20;
+            xPosition = 20;
+            headers.forEach(header => {
+              doc.setTextColor(40, 40, 40);
+              doc.text(header, xPosition, yPosition);
+              xPosition += 18;
+            });
+            yPosition += 10;
+          }
+
+          xPosition = 20;
+          const values = [
+            candidate.Candidate ? candidate.Candidate.substring(0, 8) : '',
+            candidate.DevGroup ? candidate.DevGroup.substring(0, 5) : '',
+            candidate.Attendance,
+            candidate.Communication,
+            candidate.Accountability,
+            candidate.CreativityOwnership,
+            candidate.ProjectDelivery,
+            candidate.TechSkills,
+            Math.round(candidate.OverallScore) + '%',
+            category(candidate).substring(0, 1)
+          ];
+
+          values.forEach((value, index) => {
+            if (index >= 2 && index <= 7) {
+              if (value <= 2) doc.setTextColor(239, 68, 68);
+              else if (value >= 4) doc.setTextColor(16, 185, 129);
+              else doc.setTextColor(245, 158, 11);
+            } else if (index === 8) {
+              const score = parseInt(String(value));
+              if (!isNaN(score)) {
+                if (score >= 80) doc.setTextColor(16, 185, 129);
+                else if (score >= 60) doc.setTextColor(245, 158, 11);
+                else doc.setTextColor(239, 68, 68);
+              } else doc.setTextColor(80, 80, 80);
+            } else {
+              doc.setTextColor(80, 80, 80);
+            }
+
+            doc.text(String(value), xPosition, yPosition);
+            xPosition += 18;
+          });
+
+          yPosition += 5;
+        });
+      }
+
+      doc.save(`${reportTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`);
+    }
+
+    // Enhanced CSV Export
+    function exportToCSV(dataScope, includeSections) {
+      const exportData = dataScope === 'all' ? ALL_DATA : filterData();
+      let csvContent = "data:text/csv;charset=utf-8,";
+      const reportTitle = document.getElementById('reportTitle') ? document.getElementById('reportTitle').value || 'MICT SP Performance Analysis Report' : 'MICT SP Performance Analysis Report';
+
+      csvContent += `${reportTitle}\r\n`;
+      csvContent += `Generated on,${new Date().toLocaleDateString()}\r\n`;
+      csvContent += `Data Scope,${dataScope === 'all' ? 'All Data' : 'Filtered View'}\r\n`;
+      csvContent += `Total Candidates,${exportData.length}\r\n`;
+      csvContent += `Development Groups,${unique(exportData.map(r => r.DevGroup)).join('; ')}\r\n`;
+      csvContent += "\r\n";
+
+      if (includeSections.executive) {
+        csvContent += "PERFORMANCE SUMMARY\r\n";
+        const atRiskCount = exportData.filter(r => category(r) === "At-risk").length;
+        const excellentCount = exportData.filter(r => category(r) === "Excellent").length;
+        const moderateCount = exportData.filter(r => category(r) === "Moderate").length;
+        const avgOverallScore = exportData.length ? exportData.reduce((sum, r) => sum + r.OverallScore, 0) / exportData.length : 0;
+
+        csvContent += `Excellent Candidates,${excellentCount},${exportData.length ? Math.round(excellentCount/exportData.length*100) : 0}%\r\n`;
+        csvContent += `Moderate Candidates,${moderateCount},${exportData.length ? Math.round(moderateCount/exportData.length*100) : 0}%\r\n`;
+        csvContent += `At-Risk Candidates,${atRiskCount},${exportData.length ? Math.round(atRiskCount/exportData.length*100) : 0}%\r\n`;
+        csvContent += `Average Overall Score,${Math.round(avgOverallScore)}%\r\n`;
+        csvContent += "\r\n";
+      }
+
+      if (includeSections.kpis) {
+        csvContent += "GROUP PERFORMANCE\r\n";
+        csvContent += "Group,Total Candidates,Excellent,Moderate,At-Risk,Avg Tech Skills,Avg Soft Skills,Avg Overall Score\r\n";
+
+        const groups = unique(exportData.map(r => r.DevGroup));
+        groups.forEach(group => {
+          const groupData = exportData.filter(r => r.DevGroup === group);
+          const excellent = groupData.filter(r => category(r) === "Excellent").length;
+          const moderate = groupData.filter(r => category(r) === "Moderate").length;
+          const atRisk = groupData.filter(r => category(r) === "At-risk").length;
+          const avgTech = groupData.length ? groupData.reduce((sum, r) => sum + (Number(r.TechSkills) || 0), 0) / groupData.length : 0;
+          const avgSoft = groupData.length ? groupData.reduce((sum, r) => sum + softSkillAvg(r), 0) / groupData.length : 0;
+          const avgOverallScore = groupData.length ? groupData.reduce((sum, r) => sum + r.OverallScore, 0) / groupData.length : 0;
+
+          csvContent += `${group},${groupData.length},${excellent},${moderate},${atRisk},${fmt(avgTech)},${fmt(avgSoft)},${Math.round(avgOverallScore)}%\r\n`;
+        });
+        csvContent += "\r\n";
+      }
+
+      if (includeSections.risk) {
+        csvContent += "RISK ANALYSIS\r\n";
+        csvContent += "Candidate,Group,Overall Score,Primary Concerns\r\n";
+
+        const atRiskCandidates = exportData.filter(r => category(r) === "At-risk");
+        atRiskCandidates.forEach(candidate => {
+          const lowScores = [];
+          if (candidate.Attendance <= 2) lowScores.push('Attendance');
+          if (candidate.Communication <= 2) lowScores.push('Communication');
+          if (candidate.Accountability <= 2) lowScores.push('Accountability');
+          if (candidate.CreativityOwnership <= 2) lowScores.push('Creativity & Ownership');
+          if (candidate.ProjectDelivery <= 2) lowScores.push('Project Delivery');
+          if (candidate.TechSkills <= 2) lowScores.push('Technical Skills');
+
+          csvContent += `"${candidate.Candidate}","${candidate.DevGroup}","${Math.round(candidate.OverallScore)}%","${lowScores.join('; ')}"\r\n`;
+        });
+        csvContent += "\r\n";
+      }
+
+      if (includeSections.detailed) {
+        csvContent += "DETAILED CANDIDATE DATA\r\n";
+        const headers = ["Candidate","DevGroup","Scrum","Attendance","Communication","Accountability",
+                        "CreativityOwnership","ProjectDelivery","TechSkills","OverallScore","Category"];
+        csvContent += headers.join(",") + "\r\n";
+
+        exportData.forEach(row => {
+          const values = [
+            `"${row.Candidate}"`,
+            row.DevGroup,
+            `"${row.Scrum}"`,
+            row.Attendance,
+            row.Communication,
+            row.Accountability,
+            row.CreativityOwnership,
+            row.ProjectDelivery,
+            row.TechSkills,
+            Math.round(row.OverallScore) + '%',
+            category(row)
+          ];
+          csvContent += values.join(",") + "\r\n";
+        });
+      }
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "comprehensive_performance_report.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Debounced updates for better performance
+    function debouncedUpdate() {
+      clearTimeout(window.updateTimeout);
+      window.updateTimeout = setTimeout(update, 100);
+    }
+
+    // Orchestrate updates
+    function update() {
+      const rows = filterData();
+      window.currentData = rows;
+
+      renderKPIs(rows);
+      renderPerformanceTrends(rows);
+      renderOverallCategory(rows);
+      renderGroupComparison(rows);
+      renderSkillDistribution(rows);
+      renderCriteriaRadar(rows);
+      renderTechSoftScatter(rows);
+      renderGroupBoxPlots(rows);
+      renderCorrelationMatrix(rows);
+      renderTopPerformers(rows);
+      renderAtRiskCandidates(rows);
+      renderTable(rows);
+      generateInsights(rows);
+    }
+
+    // --- New Function: Dataset Import ---
+    function importDataset() {
+      const fileInput = document.createElement('input');
+      fileInput.type = 'file';
+      fileInput.accept = '.json';
+      fileInput.onchange = e => {
+        const file = e.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = event => {
+          try {
+            const newDataset = JSON.parse(event.target.result);
+            if (Array.isArray(newDataset) && newDataset.length > 0) {
+              // Assuming the new dataset has the same structure as the existing ALL_DATA
+              window.ALL_DATA = newDataset;
+              // Re-initialize filters and update dashboard with the new data
+              initFilters();
+              update();
+              alert(`Successfully imported ${newDataset.length} records from ${file.name}.`);
+            } else {
+              alert('Error: Imported file is empty or not a valid array.');
+            }
+          } catch (error) {
+            console.error('Error parsing JSON file:', error);
+            alert('Error: Could not parse the file as JSON. Please ensure it is a valid JSON array of objects.');
+          }
+        };
+        reader.readAsText(file);
+      };
+      fileInput.click();
+    }
+
+
+
+    // Initialize the dashboard
+    function initDashboard() {
+
+      initFilters();
+      update();
+      setupPerformanceFilters();
+      setupExportFunctionality();
+      
+      // Add event listener for dataset import
+      const importBtn = document.getElementById('importDatasetBtn');
+      importBtn && importBtn.addEventListener('click', importDataset);
+
+      // Add event listeners
+      const gEl = document.getElementById('groupSel');
+      const wEl = document.getElementById('weekSel');
+      const sEl = document.getElementById('searchIn');
+      const rBtn = document.getElementById('resetBtn');
+
+      gEl && gEl.addEventListener('change', debouncedUpdate);
+      wEl && wEl.addEventListener('change', debouncedUpdate);
+      sEl && sEl.addEventListener('input', debouncedUpdate);
+      rBtn && rBtn.addEventListener('click', () => {
+        initFilters();
+        update();
+      });
+
+      const saveViewBtn = document.getElementById('saveView');
+      saveViewBtn && saveViewBtn.addEventListener('click', () => {
+        alert('View saved! In a real application, this would save your current filter state.');
+      });
+    }
+
+    // Initialize when DOM is loaded
+    document.addEventListener('DOMContentLoaded', function() {
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      const mainContent = document.getElementById('mainContent');
+
+      setTimeout(() => {
+        if (typeof initDashboard === 'function') {
+          initDashboard();
+        }
+
+        if (loadingIndicator) loadingIndicator.style.display = 'none';
+        if (mainContent) mainContent.classList.remove('opacity-0');
+
+        if (typeof feather !== 'undefined') {
+          feather.replace();
+        }
+      }, 100);
+    });
+  </script>
+</body>
+</html>
