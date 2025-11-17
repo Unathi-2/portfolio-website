@@ -1,245 +1,220 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kekeletso Basholo | Data Analyst Portfolio</title>
-    <meta name="description" content="Data Analyst and Math Tutor specializing in Python, R, SQL, and Machine Learning. Transforming complex data into actionable insights.">
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/x-icon" href="static/favicon.ico">
+    <title>Kekeletso Basholo Portfolio</title>
+
+    <!-- Favicon -->
+    <link rel="icon" href="frontend/static/pictures/banner1.png" type="image/png">
+
+    <!-- Tailwind -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="components/navbar.js"></script>
-    <script src="components/footer.js"></script>
+
+    <!-- UI Components -->
+    <script src="https://cdn.jsdelivr.net/gh/saadeghi/daisyui@latest/dist/full.js"></script>
+
+    <style>
+        html { scroll-behavior: smooth }
+        .certificate-card:hover { transform: scale(1.02) }
+    </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-    <custom-navbar></custom-navbar>
-    
-    <main id="main-content" class="container mx-auto px-4 py-12">
-                <!-- Redesigned Hero Section -->
-        <section class="flex flex-col items-center gap-12 mb-20 py-16">
-            <!-- Profile Picture Section -->
-            <div class="w-full max-w-md flex justify-center">
-                <div class="relative">
-                    <!-- Round Profile Picture Container -->
-                    <div class="w-64 h-64 md:w-80 md:h-80 rounded-full bg-gradient-to-br from-blue-400 to-purple-600 p-1 shadow-2xl">
-                        <div class="w-full h-full rounded-full bg-white dark:bg-gray-800 flex items-center justify-center overflow-hidden">
-                            <!-- Placeholder for your photo -->
-                            <img src = "frontend/static/certificates/picture1.jpg" alt = "Photo" class = "w-full h-full object-cover rounded-full">
-                            <div class="text-center p-8">
-                                <svg class="w-24 h-24 mx-auto text-gray-400 dark:text-gray-500" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
-                                    <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"></path>
-                                </svg>
-                                <p class="text-gray-500 dark:text-gray-400 text-sm mt-2">Your Professional Photo</p>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <!-- Status Badge -->
-                    <div class="absolute -bottom-2 -right-2 bg-green-500 text-white px-4 py-2 rounded-full shadow-lg">
-                        <div class="flex items-center space-x-2">
-                            <div class="w-2 h-2 bg-white rounded-full animate-pulse"></div>
-                            <span class="text-sm font-medium">Available</span>
-                        </div>
-                    </div>
+
+<body class="bg-gray-100 text-gray-900">
+
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg fixed top-0 left-0 right-0 z-50 p-4">
+        <div class="max-w-6xl mx-auto flex justify-between items-center">
+            <a href="#" class="text-xl font-bold">Kekeletso Basholo</a>
+            <div class="space-x-6 text-sm">
+                <a href="#about" class="hover:text-blue-600">About</a>
+                <a href="#skills" class="hover:text-blue-600">Skills</a>
+                <a href="#experience" class="hover:text-blue-600">Experience</a>
+                <a href="#projects" class="hover:text-blue-600">Projects</a>
+                <a href="#certifications" class="hover:text-blue-600">Certificates</a>
+                <a href="#contact" class="hover:text-blue-600">Contact</a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero -->
+    <section class="pt-32 pb-20 text-center max-w-4xl mx-auto px-4">
+        <img src="frontend/static/certificates/picture1.jpg" alt="Profile" class="w-32 h-32 mx-auto rounded-full object-cover shadow-xl">
+        <h1 class="text-4xl font-bold mt-4">Kekeletso Basholo</h1>
+        <p class="text-gray-600 mt-2">Data Analyst, Python Developer, Reporting Specialist</p>
+        <p class="mt-4 max-w-2xl mx-auto">
+            I am passionate about discovering patterns in data and turning them into solutions that support decision making. I enjoy creating dashboards, models and insights that provide value for organisations.
+        </p>
+    </section>
+
+    <!-- About -->
+    <section id="about" class="bg-white py-16">
+        <div class="max-w-4xl mx-auto px-4">
+            <h2 class="text-3xl font-bold mb-6 text-center">About Me</h2>
+            <p class="text-gray-700 leading-relaxed">
+                I am a dedicated Data Analyst with strong interest in financial data, machine learning and business intelligence. I work comfortably with Python, SQL and spreadsheet tools. I enjoy building clean analytics systems and helping organisations make sense of their data.
+            </p>
+        </div>
+    </section>
+
+    <!-- Skills -->
+    <section id="skills" class="py-16">
+        <div class="max-w-5xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-10">Skills</h2>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+
+                <div class="p-6 bg-white rounded-xl shadow">
+                    <h3 class="font-semibold mb-3">Programming</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li>Python</li>
+                        <li>NumPy, Pandas, Matplotlib</li>
+                        <li>Data Cleaning and Processing</li>
+                    </ul>
                 </div>
-            </div>
 
-            <!-- Name and Title -->
-            <div class="text-center w-full">
-                <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-800 dark:text-white mb-4 leading-tight">
-                    Kekeletso Basholo
-                </h1>
-                <h2 class="text-xl md:text-2xl text-blue-600 dark:text-blue-400 mb-8 font-medium">
-                    Data Analyst | Aspiring Data Scientist | Math Tutor
-                </h2>
-            </div>
+                <div class="p-6 bg-white rounded-xl shadow">
+                    <h3 class="font-semibold mb-3">Data Analytics</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li>Exploratory Data Analysis</li>
+                        <li>Hypothesis Testing</li>
+                        <li>Data Visualization</li>
+                    </ul>
+                </div>
 
-            <!-- Professional Summary -->
-            <div class="w-full max-w-4xl">
-                <div class="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-lg border border-gray-100 dark:border-gray-700">
-                    <h3 class="text-2xl font-bold text-gray-800 dark:text-white mb-4 text-center">Professional Summary</h3>
-                    <p class="text-lg text-gray-700 dark:text-gray-300 leading-relaxed text-center">
-                        Motivated Data Analyst with a strong foundation in mathematics, statistics and programming. 
-                        Skilled in Python, data visualization, and statistical modeling with hands-on experience in analytics projects. 
-                        Passionate about transforming raw data into actionable insights to support data-driven decision making. 
-                        Organized, dependable, and eager to contribute to analytical problem solving in professional settings
+                <div class="p-6 bg-white rounded-xl shadow">
+                    <h3 class="font-semibold mb-3">Business Tools</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li>Power BI</li>
+                        <li>Excel</li>
+                        <li>Google Sheets</li>
+                    </ul>
+                </div>
+
+                <div class="p-6 bg-white rounded-xl shadow">
+                    <h3 class="font-semibold mb-3">Machine Learning</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li>Classification Models</li>
+                        <li>Regression Models</li>
+                        <li>Feature Engineering</li>
+                    </ul>
+                </div>
+
+                <div class="p-6 bg-white rounded-xl shadow">
+                    <h3 class="font-semibold mb-3">Other</h3>
+                    <ul class="space-y-2 text-sm">
+                        <li>Team Collaboration</li>
+                        <li>Reporting</li>
+                        <li>Documentation</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Experience -->
+    <section id="experience" class="bg-white py-16">
+        <div class="max-w-5xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-10">Experience</h2>
+
+            <div class="space-y-8">
+
+                <div class="bg-gray-50 p-6 rounded-xl shadow">
+                    <h3 class="font-bold text-xl mb-2">Data Analyst Associate, CAPACITI</h3>
+                    <p class="text-sm text-gray-600 mb-3">2024 to 2025</p>
+                    <ul class="list-disc ml-6 space-y-2">
+                        <li>Created dashboards and reports for analytics teams</li>
+                        <li>Cleaned, transformed and analysed organisational datasets</li>
+                        <li>Built predictive models for forecasting tasks</li>
+                        <li>Worked with SQL, Python and Power BI</li>
+                    </ul>
+                </div>
+
+                <div class="bg-gray-50 p-6 rounded-xl shadow">
+                    <h3 class="font-bold text-xl mb-2">Mathematics and Statistics Tutor, University of the Western Cape</h3>
+                    <p class="text-sm text-gray-600 mb-3">2023 to 2024</p>
+                    <ul class="list-disc ml-6 space-y-2">
+                        <li>Guided students in solving mathematical and statistical problems</li>
+                        <li>Provided support in probability, hypothesis testing, calculus and modelling</li>
+                        <li>Helped students prepare for tests and assignments</li>
+                    </ul>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Projects -->
+    <section id="projects" class="py 16">
+        <div class="max-w-5xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Projects</h2>
+
+            <div class="grid md:grid-cols-2 gap-8">
+
+                <div class="bg-white p-6 rounded-xl shadow">
+                    <h3 class="font-semibold text-lg mb-2">Finance Analytics Dashboard</h3>
+                    <p class="text-sm text-gray-700 mb-4">
+                        A Power BI dashboard that tracks financial metrics, spending patterns and investment performance.
                     </p>
-                    <div class="mt-6 flex flex-wrap gap-2 justify-center">
-                        <span class="bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 text-sm px-3 py-1 rounded-full">Data Analysis</span>
-                        <span class="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 text-sm px-3 py-1 rounded-full">Machine Learning</span>
-                        <span class="bg-purple-100 dark:bg-purple-900/20 text-purple-800 dark:text-purple-400 text-sm px-3 py-1 rounded-full">Statistical Modeling</span>
-                        <span class="bg-orange-100 dark:bg-orange-900/20 text-orange-800 dark:text-orange-400 text-sm px-3 py-1 rounded-full">Data Visualization</span>
-                        <span class="bg-red-100 dark:bg-red-900/20 text-red-800 dark:text-red-400 text-sm px-3 py-1 rounded-full">Python & R</span>
-                        <span class="bg-indigo-100 dark:bg-indigo-900/20 text-indigo-800 dark:text-indigo-400 text-sm px-3 py-1 rounded-full">SQL Databases</span>
-                    </div>
+                    <a href="#" class="text-blue-600 text-sm">View Project</a>
                 </div>
+
+                <div class="bg-white p-6 rounded-xl shadow">
+                    <h3 class="font-semibold text-lg mb-2">Python Machine Learning Model</h3>
+                    <p class="text-sm text-gray-700 mb-4">
+                        A classification model built with Python for identifying patterns in historical data.
+                    </p>
+                    <a href="#" class="text-blue-600 text-sm">View Project</a>
+                </div>
+
             </div>
+        </div>
+    </section>
 
-            <!-- Call-to-Action Buttons -->
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="projects.html" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg text-center flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-                    </svg>
-                    View My Projects
-                </a>
-                <a href="contact.html" class="border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white font-bold py-3 px-8 rounded-lg transition-all duration-300 transform hover:-translate-y-1 text-center dark:border-blue-400 dark:text-blue-400 dark:hover:bg-blue-400 dark:hover:text-white flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                    Get In Touch
-                </a>
+    <!-- Certifications -->
+    <section id="certifications" class="bg-white py-16">
+        <div class="max-w-5xl mx-auto px-4">
+            <h2 class="text-3xl font-bold text-center mb-12">Certifications</h2>
+
+            <div class="grid md:grid-cols-2 gap-8">
+
+                <!-- IBM -->
+                <div class="bg-gray-50 p-6 rounded-xl shadow certificate-card">
+                    <h3 class="font-bold text-lg">IBM Data Analyst</h3>
+                    <p class="text-sm text-gray-600 mb-3">IBM, Coursera</p>
+                    <p class="text-sm mb-3">
+                        Training in data analysis, cleaning, visualisation and Python.
+                    </p>
+                    <a href="static/certificates/IBM Data Analyst.pdf" target="_blank" class="text-blue-600">
+                        View Certificate
+                    </a>
+                </div>
+
+                <!-- CompTIA -->
+                <div class="bg-gray-50 p-6 rounded-xl shadow certificate-card">
+                    <h3 class="font-bold text-lg">CompTIA Data Plus</h3>
+                    <p class="text-sm text-gray-600 mb-3">CompTIA</p>
+                    <p class="text-sm mb 3">
+                        Certificate focused on analytics, visualisation, governance and statistics.
+                    </p>
+                    <a href="static/certificates/CompTIA Data Plus.pdf" target="_blank" class="text-blue-600">
+                        View Certificate
+                    </a>
+                </div>
+
             </div>
-            
-            <!-- Stats Grid -->
-            <div class="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4 max-w-2xl w-full">
-                <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <div class="text-2xl font-bold text-blue-600 dark:text-blue-400 counter" data-target="5">2</div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">Projects Completed</div>
-                </div>
-                <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <div class="text-2xl font-bold text-purple-600 dark:text-purple-400 counter" data-target="30">30+</div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">Students Tutored</div>
-                </div>
-                <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <div class="text-2xl font-bold text-orange-600 dark:text-orange-400 counter" data-target="1">2</div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">Years Experience</div>
-                </div>
-                <div class="text-center p-4 bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700">
-                    <div class="text-2xl font-bold text-green-600 dark:text-green-400 counter" data-target="2">2</div>
-                    <div class="text-sm text-gray-600 dark:text-gray-400">Certifications</div>
-                </div>
-            </div>
-        </section>
+        </div>
+    </section>
 
-        <!-- Certificates Section -->
-        <section class="mb-20">
-            <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-12">Certifications</h2>
-            <div class="grid md:grid-cols-2 lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
-                <!-- Certificate 1 -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 certificate-card">
-                    <div class="flex items-start mb-4">
-                        <div class="bg-blue-100 dark:bg-blue-900/20 p-3 rounded-lg mr-4 flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-lg text-gray-800 dark:text-white mb-1">IBM Data Analyst</h3>
-                            <p class="text-blue-600 dark:text-blue-400 text-sm mb-2">IBM / Coursera</p>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">Comprehensive data analysis training covering data cleaning, analysis, visualization, and Python programming.</p>
-                            <div class="flex flex-wrap gap-1 mb-3">
-                                <span class="bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 text-xs px-2 py-1 rounded">Data Analysis</span>
-                                <span class="bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 text-xs px-2 py-1 rounded">Python Programming</span>
-                                <span class="bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 text-xs px-2 py-1 rounded">Visualization</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs text-gray-500 dark:text-gray-400">Issued: October 2025</span>
-                                <a href="static/certificates/IBM Data Analyst.pdf" 
-                                   class="text-blue-600 dark:text-blue-400 hover:underline text-sm font-medium flex items-center"
-                                   target="_blank"
-                                   onclick="trackCertificateView('IBM Data Analyst')">
-                                    View Certificate
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <!-- Contact -->
+    <section id="contact" class="py-16">
+        <div class="max-w-4xl mx-auto px-4 text-center">
+            <h2 class="text-3xl font-bold mb-6">Contact Me</h2>
+            <p class="mb-4">Email: kbasholo@gmail.com</p>
+            <p>GitHub: github.com/KekeletsoBasholo</p>
+        </div>
+    </section>
 
-                <!-- Certificate 2 -->
-                <div class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 border border-gray-100 dark:border-gray-700 certificate-card">
-                    <div class="flex items-start mb-4">
-                        <div class="bg-green-100 dark:bg-green-900/20 p-3 rounded-lg mr-4 flex-shrink-0">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div class="flex-1">
-                            <h3 class="font-bold text-lg text-gray-800 dark:text-white mb-1">CompTIA Data+ </h3>
-                            <p class="text-green-600 dark:text-green-400 text-sm mb-2">Stanford Online</p>
-                            <p class="text-gray-600 dark:text-gray-400 text-sm mb-3">Advanced machine learning algorithms, neural networks, and deep learning applications.</p>
-                            <div class="flex flex-wrap gap-1 mb-3">
-                                <span class="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 text-xs px-2 py-1 rounded">Machine Learning</span>
-                                <span class="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 text-xs px-2 py-1 rounded">Neural Networks</span>
-                                <span class="bg-green-100 dark:bg-green-900/20 text-green-800 dark:text-green-400 text-xs px-2 py-1 rounded">Deep Learning</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-xs text-gray-500 dark:text-gray-400">Issued: September 2025</span>
-                                <a href="static/certificates/CompTIA Data+.pdf" 
-                                   class="text-green-600 dark:text-green-400 hover:underline text-sm font-medium flex items-center"
-                                   target="_blank"
-                                   onclick="trackCertificateView('CompTIA')">
-                                    View Certificate
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                                    </svg>
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-        </section>
-
-        <!-- Enhanced Education Section -->
-        <section class="mb-20">
-            <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-12">Education</h2>
-            <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg max-w-3xl mx-auto education-item border border-gray-100 dark:border-gray-700">
-                <div class="border-l-4 border-blue-600 dark:border-blue-400 pl-6">
-                    <h3 class="text-xl font-bold text-gray-800 dark:text-white">BSc in Mathematics & Statistical Sciences</h3>
-                    <p class="text-gray-600 dark:text-gray-400">University of Western Cape | 2025</p>
-                    <p class="mt-2 text-gray-700 dark:text-gray-300">Specialized in data analysis, statistical modeling, and mathematical problem-solving with focus on real-world applications.</p>
-                    <div class="mt-4 flex flex-wrap gap-2">
-                        <span class="bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 text-xs font-medium px-2.5 py-0.5 rounded">Statistical Modeling</span>
-                        <span class="bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 text-xs font-medium px-2.5 py-0.5 rounded">Data Analysis</span>
-                        <span class="bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 text-xs font-medium px-2.5 py-0.5 rounded">Mathematical Theory</span>
-                        <span class="bg-blue-100 dark:bg-blue-900/20 text-blue-800 dark:text-blue-400 text-xs font-medium px-2.5 py-0.5 rounded">Research Methods</span>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Enhanced Experience Section -->
-        <section class="mb-20">
-            <h2 class="text-3xl font-bold text-center text-gray-800 dark:text-white mb-12">Professional Experience</h2>
-            <div class="bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-lg max-w-3xl mx-auto border border-gray-100 dark:border-gray-700">
-                <div class="border-l-4 border-blue-600 dark:border-blue-400 pl-6 mb-8 education-item">
-                    <h3 class="text-xl font-bold text-gray-800 dark:text-white">Data Analyst</h3>
-                    <p class="text-gray-600 dark:text-gray-400">CAPACITI | July 2025-Present</p>
-                    <p class="mt-2 text-gray-700 dark:text-gray-300">Transforming raw data into meaningful insights to drive business decisions and optimize operational efficiency.</p>
-                    <ul class="mt-2 list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">
-                        <li>Developed predictive models with 92% accuracy for business forecasting</li>
-                        <li>Automated data processing pipelines, reducing manual work by 60%</li>
-                        <li>Created interactive dashboards used by executive team for strategic decisions</li>
-                    </ul>
-                </div>
-                <div class="border-l-4 border-blue-600 dark:border-blue-400 pl-6 mb-8 education-item">
-                    <h3 class="text-xl font-bold text-gray-800 dark:text-white">Mathematics Tutor</h3>
-                    <p class="text-gray-600 dark:text-gray-400">University of Western Cape | February 2025 - July 2025</p>
-                    <p class="mt-2 text-gray-700 dark:text-gray-300">Helped students grasp complex mathematical concepts and improve their analytical skills through personalized instruction.</p>
-                    <ul class="mt-2 list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">
-                        <li>Improved student test scores by average of 25% through targeted tutoring</li>
-                        <li>Developed customized learning materials for diverse learning styles</li>
-                        <li>Mentored 50+ students in advanced calculus and linear algebra</li>
-                    </ul>
-                </div>
-                <div class="border-l-4 border-blue-600 dark:border-blue-400 pl-6 education-item">
-                    <h3 class="text-xl font-bold text-gray-800 dark:text-white">Statistics Tutor</h3>
-                    <p class="text-gray-600 dark:text-gray-400">University of Western Cape | February 2024 - November 2024</p>
-                    <p class="mt-2 text-gray-700 dark:text-gray-300">Guided students through statistical concepts and software applications, building foundational data analysis skills.</p>
-                    <ul class="mt-2 list-disc list-inside text-gray-700 dark:text-gray-300 space-y-1">
-                        <li>Taught R and Python for statistical analysis to undergraduate students</li>
-                        <li>Created practical exercises using real-world datasets</li>
-                        <li>Assisted lectures with grading and tutorial coordination</li>
-                    </ul>
-                </div>
-            </div>
-        </section>
-    </main>
-
-    <custom-footer></custom-footer>
-    <script src="script.js"></script>
 </body>
 </html>
