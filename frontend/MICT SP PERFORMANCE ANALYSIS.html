@@ -2,2094 +2,1530 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>MICT SP Insights Dashboard</title>
+  <title>MICT SP Performance Analytics | Advanced Visuals</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
+  
+  <!-- Libraries -->
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"></script>
+  
   <style>
-    /* CSS Variables for Themes */
     :root {
-      --primary-color: #0078d4;
-      --secondary-color: #50e6ff;
-      --success-color: #107c10;
-      --warning-color: #d83b01;
-      --error-color: #e81123;
-      --bg-primary: #ffffff;
-      --bg-secondary: #f8fafc;
-      --bg-card: #ffffff;
-      --text-primary: #1f2937;
-      --text-secondary: #6b7280;
-      --border-color: #e5e7eb;
-      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+      --pbi-header: #252423;
+      --pbi-canvas: #f0f2f5; 
+      --pbi-card-bg: #ffffff;
+      --pbi-accent: #0078d4;
+      --pbi-text: #201f1e;
+      --pbi-grid: #e1dfdd;
     }
 
-    
+    [data-theme="dark"] {
+      --pbi-header: #1e1e1e;
+      --pbi-canvas: #252423;
+      --pbi-card-bg: #333333;
+      --pbi-accent: #4da6ff;
+      --pbi-text: #f3f2f1;
+      --pbi-grid: #484644;
+    }
 
-    /* Apply theme variables */
     body {
-      background-color: var(--bg-secondary);
-      color: var(--text-primary);
-      transition: all 0.3s ease;
+      background-color: var(--pbi-canvas);
+      color: var(--pbi-text);
+      font-family: 'Segoe UI', 'Segoe UI Web (West European)', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+      margin: 0;
+      padding: 0;
+      transition: background-color 0.3s, color 0.3s;
+      overflow-x: hidden;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
     }
 
-    .theme-transition {
-      transition: all 0.3s ease;
+    /* Top Navigation */
+    .pbi-top-bar {
+      background-color: var(--pbi-header);
+      color: white;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+      flex-shrink: 0;
+      z-index: 50;
     }
 
-    /* Performance filter buttons */
-    .performance-filter {
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 500;
-      background-color: var(--bg-card);
-      color: var(--text-secondary);
-      border: 1px solid var(--border-color);
+    /* Main Layout */
+    .main-wrapper {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    /* Sidebar / Slicers Pane */
+    .slicer-pane {
+      width: 260px;
+      background-color: var(--pbi-card-bg);
+      border-right: 1px solid var(--pbi-grid);
+      padding: 16px;
+      overflow-y: auto;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      transition: width 0.3s ease;
+    }
+    
+    /* Canvas Area */
+    .canvas-area {
+      flex: 1;
+      overflow-y: auto;
+      padding: 20px;
+      position: relative;
+    }
+
+    /* Visual Cards (Power BI Tiles) */
+    .viz-card {
+      background-color: var(--pbi-card-bg);
+      border: 1px solid transparent;
+      box-shadow: 0 1.6px 3.6px 0 rgba(0,0,0,0.132), 0 0.3px 0.9px 0 rgba(0,0,0,0.108);
+      padding: 12px;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      border-radius: 2px;
+      transition: all 0.3s;
+      position: relative;
+    }
+    .viz-card:hover {
+        box-shadow: 0 3.2px 7.2px 0 rgba(0,0,0,0.132), 0 0.6px 1.8px 0 rgba(0,0,0,0.108);
+    }
+
+    .dark-mode .viz-card {
+      background-color: var(--pbi-card-bg);
+      border-color: #444;
+      box-shadow: none;
+    }
+
+    .viz-header {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: var(--pbi-text);
+      margin-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 4px;
+    }
+
+    /* Tab Navigation */
+    .tab-container {
+      display: flex;
+      gap: 24px;
+      padding: 0 20px;
+      background: var(--pbi-card-bg);
+      border-bottom: 1px solid var(--pbi-grid);
+      flex-shrink: 0;
+    }
+
+    .tab {
+      padding: 12px 4px;
       cursor: pointer;
+      font-weight: 400;
+      color: #605e5c;
+      font-size: 0.95rem;
+      border-bottom: 3px solid transparent;
       transition: all 0.2s;
     }
 
-    .performance-filter:hover {
-      background-color: var(--primary-color);
-      color: white;
-      border-color: var(--primary-color);
-    }
+    .dark-mode .tab { color: #c8c6c4; }
 
-    .performance-filter.active {
-      background-color: var(--primary-color);
-      color: white;
-      border-color: var(--primary-color);
-    }
-
-    /* Table styles */
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
-
-    th {
-      background-color: var(--bg-secondary);
-      text-align: left;
-      padding: 0.75rem 1rem;
+    .tab.active {
+      color: var(--pbi-text);
       font-weight: 600;
-      color: var(--text-secondary);
-      text-transform: uppercase;
-      font-size: 0.75rem;
-      letter-spacing: 0.05em;
-      border-bottom: 1px solid var(--border-color);
-    }
-
-    td {
-      padding: 1rem;
-      border-bottom: 1px solid var(--border-color);
-      font-size: 0.875rem;
-      color: var(--text-primary);
-    }
-
-    tr:hover {
-      background-color: var(--bg-secondary);
-    }
-
-    /* Category colors - Enhanced visibility */
-    .tr-excellent {
-      background-color: rgba(16, 185, 129, 0.15) !important;
-    }
-
-    .tr-excellent:hover {
-      background-color: rgba(16, 185, 129, 0.25) !important;
-    }
-
-    .tr-moderate {
-      background-color: rgba(245, 158, 11, 0.15) !important;
-    }
-
-    .tr-moderate:hover {
-      background-color: rgba(245, 158, 11, 0.25) !important;
-    }
-
-    .tr-at-risk {
-      background-color: rgba(239, 68, 68, 0.15) !important;
-    }
-
-    .tr-at-risk:hover {
-      background-color: rgba(239, 68, 68, 0.25) !important;
-    }
-
-    /* Chart container */
-    .chart {
-      width: 100%;
-    }
-
-    /* KPI cards */
-    .kpi-card {
-      border-top: 4px solid;
-      transition: all 0.3s ease;
-      background-color: var(--bg-card);
-      box-shadow: var(--shadow);
-    }
-
-    .kpi-card:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-    }
-
-    /* Loading states */
-    .loading {
-      opacity: 0.6;
-      pointer-events: none;
-    }
-
-    .skeleton {
-      background: linear-gradient(90deg, var(--border-color) 25%, var(--bg-secondary) 50%, var(--border-color) 75%);
-      background-size: 200% 100%;
-      animation: loading 1.5s infinite;
-    }
-
-    @keyframes loading {
-      0% { background-position: 200% 0; }
-      100% { background-position: -200% 0; }
+      border-bottom: 3px solid #e2a03f;
     }
     
-    /* Fade in animation */
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-    
-    .fade-in {
-      animation: fadeIn 0.5s ease-out forwards;
-    }
-    
-    /* Page transition */
-    .page-transition {
-      transition: opacity 0.3s ease;
-    }
-    
-    .page-hidden {
-      opacity: 0;
-      pointer-events: none;
-      display: none;
-    }
-    
-    .page-visible {
-      opacity: 1;
-      display: block;
-    }
-    
-    /* Active navigation item */
-    .nav-active {
-      background-color: var(--primary-color);
-      color: white;
-    }
-    
-    /* Export modal */
-    .export-modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background-color: rgba(0, 0, 0, 0.5);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 1000;
-    }
-    
-    .export-modal-content {
-      background: var(--bg-card);
-      padding: 2rem;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 500px;
-      box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-      color: var(--text-primary);
-    }
-    
-    /* Chart export styles */
-    .chart-export {
-      border: 1px solid var(--border-color);
-      border-radius: 8px;
-      margin-bottom: 20px;
-      page-break-inside: avoid;
-    }
-    
-    /* Enhanced color badges */
-    .status-badge {
-      display: inline-flex;
-      align-items: center;
-      padding: 0.25rem 0.75rem;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-    
-    .status-badge.excellent {
-      background-color: #d1fae5;
-      color: #065f46;
-    }
-    
-    .status-badge.moderate {
-      background-color: #fef3c7;
-      color: #92400e;
-    }
-    
-    .status-badge.at-risk {
-      background-color: #fee2e2;
-      color: #991b1b;
+    .tab:hover:not(.active) {
+        background-color: rgba(0,0,0,0.05);
     }
 
+    /* KPI Cards */
+    .kpi-value { font-size: 2.2rem; font-weight: 600; color: var(--pbi-text); }
+    .kpi-label { font-size: 0.8rem; text-transform: uppercase; color: #605e5c; margin-bottom: 4px; letter-spacing: 0.5px; }
+    .kpi-delta { font-size: 0.85rem; display: flex; align-items: center; gap: 4px; font-weight: 500; }
+
+    /* Tables */
+    .data-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .data-table th { text-align: left; padding: 8px 8px; border-bottom: 2px solid var(--pbi-grid); color: #605e5c; font-weight: 600; position: sticky; top: 0; background: var(--pbi-card-bg); z-index: 10;}
+    .data-table td { padding: 8px; border-bottom: 1px solid var(--pbi-grid); vertical-align: middle; }
+    .data-table tr:hover { background-color: rgba(0,0,0,0.03); }
+    .dark-mode .data-table tr:hover { background-color: rgba(255,255,255,0.05); }
+
+    /* Inputs */
+    .pbi-select {
+        width: 100%; padding: 6px; border: 1px solid #8a8886; border-radius: 2px;
+        font-size: 0.9rem; background: var(--pbi-card-bg); color: var(--pbi-text);
+    }
+    .pbi-select:focus { border-color: var(--pbi-accent); outline: 1px solid var(--pbi-accent); }
     
+    /* Scrollbars */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #c8c6c4; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #8a8886; }
 
-    /* Power BI Style Filters Panel */
-    .filters-panel {
-      background-color: var(--bg-card);
-      box-shadow: var(--shadow);
-      border-radius: 8px;
+    /* Badges */
+    .status-badge { padding: 2px 8px; border-radius: 12px; font-size: 0.7rem; font-weight: 600; display: inline-block; min-width: 70px; text-align: center; }
+    .badge-excellent { background: #e6f8e7; color: #107c10; }
+    .badge-moderate { background: #fff4ce; color: #795e00; }
+    .badge-risk { background: #fde7e9; color: #a80000; }
+
+    /* Chat Styling */
+    .chat-bubble-user { background: linear-gradient(135deg, #0078d4 0%, #005a9e 100%); color: white; border-bottom-right-radius: 2px; }
+    .chat-bubble-bot { background: var(--pbi-card-bg); border: 1px solid var(--pbi-grid); border-bottom-left-radius: 2px; }
+    .dark-mode .chat-bubble-bot { background: #333; color: #f3f2f1; border-color: #444; }
+
+    /* Animations */
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .animate-fade-in { animation: fadeIn 0.4s ease-out forwards; }
+
+    /* Modals & Overlays */
+    .modal-overlay {
+      position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(0,0,0,0.4); z-index: 2000; display: none;
+      align-items: center; justify-content: center;
+      backdrop-filter: blur(2px);
     }
-
-    /* Custom select styles */
-    .custom-select {
-      background-color: var(--bg-card);
-      border: 1px solid var(--border-color);
-      color: var(--text-primary);
+    .modal-content {
+      background: var(--pbi-card-bg); padding: 24px; border-radius: 2px; width: 450px;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     }
+    .modal-content.large { width: 90%; max-width: 1100px; height: 85vh; padding: 0; display: flex; flex-direction: column; overflow: hidden; }
 
-    .custom-select:focus {
-      border-color: var(--primary-color);
-      ring-color: var(--primary-color);
-    }
-
-    /* Card styles */
-    .card {
-      background-color: var(--bg-card);
-      box-shadow: var(--shadow);
-      border-radius: 8px;
+    /* AI Chat */
+    .ai-chat-container {
+      position: fixed; bottom: 0; right: 20px; width: 350px; height: 500px;
+      background: var(--pbi-card-bg); border-radius: 8px 8px 0 0;
+      box-shadow: 0 -4px 20px rgba(0,0,0,0.15); display: none;
+      flex-direction: column; z-index: 1001; border: 1px solid var(--pbi-grid);
     }
   </style>
 </head>
-<body class="theme-transition">
+<body>
 
+  <!-- Hidden File Input -->
+  <input type="file" id="fileInput" accept=".json" style="display: none;" onchange="handleFileUpload(event)">
 
-  <!-- Loading indicator -->
-  <div id="loadingIndicator" class="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50 theme-transition">
-    <div class="text-center">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-      <p class="text-gray-600">Loading dashboard...</p>
+  <!-- Loading Overlay -->
+  <div id="loadingIndicator" class="fixed inset-0 bg-white/80 dark:bg-black/80 flex items-center justify-center z-[9999] transition-opacity duration-500">
+    <div class="flex flex-col items-center">
+      <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+      <div class="text-xl font-semibold text-gray-700 dark:text-gray-200">Hydrating Data Model...</div>
     </div>
   </div>
 
-  <!-- Export Modal -->
-  <div id="exportModal" class="export-modal page-hidden">
-    <div class="export-modal-content">
-      <div class="flex justify-between items-center mb-4">
-        <h3 class="text-lg font-semibold">Export Report</h3>
-        <button id="closeExportModal" class="text-gray-400 hover:text-gray-600">
-          <i data-feather="x" class="w-5 h-5"></i>
-        </button>
+  <!-- Navbar -->
+  <div class="pbi-top-bar">
+    <div class="flex items-center gap-3">
+      <div class="bg-yellow-500 p-1.5 rounded-sm">
+        <i data-feather="bar-chart-2" class="w-4 h-4 text-black"></i>
       </div>
-      
-      <div class="space-y-4">
-        <div>
-          <label class="block text-sm font-medium mb-2">Export Format</label>
-          <div class="grid grid-cols-2 gap-3">
-            <button class="export-format-btn border border-gray-300 rounded-lg p-3 text-left hover:border-blue-500 hover:bg-blue-50 transition-colors custom-select" data-format="pdf">
-              <div class="flex items-center">
-                <i data-feather="file-text" class="text-red-500 mr-2"></i>
-                <span>PDF Document</span>
-              </div>
-              <p class="text-xs text-gray-500 mt-1">High-quality report with charts</p>
-            </button>
-            <button class="export-format-btn border border-gray-300 rounded-lg p-3 text-left hover:border-blue-500 hover:bg-blue-50 transition-colors custom-select" data-format="csv">
-              <div class="flex items-center">
-                <i data-feather="file-text" class="text-green-500 mr-2"></i>
-                <span>CSV Data</span>
-              </div>
-              <p class="text-xs text-gray-500 mt-1">Raw data for analysis</p>
-            </button>
-          </div>
-        </div>
-        
-        <div id="pdfOptions" class="space-y-3">
-          <div>
-            <label class="block text-sm font-medium mb-1">Report Title</label>
-            <input type="text" id="reportTitle" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 custom-select" value="MICT SP Performance Analysis Report">
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium mb-1">Data Scope</label>
-            <div class="space-y-2">
-              <label class="flex items-center">
-                <input type="radio" name="dataScope" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="current" checked>
-                <span class="ml-2 text-sm">Current filtered view</span>
-              </label>
-              <label class="flex items-center">
-                <input type="radio" name="dataScope" class="rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="all">
-                <span class="ml-2 text-sm">All data (ignore filters)</span>
-              </label>
-            </div>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium mb-1">Include Sections</label>
-            <div class="space-y-2">
-              <label class="flex items-center">
-                <input type="checkbox" class="section-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-section="executive" checked>
-                <span class="ml-2 text-sm">Executive Summary</span>
-              </label>
-              <label class="flex items-center">
-                <input type="checkbox" class="section-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-section="kpis" checked>
-                <span class="ml-2 text-sm">Performance Metrics</span>
-              </label>
-              <label class="flex items-center">
-                <input type="checkbox" class="section-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-section="charts" checked>
-                <span class="ml-2 text-sm">Charts & Visualizations</span>
-              </label>
-              <label class="flex items-center">
-                <input type="checkbox" class="section-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-section="risk" checked>
-                <span class="ml-2 text-sm">Risk Analysis</span>
-              </label>
-              <label class="flex items-center">
-                <input type="checkbox" class="section-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-section="recommendations" checked>
-                <span class="ml-2 text-sm">Recommendations</span>
-              </label>
-              <label class="flex items-center">
-                <input type="checkbox" class="section-checkbox rounded border-gray-300 text-blue-600 focus:ring-blue-500" data-section="detailed" checked>
-                <span class="ml-2 text-sm">Detailed Data</span>
-              </label>
-            </div>
-          </div>
-        </div>
-        
-        <div class="flex justify-end space-x-3 pt-4">
-          <button id="cancelExport" class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors custom-select">
-            Cancel
+      <span class="font-semibold tracking-wide text-sm">MICT SP Performance Analytics</span>
+      <span class="text-xs bg-gray-700 px-2 py-0.5 rounded ml-2" id="dsName">Master_Dataset_v3.0.json</span>
+    </div>
+    
+    <div class="flex items-center gap-4">
+       <div id="voiceStatus" class="hidden flex items-center gap-2 bg-red-600 px-2 py-1 rounded text-xs font-bold animate-pulse">
+          <i data-feather="mic" class="w-3 h-3"></i> Listening...
+       </div>
+
+       <div class="flex items-center gap-1">
+          <button onclick="toggleLiveMode()" id="liveBtn" class="px-3 py-1 text-xs hover:bg-white/10 rounded transition flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-gray-400" id="liveDot"></span> Live
           </button>
-          <button id="confirmExport" class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center">
-            <i data-feather="download" class="w-4 h-4 mr-2"></i>
-            Export Report
-          </button>
-        </div>
-      </div>
+       </div>
+
+       <div class="h-4 w-px bg-white/30"></div>
+
+       <div class="flex gap-2">
+         <button onclick="document.getElementById('fileInput').click()" title="Import Data" class="p-1.5 hover:bg-white/10 rounded"><i data-feather="upload-cloud" class="w-4 h-4"></i></button>
+         <button onclick="openExportModal()" title="Export" class="p-1.5 hover:bg-white/10 rounded"><i data-feather="download" class="w-4 h-4"></i></button>
+         <button onclick="openSettingsModal()" title="Settings" class="p-1.5 hover:bg-white/10 rounded"><i data-feather="settings" class="w-4 h-4"></i></button>
+         <button onclick="toggleAIChat()" title="AI Assistant" class="p-1.5 hover:bg-white/10 rounded relative">
+            <i data-feather="message-square" class="w-4 h-4"></i>
+            <span class="absolute top-1 right-1 w-2 h-2 bg-yellow-400 rounded-full"></span>
+         </button>
+       </div>
+
+       <div class="h-4 w-px bg-white/30"></div>
+       
+       <label class="cursor-pointer">
+          <input type="checkbox" id="darkModeToggle" class="hidden">
+          <i data-feather="moon" class="w-4 h-4 text-gray-300 hover:text-white transition"></i>
+       </label>
     </div>
   </div>
 
-  <!-- Dashboard Page -->
-  <div id="dashboard-page" class="page-transition page-visible">
-    <!-- Main Content -->
-    <div id="mainContent" class="container mx-auto px-4 py-6 opacity-0 theme-transition">
-      <!-- Dashboard Header -->
-      <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 fade-in">
+  <!-- Tab Navigation -->
+  <div class="tab-container">
+    <div class="tab active" onclick="switchTab('overview', this)">Executive Overview</div>
+    <div class="tab" onclick="switchTab('kanban', this)">Pipeline & Workflow</div>
+    <div class="tab" onclick="switchTab('analytics', this)">Deep Dive Analytics</div>
+    <div class="tab" onclick="switchTab('candidates', this)">Candidate Management</div>
+  </div>
+
+  <!-- Alerts Container -->
+  <div id="performanceAlerts" class="fixed top-16 right-5 z-[2000] w-80 space-y-2 pointer-events-none"></div>
+
+  <!-- Main Content Wrapper -->
+  <div class="main-wrapper">
+    
+    <!-- Slicer Pane (Left Sidebar) -->
+    <div class="slicer-pane custom-scrollbar" id="slicerPane">
+        <div class="flex justify-between items-center mb-2">
+            <span class="text-sm font-bold uppercase text-gray-500">Filters</span>
+            <button class="text-xs text-blue-600 hover:underline" onclick="resetDashboard()">Reset All</button>
+        </div>
+
+        <div class="mb-2">
+            <div class="relative">
+                <input id="searchIn" type="text" class="pbi-select pl-8" placeholder="Search Candidate...">
+                <i data-feather="search" class="w-4 h-4 absolute left-2 top-2 text-gray-400"></i>
+            </div>
+        </div>
+
+        <div class="bg-gray-50 dark:bg-white/5 p-2 rounded border border-gray-200 dark:border-gray-700">
+            <label class="text-xs font-semibold mb-1 block">Development Group</label>
+            <select id="groupSel" class="pbi-select h-24" multiple>
+                <option value="All" selected>Select All</option>
+                <!-- JS Populated -->
+            </select>
+            <div class="text-[10px] text-gray-400 mt-1 italic">Ctrl+Click to select multiple</div>
+        </div>
+
         <div>
-          <h1 class="text-3xl font-bold">MICT SP Performance Analysis</h1>
-          <p class="text-gray-600">Comprehensive candidate performance analytics</p>
+            <label class="text-xs font-semibold mb-1 block">Sprint Timeline</label>
+            <select id="weekSel" class="pbi-select">
+                <option value="All">All Weeks</option>
+                <!-- JS Populated -->
+            </select>
         </div>
-        <div class="mt-4 md:mt-0 flex gap-3">
-          <button id="saveView" class="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded-lg flex items-center gap-2 transition-colors custom-select">
-            <i data-feather="save"></i> Save View
-          </button>
-          <button id="importDatasetBtn" class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-	            <i data-feather="upload-cloud"></i> Import Dataset
-	          </button>
-	          <button id="exportReportBtn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center gap-2 transition-colors">
-	            <i data-feather="download"></i> Export Full Report
-	          </button>
-        </div>
-      </div>
 
-      <!-- Power BI Style Filters Panel -->
-      <div class="filters-panel p-4 mb-6 fade-in">
-        <div class="flex items-center justify-between mb-4">
-          <h3 class="font-semibold">Filters</h3>
-          <div class="flex gap-2">
-            <button id="applyFiltersBtn" class="text-sm text-blue-600 hover:text-blue-800">Apply</button>
-            <button id="clearFiltersBtn" class="text-sm text-gray-600 hover:text-gray-800">Clear</button>
-          </div>
+        <div>
+            <label class="text-xs font-semibold mb-2 block">Performance Status</label>
+            <div class="space-y-1">
+                <label class="flex items-center gap-2 cursor-pointer p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+                    <input type="checkbox" class="status-chk accent-green-600" value="Excellent" checked> 
+                    <span class="w-3 h-3 rounded-full bg-green-500"></span>
+                    <span class="text-xs">Excellent (>80%)</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+                    <input type="checkbox" class="status-chk accent-yellow-600" value="Moderate" checked>
+                    <span class="w-3 h-3 rounded-full bg-yellow-500"></span> 
+                    <span class="text-xs">Moderate (60-80%)</span>
+                </label>
+                <label class="flex items-center gap-2 cursor-pointer p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">
+                    <input type="checkbox" class="status-chk accent-red-600" value="At-risk" checked> 
+                    <span class="w-3 h-3 rounded-full bg-red-500"></span>
+                    <span class="text-xs">At Risk (<60%)</span>
+                </label>
+            </div>
         </div>
+
+        <div class="pt-4 border-t border-gray-200 dark:border-gray-700">
+             <div class="flex justify-between text-xs mb-1 font-semibold">
+                 <span>Min Score</span>
+                 <span id="scoreVal" class="text-blue-600">0%</span>
+             </div>
+             <input type="range" id="minScore" min="0" max="100" value="0" class="w-full h-1 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-blue-600">
+        </div>
+
+        <div class="mt-auto bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-400 p-3 rounded text-xs shadow-sm">
+            <div class="font-bold text-yellow-800 dark:text-yellow-200 flex items-center gap-1 mb-2">
+                <i data-feather="zap" class="w-3 h-3"></i> AI Smart Insight
+            </div>
+            <div id="aiInsights" class="leading-relaxed opacity-90">Analyzing dataset...</div>
+        </div>
+    </div>
+
+    <!-- Canvas (Main Report Area) -->
+    <div class="canvas-area custom-scrollbar bg-gray-100 dark:bg-[#201f1e]">
         
-        <div class="grid grid-cols-1 md:grid-cols-5 gap-4">
-          <!-- Development Group -->
-          <div>
-            <label class="block text-sm font-medium mb-2">Development Group</label>
-            <div class="relative">
-              <select id="groupSel" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 appearance-none custom-select">
-                <option value="All">All Groups</option>
-              </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <i data-feather="chevron-down" class="w-4 h-4"></i>
-              </div>
-            </div>
-          </div>
+        <!-- OVERVIEW TAB -->
+        <div id="overviewTab" class="tab-content block h-full">
+            <div class="grid grid-cols-12 gap-4 h-full">
+                
+                <!-- KPIs -->
+                <div class="col-span-12 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 h-[120px]">
+                    <div class="viz-card border-l-4 border-blue-500 justify-center">
+                        <div class="kpi-label">Avg Cohort Score</div>
+                        <div class="kpi-value" id="kpiAvg">0%</div>
+                        <div class="kpi-delta text-green-600"><i data-feather="trending-up" class="w-3 h-3"></i> vs prev week</div>
+                    </div>
+                    <div class="col-span-1 viz-card border-l-4 border-red-500 justify-center">
+                        <div class="kpi-label">At-Risk Candidates</div>
+                        <div class="kpi-value text-red-600" id="kpiRisk">0</div>
+                        <div class="kpi-delta text-gray-400">Requires Intervention</div>
+                    </div>
+                    <div class="col-span-1 viz-card border-l-4 border-green-500 justify-center">
+                        <div class="kpi-label">Avg Attendance</div>
+                        <div class="kpi-value" id="kpiAtt">0.0</div>
+                        <div class="kpi-delta text-gray-400">Max: 5.0</div>
+                    </div>
+                    <div class="col-span-1 viz-card border-l-4 border-purple-500 justify-center">
+                        <div class="kpi-label">Top Performer</div>
+                        <div class="text-xl font-bold mt-1 truncate" id="kpiTopName">-</div>
+                        <div class="text-sm text-purple-600 font-semibold" id="kpiTopScore">-</div>
+                    </div>
+                </div>
 
-          <!-- Week / Scrum selector -->
-          <div>
-            <label class="block text-sm font-medium mb-2">Sprint / Week</label>
-            <div class="relative">
-              <select id="weekSel" class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 appearance-none custom-select">
-                <option value="All">All</option>
-              </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                <i data-feather="chevron-down" class="w-4 h-4"></i>
-              </div>
-            </div>
-          </div>
+                <!-- Charts Row 1 -->
+                <div class="col-span-12 lg:col-span-8 viz-card min-h-[300px]">
+                    <div class="viz-header">
+                        <span>Performance Trend by Group</span>
+                    </div>
+                    <div id="trendChart" class="w-full flex-1"></div>
+                </div>
 
-          <!-- Search input -->
-          <div>
-            <label class="block text-sm font-medium mb-2">Search Candidate</label>
-            <input id="searchIn" type="search" placeholder="Search by name..." class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 custom-select">
-          </div>
-          
-          <!-- Multi-select filter -->
-          <div>
-            <label class="block text-sm font-medium mb-2">Performance Category</label>
-            <div class="relative">
-              <select id="categoryFilter" multiple class="w-full p-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 h-24 custom-select">
-                <option value="Excellent" selected>Excellent</option>
-                <option value="Moderate" selected>Moderate</option>
-                <option value="At-risk" selected>At Risk</option>
-              </select>
+                <div class="col-span-12 lg:col-span-4 viz-card min-h-[300px]">
+                     <div class="viz-header">Status Distribution</div>
+                     <div id="distChart" class="w-full flex-1"></div>
+                </div>
+
+                <!-- Charts Row 2 -->
+                <div class="col-span-12 lg:col-span-6 viz-card min-h-[300px]">
+                    <div class="viz-header">Tech vs. Soft Skills Correlation</div>
+                    <div id="scatterChart" class="w-full flex-1"></div>
+                </div>
+
+                <div class="col-span-12 lg:col-span-6 viz-card min-h-[300px]">
+                    <div class="viz-header">Cohort Skill Profile (Radar)</div>
+                    <div id="radarChart" class="w-full flex-1"></div>
+                </div>
+
+                <!-- Matrix Table -->
+                <div class="col-span-12 viz-card min-h-[400px]">
+                    <div class="viz-header">
+                        <div class="flex items-center gap-2">
+                             <span>Detailed Candidate Matrix</span>
+                             <span class="text-xs font-normal text-gray-500 bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded" id="tableCount">0 rows</span>
+                        </div>
+                        <div class="flex gap-2">
+                             <button id="compareBtn" onclick="compareCandidates()" class="hidden text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded font-bold hover:bg-blue-200">Compare Selected</button>
+                        </div>
+                    </div>
+                    <div class="overflow-auto custom-scrollbar flex-1 relative">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th width="30"><input type="checkbox" id="selectAll"></th>
+                                    <th>Candidate Name</th>
+                                    <th>Group</th>
+                                    <th>Week</th>
+                                    <th>Attendance</th>
+                                    <th>Tech Score</th>
+                                    <th>Overall Score</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="candidateTableBody">
+                                <!-- JS Generated -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
             </div>
-          </div>
-          
-          <!-- Score range slider + Quick actions -->
-          <div>
-            <label class="block text-sm font-medium mb-2">
-              Overall Score: <span id="scoreRangeValue">0-100%</span>
-            </label>
-            <div class="space-y-2 mb-3">
-              <div class="flex justify-between text-xs text-gray-500">
-                <span>0%</span>
-                <span>100%</span>
-              </div>
-              <input type="range" id="minScore" min="0" max="100" value="0" class="w-full custom-select">
-              <input type="range" id="maxScore" min="0" max="100" value="100" class="w-full custom-select">
-            </div>
-            <div class="flex items-end space-x-2">
-              <button id="resetBtn" class="flex-1 bg-gray-100 hover:bg-gray-200 px-3 py-2 rounded-lg text-sm transition-colors custom-select">
-                Reset All
-              </button>
-            </div>
-          </div>
         </div>
-      </div>
 
-      <!-- Detailed Table - MOVED TO TOP -->
-      <div class="card overflow-hidden mb-6 fade-in">
-        <div class="flex justify-between items-center p-4 border-b">
-          <h3 class="text-lg font-semibold">Candidate Details</h3>
-          <div class="flex items-center gap-2 text-sm">
-            <span class="text-gray-500">Showing <span id="candidateCount" class="font-medium">0</span> candidates</span>
-            <button class="text-blue-600 hover:text-blue-800 flex items-center gap-1 transition-colors">
-              <i data-feather="filter" class="w-4 h-4"></i>
-              <span>Filter</span>
-            </button>
-          </div>
+        <!-- KANBAN TAB -->
+        <div id="kanbanTab" class="tab-content hidden h-full">
+            <div class="flex gap-4 h-full overflow-x-auto pb-2">
+                <!-- Columns -->
+                <div class="flex-1 min-w-[280px] bg-gray-200 dark:bg-white/5 rounded p-3 flex flex-col" ondragover="allowDrop(event)" ondrop="drop(event, 'Training')">
+                    <div class="font-bold text-gray-600 dark:text-gray-300 mb-3 flex justify-between">
+                        <span>IN TRAINING</span>
+                        <span class="bg-gray-300 dark:bg-gray-600 px-2 rounded-full text-xs flex items-center" id="cntTraining">0</span>
+                    </div>
+                    <div class="flex-1 overflow-y-auto space-y-2 custom-scrollbar" id="colTraining"></div>
+                </div>
+                
+                <div class="flex-1 min-w-[280px] bg-blue-50 dark:bg-blue-900/10 rounded p-3 flex flex-col border-t-4 border-blue-500" ondragover="allowDrop(event)" ondrop="drop(event, 'Interview Ready')">
+                     <div class="font-bold text-blue-800 dark:text-blue-300 mb-3 flex justify-between">
+                        <span>INTERVIEW READY</span>
+                        <span class="bg-blue-200 dark:bg-blue-800 px-2 rounded-full text-xs flex items-center" id="cntInterview">0</span>
+                    </div>
+                    <div class="flex-1 overflow-y-auto space-y-2 custom-scrollbar" id="colInterview"></div>
+                </div>
+
+                 <div class="flex-1 min-w-[280px] bg-green-50 dark:bg-green-900/10 rounded p-3 flex flex-col border-t-4 border-green-500" ondragover="allowDrop(event)" ondrop="drop(event, 'Placed')">
+                     <div class="font-bold text-green-800 dark:text-green-300 mb-3 flex justify-between">
+                        <span>PLACED</span>
+                        <span class="bg-green-200 dark:bg-green-800 px-2 rounded-full text-xs flex items-center" id="cntPlaced">0</span>
+                    </div>
+                    <div class="flex-1 overflow-y-auto space-y-2 custom-scrollbar" id="colPlaced"></div>
+                </div>
+
+                <div class="flex-1 min-w-[280px] bg-red-50 dark:bg-red-900/10 rounded p-3 flex flex-col border-t-4 border-red-500" ondragover="allowDrop(event)" ondrop="drop(event, 'Needs Support')">
+                     <div class="font-bold text-red-800 dark:text-red-300 mb-3 flex justify-between">
+                        <span>NEEDS SUPPORT</span>
+                        <span class="bg-red-200 dark:bg-red-800 px-2 rounded-full text-xs flex items-center" id="cntSupport">0</span>
+                    </div>
+                    <div class="flex-1 overflow-y-auto space-y-2 custom-scrollbar" id="colSupport"></div>
+                </div>
+            </div>
         </div>
-        <div id="tableWrap" class="overflow-x-auto">
-          <div class="skeleton p-4 h-64"></div>
+
+        <!-- ANALYTICS TAB -->
+        <div id="analyticsTab" class="tab-content hidden h-full">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 h-full overflow-y-auto custom-scrollbar pr-2 pb-4">
+                <!-- Row 1: Skill Gap & Distribution -->
+                <div class="viz-card min-h-[300px]">
+                   <div class="viz-header">Group Performance Comparison</div>
+                   <div id="groupPerfChart" class="w-full flex-1"></div>
+                </div>
+                <div class="viz-card min-h-[300px]">
+                   <div class="viz-header">Skill Profile by Performance Category</div>
+                   <div id="skillDistChart" class="w-full flex-1"></div>
+                </div>
+
+                <!-- Row 2: Distribution & Correlations -->
+                <div class="viz-card min-h-[350px]">
+                   <div class="viz-header">Performance Distribution by Group (Box Plot)</div>
+                   <div id="distBoxChart" class="w-full flex-1"></div>
+                </div>
+                <div class="viz-card min-h-[350px]">
+                   <div class="viz-header">Metric Correlation Matrix</div>
+                   <div id="corrHeatmap" class="w-full flex-1"></div>
+                </div>
+
+                <!-- Row 3: Peer & Risk (Existing) -->
+                <div class="viz-card min-h-[300px]">
+                   <div class="viz-header">Peer Comparison Scatter</div>
+                   <div id="peerChart" class="w-full flex-1"></div>
+                </div>
+                <div class="viz-card min-h-[300px]">
+                   <div class="viz-header">Retention Risk Matrix</div>
+                   <div id="riskChart" class="w-full flex-1"></div>
+                </div>
+             </div>
         </div>
-      </div>
 
-      <!-- Enhanced KPIs -->
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-6" id="kpiRow">
-        <!-- Skeleton loading -->
-        <div class="kpi-card skeleton rounded-lg p-4 h-24 fade-in"></div>
-        <div class="kpi-card skeleton rounded-lg p-4 h-24 fade-in"></div>
-        <div class="kpi-card skeleton rounded-lg p-4 h-24 fade-in"></div>
-        <div class="kpi-card skeleton rounded-lg p-4 h-24 fade-in"></div>
-        <div class="kpi-card skeleton rounded-lg p-4 h-24 fade-in"></div>
-      </div>
+        <!-- CANDIDATES TAB -->
+        <div id="candidatesTab" class="tab-content hidden h-full">
+             <div class="grid grid-cols-3 gap-6 h-full">
+                <div class="col-span-2 viz-card">
+                    <div class="viz-header border-b border-gray-100 pb-2 mb-2">
+                        <span>Active Development Plans</span>
+                        <button class="bg-blue-600 text-white px-3 py-1 text-xs rounded hover:bg-blue-700">+ Create Plan</button>
+                    </div>
+                    <div id="devPlansContainer" class="space-y-3 overflow-y-auto pr-2">
+                        <!-- JS -->
+                    </div>
+                </div>
+                <div class="viz-card h-fit">
+                    <div class="viz-header">Quick Actions</div>
+                    <div class="grid grid-cols-1 gap-3">
+                         <button class="flex items-center gap-3 p-3 border rounded hover:bg-gray-50 dark:hover:bg-white/5 text-left group">
+                             <div class="bg-blue-100 dark:bg-blue-900 text-blue-600 p-2 rounded group-hover:bg-blue-600 group-hover:text-white transition"><i data-feather="calendar" class="w-4 h-4"></i></div>
+                             <div>
+                                 <div class="text-sm font-bold">Schedule Review</div>
+                                 <div class="text-xs text-gray-500">Book 1:1 sessions</div>
+                             </div>
+                         </button>
+                         <button class="flex items-center gap-3 p-3 border rounded hover:bg-gray-50 dark:hover:bg-white/5 text-left group">
+                             <div class="bg-purple-100 dark:bg-purple-900 text-purple-600 p-2 rounded group-hover:bg-purple-600 group-hover:text-white transition"><i data-feather="mail" class="w-4 h-4"></i></div>
+                             <div>
+                                 <div class="text-sm font-bold">Bulk Email</div>
+                                 <div class="text-xs text-gray-500">Send status reports</div>
+                             </div>
+                         </button>
+                    </div>
+                </div>
+             </div>
+        </div>
 
-      <!-- Performance Trends Over Time -->
-      <div class="card p-4 mb-6 fade-in">
-        <h3 class="text-lg font-semibold mb-4">Performance Trends</h3>
-        <div id="performanceTrends" class="chart h-80 skeleton rounded-lg"></div>
-      </div>
+    </div>
+  </div>
 
-      <!-- Main Charts -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <!-- Overall Distribution -->
-        <div class="card p-4 fade-in">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold">Performance Distribution</h3>
+  <!-- MODALS -->
+
+  <!-- Candidate Details Modal (Large) -->
+  <div id="candidateModal" class="modal-overlay" onclick="if(event.target===this) closeCandidateModal()">
+    <div class="modal-content large bg-gray-50 dark:bg-[#201f1e]">
+       <div class="bg-white dark:bg-[#252423] p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center sticky top-0 z-20">
+            <div class="flex items-center gap-4">
+                <div class="h-12 w-12 rounded bg-blue-600 text-white flex items-center justify-center font-bold text-xl shadow-lg" id="modalInitials">JD</div>
+                <div>
+                    <h2 class="text-xl font-bold" id="modalName">John Doe</h2>
+                    <div class="text-sm text-gray-500 flex gap-2 items-center">
+                        <span id="modalGroup">Scan-Tech</span>
+                        <span class="w-1 h-1 bg-gray-400 rounded-full"></span>
+                        <span id="modalBadge" class="status-badge">Excellent</span>
+                    </div>
+                </div>
+            </div>
             <div class="flex gap-2">
-              <button class="performance-filter active" data-filter="all">All</button>
-              <button class="performance-filter" data-filter="excellent">Excellent</button>
-              <button class="performance-filter" data-filter="moderate">Moderate</button>
-              <button class="performance-filter" data-filter="at-risk">At Risk</button>
+                <button onclick="generateSinglePDF()" class="px-4 py-2 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 rounded text-sm font-semibold flex items-center gap-2">
+                    <i data-feather="printer" class="w-4 h-4"></i> Report
+                </button>
+                <button onclick="closeCandidateModal()" class="p-2 hover:bg-red-50 hover:text-red-600 rounded"><i data-feather="x" class="w-5 h-5"></i></button>
             </div>
-          </div>
-          <div id="overallDist" class="chart h-80 skeleton rounded-lg"></div>
-        </div>
+       </div>
 
-        <!-- Group Comparison -->
-        <div class="card p-4 fade-in">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold">Group Performance Comparison</h3>
-            <div class="flex items-center gap-2 text-sm text-gray-500">
-              <i data-feather="info" class="w-4 h-4"></i>
-              <span>Hover for details</span>
+       <div class="p-6 overflow-y-auto bg-gray-50 dark:bg-[#1b1b1b] flex-1">
+            <!-- Metric Cards -->
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+                <div class="bg-white dark:bg-[#252423] p-4 rounded shadow-sm border-t-4 border-blue-500">
+                    <div class="text-xs text-gray-500 uppercase">Overall</div>
+                    <div class="text-2xl font-bold mt-1" id="modalScore">0%</div>
+                </div>
+                <div class="bg-white dark:bg-[#252423] p-4 rounded shadow-sm border-t-4 border-green-500">
+                    <div class="text-xs text-gray-500 uppercase">Attendance</div>
+                    <div class="text-2xl font-bold mt-1" id="modalAtt">0</div>
+                </div>
+                <div class="bg-white dark:bg-[#252423] p-4 rounded shadow-sm border-t-4 border-purple-500">
+                    <div class="text-xs text-gray-500 uppercase">Tech Skills</div>
+                    <div class="text-2xl font-bold mt-1" id="modalTech">0</div>
+                </div>
+                <div class="bg-white dark:bg-[#252423] p-4 rounded shadow-sm border-t-4 border-orange-500">
+                    <div class="text-xs text-gray-500 uppercase">Projects</div>
+                    <div class="text-2xl font-bold mt-1" id="modalProj">0</div>
+                </div>
+                <div class="bg-white dark:bg-[#252423] p-4 rounded shadow-sm border-t-4 border-teal-500">
+                    <div class="text-xs text-gray-500 uppercase">Soft Skills</div>
+                    <div class="text-2xl font-bold mt-1" id="modalSoft">0</div>
+                </div>
             </div>
-          </div>
-          <div id="groupCompare" class="chart h-80 skeleton rounded-lg"></div>
-        </div>
-      </div>
 
-      <!-- Skill Distribution by Category -->
-      <div class="card p-4 mb-6 fade-in">
-        <h3 class="text-lg font-semibold mb-4">Skill Distribution by Performance Category</h3>
-        <div id="skillDistribution" class="chart h-80 skeleton rounded-lg"></div>
-      </div>
-
-      <!-- Secondary Charts -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <!-- Radar Chart -->
-        <div class="card p-4 fade-in">
-          <h3 class="text-lg font-semibold mb-4">Skills Radar</h3>
-          <div id="criteriaRadar" class="chart h-80 skeleton rounded-lg"></div>
-        </div>
-
-        <!-- Scatter Plot -->
-        <div class="card p-4 fade-in">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-semibold">Tech vs Soft Skills</h3>
-            <div class="flex items-center gap-2">
-              <div class="flex items-center gap-1">
-                <span class="w-3 h-3 rounded-full bg-green-500"></span>
-                <span class="text-xs">Excellent</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <span class="w-3 h-3 rounded-full bg-amber-500"></span>
-                <span class="text-xs">Moderate</span>
-              </div>
-              <div class="flex items-center gap-1">
-                <span class="w-3 h-3 rounded-full bg-red-500"></span>
-                <span class="text-xs">At Risk</span>
-              </div>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                 <div class="viz-card h-[350px]">
+                     <div class="viz-header">Performance Trajectory</div>
+                     <div id="modalTrendChart" class="w-full h-full"></div>
+                 </div>
+                 <div class="viz-card h-[350px]">
+                     <div class="viz-header">Detailed Skill Profile</div>
+                     <div id="modalRadarChart" class="w-full h-full"></div>
+                 </div>
             </div>
-          </div>
-          <div id="techSoftScatter" class="chart h-80 skeleton rounded-lg"></div>
+
+            <div class="mt-6 bg-blue-50 dark:bg-blue-900/10 p-4 rounded border border-blue-100 dark:border-blue-800">
+                <h3 class="font-bold text-blue-800 dark:text-blue-300 mb-2 flex items-center gap-2"><i data-feather="info" class="w-4 h-4"></i> Automated Recommendations</h3>
+                <ul class="list-disc ml-5 text-sm space-y-1 text-gray-700 dark:text-gray-300" id="modalRecs"></ul>
+            </div>
+       </div>
+    </div>
+  </div>
+
+  <!-- Settings Modal -->
+  <div id="settingsModal" class="modal-overlay" onclick="if(event.target===this) document.getElementById('settingsModal').style.display='none'">
+     <div class="modal-content">
+         <h3 class="text-lg font-bold mb-4 border-b pb-2">Configuration</h3>
+         <div class="space-y-4 max-h-[60vh] overflow-y-auto pr-2">
+             <h4 class="text-xs font-bold uppercase text-gray-500">Weighted Scoring Model</h4>
+             <div class="grid grid-cols-2 gap-3 text-sm">
+                 <div><label>Attendance Weight</label><input type="number" id="w_Att" class="pbi-select" value="1"></div>
+                 <div><label>Tech Skill Weight</label><input type="number" id="w_Tech" class="pbi-select" value="1"></div>
+                 <div><label>Communication</label><input type="number" id="w_Comm" class="pbi-select" value="1"></div>
+                 <div><label>Project Delivery</label><input type="number" id="w_Proj" class="pbi-select" value="1"></div>
+                 <div><label>Code Quality</label><input type="number" id="w_Code" class="pbi-select" value="1"></div>
+                 <div><label>Problem Solving</label><input type="number" id="w_Prob" class="pbi-select" value="1"></div>
+             </div>
+         </div>
+         <div class="flex gap-2 mt-6">
+             <button onclick="saveSettings()" class="flex-1 bg-blue-600 text-white py-2 rounded text-sm font-semibold hover:bg-blue-700">Apply Changes</button>
+         </div>
+     </div>
+  </div>
+
+  <!-- AI Chat Widget -->
+  <div id="aiChat" class="ai-chat-container">
+    <div class="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-3 flex justify-between items-center cursor-pointer rounded-t-lg" onclick="toggleAIChat()">
+        <span class="font-bold text-sm flex items-center gap-2"><i data-feather="cpu" class="w-4 h-4"></i> MICT AI Analyst</span>
+        <i data-feather="chevron-down" class="w-4 h-4"></i>
+    </div>
+    <div class="flex-1 p-4 overflow-y-auto bg-gray-50 dark:bg-[#1b1b1b]" id="chatHistory">
+        <div class="bg-white dark:bg-[#333] p-3 rounded-tr-lg rounded-br-lg rounded-bl-lg shadow-sm text-sm border border-gray-100 dark:border-gray-600 mb-3">
+            Hello! I'm analyzing the <b>Full Cohort History</b>. I can filter data, switch themes, or find specific candidates. Try asking:
+            <div class="mt-2 flex flex-wrap gap-2">
+                <span class="bg-blue-100 text-blue-700 px-2 py-1 rounded-full text-xs cursor-pointer hover:bg-blue-200" onclick="askAI('Top performers')">🏆 Top 3</span>
+                <span class="bg-red-100 text-red-700 px-2 py-1 rounded-full text-xs cursor-pointer hover:bg-red-200" onclick="askAI('At risk candidates')">⚠️ At Risk</span>
+                <span class="bg-purple-100 text-purple-700 px-2 py-1 rounded-full text-xs cursor-pointer hover:bg-purple-200" onclick="askAI('Reset filters')">🔄 Reset</span>
+            </div>
         </div>
-      </div>
-
-      <!-- Performance by Group (Box Plots) -->
-      <div class="card p-4 mb-6 fade-in">
-        <h3 class="text-lg font-semibold mb-4">Performance Distribution by Group</h3>
-        <div id="groupBoxPlots" class="chart h-80 skeleton rounded-lg"></div>
-      </div>
-
-      <!-- Correlation Matrix -->
-      <div class="card p-4 mb-6 fade-in">
-        <h3 class="text-lg font-semibold mb-4">Skills Correlation Matrix</h3>
-        <div id="correlationMatrix" class="chart h-96 skeleton rounded-lg"></div>
-      </div>
-
-      <!-- Top Performers & At-Risk Candidates -->
-      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-        <!-- Top Performers -->
-        <div class="card p-4 fade-in">
-          <h3 class="text-lg font-semibold mb-4">Top Performers</h3>
-          <div id="topPerformers" class="space-y-3">
-            <div class="skeleton rounded-lg p-4 h-16"></div>
-            <div class="skeleton rounded-lg p-4 h-16"></div>
-            <div class="skeleton rounded-lg p-4 h-16"></div>
-          </div>
-        </div>
-
-        <!-- At-Risk Candidates -->
-        <div class="card p-4 fade-in">
-          <h3 class="text-lg font-semibold mb-4">At-Risk Candidates</h3>
-          <div id="atRiskCandidates" class="space-y-3">
-            <div class="skeleton rounded-lg p-4 h-16"></div>
-            <div class="skeleton rounded-lg p-4 h-16"></div>
-            <div class="skeleton rounded-lg p-4 h-16"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Insights & Recommendations -->
-      <div class="card p-6 mb-6 fade-in">
-        <h3 class="text-xl font-bold mb-4">Insights & Recommendations</h3>
-        <div id="insightsContent" class="prose max-w-none">
-          <div class="skeleton rounded-lg p-4 h-32"></div>
-        </div>
-      </div>
+    </div>
+    <div class="p-3 bg-white dark:bg-[#252423] border-t border-gray-200 dark:border-gray-600 flex gap-2">
+        <input type="text" id="chatInput" class="flex-1 text-sm border rounded-full px-3 outline-none focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600" placeholder="Ask me anything..." onkeypress="handleChatKey(event)">
+        <button onclick="sendChat()" class="bg-blue-600 text-white rounded-full p-2 hover:bg-blue-700 transition"><i data-feather="send" class="w-4 h-4"></i></button>
     </div>
   </div>
 
   <script>
-    // Enhanced dataset with ALL groups and candidates - UPDATED with only 6 skills
-    const ALL_DATA = [
-      // Scan-Tech (5)
-      {Candidate:"Aldo Stevens", Scrum:"Mini presentation", DevGroup:"Scan-Tech", 
-       Attendance:5, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:1, TechSkills:4},
-      {Candidate:"Charlton Steenkamp", Scrum:"Mini presentation", DevGroup:"Scan-Tech", 
-       Attendance:5, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
-      {Candidate:"Olona Mqongwana", Scrum:"Mini presentation", DevGroup:"Scan-Tech", 
-       Attendance:3, Communication:3, Accountability:3, CreativityOwnership:4, ProjectDelivery:4, TechSkills:3},
-      {Candidate:"Nontobeko Nkomo", Scrum:"Mini presentation", DevGroup:"Scan-Tech", 
-       Attendance:2, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
-      {Candidate:"Siyanda Dube", Scrum:"Mini presentation", DevGroup:"Scan-Tech", 
-       Attendance:5, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:1, TechSkills:4},
+    const { jsPDF } = window.jspdf;
 
-      // PinCoders (5)
-      {Candidate:"Anele Ngcatshe", Scrum:"Mini presentation", DevGroup:"PinCoders", 
-       Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
-      {Candidate:"Ceshia Williams", Scrum:"Mini presentation", DevGroup:"PinCoders", 
-       Attendance:3, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
-      {Candidate:"Lwazi Nhleko", Scrum:"Mini presentation", DevGroup:"PinCoders", 
-       Attendance:3, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
-      {Candidate:"Thando Valley", Scrum:"Mini presentation", DevGroup:"PinCoders", 
-       Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:4, TechSkills:4},
-      {Candidate:"Zanele Gulwa", Scrum:"Mini presentation", DevGroup:"PinCoders", 
-       Attendance:3, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:1, TechSkills:3},
+    // --- DATA & CONFIG ---
+    const GROUPS = ['Scan-Tech', 'PinCoders', 'HTML Pioneers', 'A-Green Culture'];
+    const WEEKS = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    
+    let scoringWeights = {
+       Attendance: 1, TechSkills: 1, Communication: 1, Accountability: 1,
+       CreativityOwnership: 1, ProjectDelivery: 1, ProblemSolving: 1, 
+       Teamwork: 1, CodeQuality: 1, Leadership: 1
+    };
 
-      // HTML Pioneers (5)
-      {Candidate:"Aphiwe Tyhalisi", Scrum:"Mini presentation", DevGroup:"HTML Pioneers", 
-       Attendance:5, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:4, TechSkills:4},
-      {Candidate:"Ashura Noordien", Scrum:"Mini presentation", DevGroup:"HTML Pioneers", 
-       Attendance:5, Communication:2, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
-      {Candidate:"Layola Mbula", Scrum:"Mini presentation", DevGroup:"HTML Pioneers", 
-       Attendance:5, Communication:4, Accountability:3, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
-      {Candidate:"Mdumiseni Radebe", Scrum:"Mini presentation", DevGroup:"HTML Pioneers", 
-       Attendance:5, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
-      {Candidate:"Athandile Nkcaza", Scrum:"Mini presentation", DevGroup:"HTML Pioneers", 
-       Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:4},
+    // --- RESTORED COMPLETE DATASET ---
+    // Contains hardcoded values for Weeks 1-4 for all candidates
+    let ALL_DATA = [
+      // SCAN-TECH GROUP
+      {Week: "Week 1", Candidate:"Aldo Stevens", DevGroup:"Scan-Tech", Attendance:3, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
+      {Week: "Week 2", Candidate:"Aldo Stevens", DevGroup:"Scan-Tech", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 3", Candidate:"Aldo Stevens", DevGroup:"Scan-Tech", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:5, ProjectDelivery:3, TechSkills:4},
+      {Week: "Week 4", Candidate:"Aldo Stevens", DevGroup:"Scan-Tech", Attendance:5, Communication:5, Accountability:3, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+      
+      {Week: "Week 1", Candidate:"Charlton Steenkamp", DevGroup:"Scan-Tech", Attendance:3, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 2", Candidate:"Charlton Steenkamp", DevGroup:"Scan-Tech", Attendance:5, Communication:3, Accountability:4, CreativityOwnership:4, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 3", Candidate:"Charlton Steenkamp", DevGroup:"Scan-Tech", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 4", Candidate:"Charlton Steenkamp", DevGroup:"Scan-Tech", Attendance:5, Communication:4, Accountability:5, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+      
+      {Week: "Week 1", Candidate:"Olona Mqongwana", DevGroup:"Scan-Tech", Attendance:5, Communication:3, Accountability:3, CreativityOwnership:4, ProjectDelivery:4, TechSkills:3},
+      {Week: "Week 2", Candidate:"Olona Mqongwana", DevGroup:"Scan-Tech", Attendance:4, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:3},
+      {Week: "Week 3", Candidate:"Olona Mqongwana", DevGroup:"Scan-Tech", Attendance:4, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 4", Candidate:"Olona Mqongwana", DevGroup:"Scan-Tech", Attendance:5, Communication:5, Accountability:2, CreativityOwnership:5, ProjectDelivery:5, TechSkills:4},
+      
+      {Week: "Week 1", Candidate:"Nontobeko Nkomo", DevGroup:"Scan-Tech", Attendance:2, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
+      {Week: "Week 2", Candidate:"Nontobeko Nkomo", DevGroup:"Scan-Tech", Attendance:1, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:2, TechSkills:3},
+      {Week: "Week 3", Candidate:"Nontobeko Nkomo", DevGroup:"Scan-Tech", Attendance:2, Communication:3, Accountability:2, CreativityOwnership:2, ProjectDelivery:1, TechSkills:2},
+      {Week: "Week 4", Candidate:"Nontobeko Nkomo", DevGroup:"Scan-Tech", Attendance:2, Communication:2, Accountability:2, CreativityOwnership:1, ProjectDelivery:1, TechSkills:1},
+      
+      {Week: "Week 1", Candidate:"Siyanda Dube", DevGroup:"Scan-Tech", Attendance:5, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:1, TechSkills:4},
+      {Week: "Week 2", Candidate:"Siyanda Dube", DevGroup:"Scan-Tech", Attendance:5, Communication:3, Accountability:3, CreativityOwnership:4, ProjectDelivery:3, TechSkills:4},
+      {Week: "Week 3", Candidate:"Siyanda Dube", DevGroup:"Scan-Tech", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:5},
+      {Week: "Week 4", Candidate:"Siyanda Dube", DevGroup:"Scan-Tech", Attendance:5, Communication:4, Accountability:5, CreativityOwnership:4, ProjectDelivery:5, TechSkills:5},
 
-      // A-Green Culture (5)
-      {Candidate:"Amahle Ngongeni", Scrum:"Mini presentation", DevGroup:"A-Green Culture", 
-       Attendance:5, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:3, TechSkills:3},
-      {Candidate:"Inganathi Mpahleni", Scrum:"Mini presentation", DevGroup:"A-Green Culture", 
-       Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:2, TechSkills:3},
-      {Candidate:"Mika'eel Albertyn", Scrum:"Mini presentation", DevGroup:"A-Green Culture", 
-       Attendance:5, Communication:3, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:5},
-      {Candidate:"Naelin Churches", Scrum:"Mini presentation", DevGroup:"A-Green Culture", 
-       Attendance:5, Communication:3, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
-      {Candidate:"Phola Mavumengwana", Scrum:"Mini presentation", DevGroup:"A-Green Culture", 
-       Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      // PINCODERS GROUP
+      {Week: "Week 1", Candidate:"Anele Ngcatshe", DevGroup:"PinCoders", Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 2", Candidate:"Anele Ngcatshe", DevGroup:"PinCoders", Attendance:4, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:3},
+      {Week: "Week 3", Candidate:"Anele Ngcatshe", DevGroup:"PinCoders", Attendance:3, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
+      {Week: "Week 4", Candidate:"Anele Ngcatshe", DevGroup:"PinCoders", Attendance:4, Communication:4, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+
+      {Week: "Week 1", Candidate:"Ceshia Williams", DevGroup:"PinCoders", Attendance:3, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
+      {Week: "Week 2", Candidate:"Ceshia Williams", DevGroup:"PinCoders", Attendance:3, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
+      {Week: "Week 3", Candidate:"Ceshia Williams", DevGroup:"PinCoders", Attendance:4, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:1},
+      {Week: "Week 4", Candidate:"Ceshia Williams", DevGroup:"PinCoders", Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:2, TechSkills:2},
+
+      {Week: "Week 1", Candidate:"Lwazi Nhleko", DevGroup:"PinCoders", Attendance:3, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
+      {Week: "Week 2", Candidate:"Lwazi Nhleko", DevGroup:"PinCoders", Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 3", Candidate:"Lwazi Nhleko", DevGroup:"PinCoders", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 4", Candidate:"Lwazi Nhleko", DevGroup:"PinCoders", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+
+      {Week: "Week 1", Candidate:"Thando Valley", DevGroup:"PinCoders", Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:4, TechSkills:4},
+      {Week: "Week 2", Candidate:"Thando Valley", DevGroup:"PinCoders", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:5, TechSkills:5},
+      {Week: "Week 3", Candidate:"Thando Valley", DevGroup:"PinCoders", Attendance:5, Communication:5, Accountability:5, CreativityOwnership:5, ProjectDelivery:5, TechSkills:5},
+      {Week: "Week 4", Candidate:"Thando Valley", DevGroup:"PinCoders", Attendance:5, Communication:5, Accountability:5, CreativityOwnership:5, ProjectDelivery:5, TechSkills:5},
+
+      {Week: "Week 1", Candidate:"Zanele Gulwa", DevGroup:"PinCoders", Attendance:3, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:1, TechSkills:3},
+      {Week: "Week 2", Candidate:"Zanele Gulwa", DevGroup:"PinCoders", Attendance:3, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:1, TechSkills:3},
+      {Week: "Week 3", Candidate:"Zanele Gulwa", DevGroup:"PinCoders", Attendance:2, Communication:2, Accountability:2, CreativityOwnership:2, ProjectDelivery:1, TechSkills:2},
+      {Week: "Week 4", Candidate:"Zanele Gulwa", DevGroup:"PinCoders", Attendance:3, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
+
+      // HTML PIONEERS GROUP
+      {Week: "Week 1", Candidate:"Aphiwe Tyhalisi", DevGroup:"HTML Pioneers", Attendance:3, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:4, TechSkills:4},
+      {Week: "Week 2", Candidate:"Aphiwe Tyhalisi", DevGroup:"HTML Pioneers", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+      {Week: "Week 3", Candidate:"Aphiwe Tyhalisi", DevGroup:"HTML Pioneers", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:5, TechSkills:4},
+      {Week: "Week 4", Candidate:"Aphiwe Tyhalisi", DevGroup:"HTML Pioneers", Attendance:5, Communication:5, Accountability:5, CreativityOwnership:4, ProjectDelivery:5, TechSkills:5},
+
+      {Week: "Week 1", Candidate:"Ashura Noordien", DevGroup:"HTML Pioneers", Attendance:5, Communication:2, Accountability:3, CreativityOwnership:2, ProjectDelivery:2, TechSkills:2},
+      {Week: "Week 2", Candidate:"Ashura Noordien", DevGroup:"HTML Pioneers", Attendance:5, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 3", Candidate:"Ashura Noordien", DevGroup:"HTML Pioneers", Attendance:2, Communication:2, Accountability:2, CreativityOwnership:1, ProjectDelivery:2, TechSkills:2},
+      {Week: "Week 4", Candidate:"Ashura Noordien", DevGroup:"HTML Pioneers", Attendance:1, Communication:1, Accountability:1, CreativityOwnership:1, ProjectDelivery:1, TechSkills:2},
+
+      {Week: "Week 1", Candidate:"Layola Mbula", DevGroup:"HTML Pioneers", Attendance:5, Communication:4, Accountability:3, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+      {Week: "Week 2", Candidate:"Layola Mbula", DevGroup:"HTML Pioneers", Attendance:5, Communication:5, Accountability:4, CreativityOwnership:4, ProjectDelivery:5, TechSkills:4},
+      {Week: "Week 3", Candidate:"Layola Mbula", DevGroup:"HTML Pioneers", Attendance:5, Communication:5, Accountability:5, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+      {Week: "Week 4", Candidate:"Layola Mbula", DevGroup:"HTML Pioneers", Attendance:5, Communication:5, Accountability:5, CreativityOwnership:5, ProjectDelivery:5, TechSkills:5},
+
+      {Week: "Week 1", Candidate:"Mdumiseni Radebe", DevGroup:"HTML Pioneers", Attendance:5, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 2", Candidate:"Mdumiseni Radebe", DevGroup:"HTML Pioneers", Attendance:5, Communication:4, Accountability:3, CreativityOwnership:3, ProjectDelivery:4, TechSkills:3},
+      {Week: "Week 3", Candidate:"Mdumiseni Radebe", DevGroup:"HTML Pioneers", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+      {Week: "Week 4", Candidate:"Mdumiseni Radebe", DevGroup:"HTML Pioneers", Attendance:5, Communication:5, Accountability:5, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+
+      {Week: "Week 1", Candidate:"Athandile Nkcaza", DevGroup:"HTML Pioneers", Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:4},
+      {Week: "Week 2", Candidate:"Athandile Nkcaza", DevGroup:"HTML Pioneers", Attendance:4, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+      {Week: "Week 3", Candidate:"Athandile Nkcaza", DevGroup:"HTML Pioneers", Attendance:3, Communication:3, Accountability:4, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 4", Candidate:"Athandile Nkcaza", DevGroup:"HTML Pioneers", Attendance:4, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+
+      // A-GREEN CULTURE GROUP
+      {Week: "Week 1", Candidate:"Amahle Ngongeni", DevGroup:"A-Green Culture", Attendance:5, Communication:3, Accountability:3, CreativityOwnership:2, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 2", Candidate:"Amahle Ngongeni", DevGroup:"A-Green Culture", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 3", Candidate:"Amahle Ngongeni", DevGroup:"A-Green Culture", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+      {Week: "Week 4", Candidate:"Amahle Ngongeni", DevGroup:"A-Green Culture", Attendance:5, Communication:5, Accountability:5, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+
+      {Week: "Week 1", Candidate:"Inganathi Mpahleni", DevGroup:"A-Green Culture", Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:2, TechSkills:3},
+      {Week: "Week 2", Candidate:"Inganathi Mpahleni", DevGroup:"A-Green Culture", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 3", Candidate:"Inganathi Mpahleni", DevGroup:"A-Green Culture", Attendance:5, Communication:4, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 4", Candidate:"Inganathi Mpahleni", DevGroup:"A-Green Culture", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:3, TechSkills:3},
+
+      {Week: "Week 1", Candidate:"Mika'eel Albertyn", DevGroup:"A-Green Culture", Attendance:5, Communication:3, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:5},
+      {Week: "Week 2", Candidate:"Mika'eel Albertyn", DevGroup:"A-Green Culture", Attendance:5, Communication:5, Accountability:5, CreativityOwnership:5, ProjectDelivery:5, TechSkills:5},
+      {Week: "Week 3", Candidate:"Mika'eel Albertyn", DevGroup:"A-Green Culture", Attendance:5, Communication:5, Accountability:5, CreativityOwnership:5, ProjectDelivery:5, TechSkills:5},
+      {Week: "Week 4", Candidate:"Mika'eel Albertyn", DevGroup:"A-Green Culture", Attendance:5, Communication:5, Accountability:5, CreativityOwnership:5, ProjectDelivery:5, TechSkills:5},
+
+      {Week: "Week 1", Candidate:"Naelin Churches", DevGroup:"A-Green Culture", Attendance:5, Communication:3, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4},
+      {Week: "Week 2", Candidate:"Naelin Churches", DevGroup:"A-Green Culture", Attendance:5, Communication:5, Accountability:5, CreativityOwnership:5, ProjectDelivery:5, TechSkills:4},
+      {Week: "Week 3", Candidate:"Naelin Churches", DevGroup:"A-Green Culture", Attendance:5, Communication:5, Accountability:5, CreativityOwnership:5, ProjectDelivery:4, TechSkills:4},
+      {Week: "Week 4", Candidate:"Naelin Churches", DevGroup:"A-Green Culture", Attendance:5, Communication:5, Accountability:5, CreativityOwnership:5, ProjectDelivery:5, TechSkills:5},
+
+      {Week: "Week 1", Candidate:"Phola Mavumengwana", DevGroup:"A-Green Culture", Attendance:4, Communication:3, Accountability:3, CreativityOwnership:3, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 2", Candidate:"Phola Mavumengwana", DevGroup:"A-Green Culture", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:3},
+      {Week: "Week 3", Candidate:"Phola Mavumengwana", DevGroup:"A-Green Culture", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:3, TechSkills:3},
+      {Week: "Week 4", Candidate:"Phola Mavumengwana", DevGroup:"A-Green Culture", Attendance:5, Communication:4, Accountability:4, CreativityOwnership:4, ProjectDelivery:4, TechSkills:4}
     ];
 
-    // Calculate overall score for each candidate and add to dataset
-    ALL_DATA.forEach(candidate => {
-      const skills = [
-        candidate.Attendance,
-        candidate.Communication,
-        candidate.Accountability,
-        candidate.CreativityOwnership,
-        candidate.ProjectDelivery,
-        candidate.TechSkills
-      ].map(v => (typeof v === 'number' && !isNaN(v)) ? v : 0);
-      const sum = skills.reduce((total, score) => total + score, 0);
-      candidate.OverallScore = (sum / 30) * 100;
+    // --- CORE LOGIC ---
+
+    // Hydrate data with missing metrics
+    function hydrateData() {
+        ALL_DATA.forEach(d => {
+            d.ProblemSolving = d.TechSkills; // Assumed correlation
+            d.Teamwork = d.Communication;    // Assumed correlation
+            d.CodeQuality = d.TechSkills;    // Assumed correlation
+            d.Leadership = d.Accountability; // Assumed correlation
+            d.isFlagged = false;
+            
+            // Set Pipeline Stage based on Score
+            if(d.Week === 'Week 4') {
+                if(d.OverallScore > 80) d.PipelineStage = 'Interview Ready';
+                else if(d.OverallScore < 60) d.PipelineStage = 'Needs Support';
+                else d.PipelineStage = 'Training';
+            } else {
+                d.PipelineStage = 'Training';
+            }
+        });
+        recalculateScores();
+    }
+
+    function recalculateScores() {
+        const totalWeight = Object.values(scoringWeights).reduce((a,b)=>a+b, 0);
+        const maxScorePerItem = 5;
+        
+        ALL_DATA.forEach(d => {
+            const weightedSum = 
+               (d.Attendance * scoringWeights.Attendance) +
+               (d.TechSkills * scoringWeights.TechSkills) +
+               (d.Communication * scoringWeights.Communication) +
+               (d.Accountability * scoringWeights.Accountability) +
+               (d.CreativityOwnership * scoringWeights.CreativityOwnership) +
+               (d.ProjectDelivery * scoringWeights.ProjectDelivery) +
+               (d.ProblemSolving * scoringWeights.ProblemSolving) +
+               (d.Teamwork * scoringWeights.Teamwork) +
+               (d.CodeQuality * scoringWeights.CodeQuality) +
+               (d.Leadership * scoringWeights.Leadership);
+            
+            const maxPossible = totalWeight * maxScorePerItem;
+            d.OverallScore = parseFloat(((weightedSum / maxPossible) * 100).toFixed(1));
+        });
+    }
+
+    function getCategory(score) {
+        if(score >= 80) return 'Excellent';
+        if(score >= 60) return 'Moderate';
+        return 'At-risk';
+    }
+
+    // --- APP STATE ---
+    let currentState = {
+        group: ['All'],
+        week: 'Week 4',
+        statuses: ['Excellent', 'Moderate', 'At-risk'],
+        search: '',
+        minScore: 0,
+        liveMode: false
+    };
+
+    // --- INITIALIZATION ---
+    document.addEventListener('DOMContentLoaded', () => {
+        hydrateData();
+        
+        // Populate Selects
+        const groupSel = document.getElementById('groupSel');
+        GROUPS.forEach(g => {
+            const opt = document.createElement('option');
+            opt.value = g; opt.text = g; groupSel.appendChild(opt);
+        });
+        
+        const weekSel = document.getElementById('weekSel');
+        WEEKS.forEach(w => {
+            const opt = document.createElement('option');
+            opt.value = w; opt.text = w; 
+            if(w === 'Week 4') opt.selected = true;
+            weekSel.appendChild(opt);
+        });
+
+        // Event Listeners
+        groupSel.addEventListener('change', () => {
+            const selected = Array.from(groupSel.selectedOptions).map(o => o.value);
+            currentState.group = selected.includes('All') ? ['All'] : selected;
+            updateDashboard();
+        });
+
+        weekSel.addEventListener('change', (e) => {
+            currentState.week = e.target.value;
+            updateDashboard();
+        });
+
+        document.getElementById('searchIn').addEventListener('input', (e) => {
+            currentState.search = e.target.value.toLowerCase();
+            updateDashboard();
+        });
+
+        document.getElementById('minScore').addEventListener('input', (e) => {
+            currentState.minScore = e.target.value;
+            document.getElementById('scoreVal').innerText = e.target.value + '%';
+            updateDashboard();
+        });
+
+        document.querySelectorAll('.status-chk').forEach(chk => {
+            chk.addEventListener('change', () => {
+                const checked = Array.from(document.querySelectorAll('.status-chk:checked')).map(c => c.value);
+                currentState.statuses = checked;
+                updateDashboard();
+            });
+        });
+
+        document.getElementById('darkModeToggle').addEventListener('change', (e) => {
+            document.body.setAttribute('data-theme', e.target.checked ? 'dark' : 'light');
+            document.body.classList.toggle('dark-mode');
+            updateDashboard();
+        });
+
+        document.getElementById('selectAll').addEventListener('change', (e) => {
+            document.querySelectorAll('.row-check').forEach(c => c.checked = e.target.checked);
+            checkSelection();
+        });
+
+        // Initial Render
+        feather.replace();
+        setTimeout(() => {
+            document.getElementById('loadingIndicator').classList.add('opacity-0');
+            setTimeout(() => { 
+                document.getElementById('loadingIndicator').style.display = 'none'; 
+                updateDashboard();
+            }, 500);
+        }, 800);
     });
-
-    // Current working dataset (can be filtered)
-    let DATA = [...ALL_DATA];
-
-    // Helper functions
-    const fmt = (v, d=2) => (v==null || isNaN(v)) ? "N/A" : Number(v).toFixed(d);
-    const unique = arr => Array.from(new Set(arr.filter(x => x != null && x !== undefined)));
-
-    // Soft skills average (Communication, Accountability, CreativityOwnership)
-    function softSkillAvg(r){
-      const vals = [r.Communication, r.Accountability, r.CreativityOwnership].map(v => Number(v) || 0);
-      return vals.reduce((a,b)=>a+b,0) / vals.length;
-    }
-
-    // Overall average using only the 6 skills
-    function overallAvg(r){
-      const vals = [r.Attendance, r.Communication, r.Accountability, r.CreativityOwnership, r.ProjectDelivery, r.TechSkills].map(v => Number(v) || 0);
-      return vals.reduce((a,b)=>a+b,0) / vals.length;
-    }
-
-    function isAtRisk(r){
-      return [r.Attendance, r.Communication, r.Accountability, r.CreativityOwnership, r.ProjectDelivery, r.TechSkills].some(v => Number(v) <= 2);
-    }
-
-    function category(r){
-      if(isAtRisk(r)) return "At-risk";
-      const avg = overallAvg(r);
-      if(avg >= 4) return "Excellent";
-      if(avg >= 2.5) return "Moderate";
-      return "Moderate";
-    }
-
-    function colorByCategory(cat){
-      return cat==="At-risk" ? "#ef4444" : (cat==="Excellent" ? "#10b981" : "#f59e0b");
-    }
-
-    // Theme Management
-    function initTheme() {
-      const themeToggle = document.getElementById('themeToggle');
-      const stored = localStorage.getItem('theme');
-      const currentTheme = stored || 'light';
-
-      document.documentElement.setAttribute('data-theme', currentTheme);
-      updateThemeIcon(currentTheme);
-
-      themeToggle && themeToggle.addEventListener('click', () => {
-        const current = document.documentElement.getAttribute('data-theme') || 'light';
-        const next = current === 'light' ? 'dark' : 'light';
-        document.documentElement.setAttribute('data-theme', next);
-        localStorage.setItem('theme', next);
-        updateThemeIcon(next);
-        setTimeout(updateChartThemes, 100);
-      });
-    }
-
-    function updateThemeIcon(theme) {
-      const icon = document.querySelector('#themeToggle i');
-      if (!icon) return;
-      if (theme === 'dark') icon.setAttribute('data-feather', 'sun');
-      else icon.setAttribute('data-feather', 'moon');
-      feather.replace();
-    }
-
-    function updateChartThemes() {
-      if (window.currentData) update();
-    }
-
-    // Enhanced Filters - DOM references safe
-    const groupSel = () => document.getElementById('groupSel');
-    const weekSel  = () => document.getElementById('weekSel');
-    const searchIn = () => document.getElementById('searchIn');
-    const resetBtn = () => document.getElementById('resetBtn');
-    const categoryFilter = () => document.getElementById('categoryFilter');
-    const minScore = () => document.getElementById('minScore');
-    const maxScore = () => document.getElementById('maxScore');
-    const scoreRangeValue = () => document.getElementById('scoreRangeValue');
-
-    function initFilters() {
-      const gEl = groupSel();
-      const wEl = weekSel();
-      const sEl = searchIn();
-      const minEl = minScore();
-      const maxEl = maxScore();
-      const catEl = categoryFilter();
-      const scoreEl = scoreRangeValue();
-
-      const groups = ["All", ...unique(ALL_DATA.map(d=>d.DevGroup)).sort()];
-      const weeks  = ["All", ...unique(ALL_DATA.map(d=>d.Scrum)).sort()];
-
-      if (gEl) gEl.innerHTML = groups.map(g=>`<option value="${g}">${g}</option>`).join('');
-      if (wEl) wEl.innerHTML = weeks.map(w=>`<option value="${w}">${w}</option>`).join('');
-      if (gEl) gEl.value = "All";
-      if (wEl) wEl.value = "All";
-      if (sEl) sEl.value = "";
-
-      // Initialize range slider values
-      updateScoreRangeDisplay();
-
-      // Event listeners (guarded)
-      if (minEl) minEl.addEventListener('input', debouncedUpdate);
-      if (maxEl) maxEl.addEventListener('input', debouncedUpdate);
-      if (catEl) catEl.addEventListener('change', debouncedUpdate);
-      if (wEl) wEl.addEventListener('change', debouncedUpdate);
-      if (sEl) sEl.addEventListener('input', debouncedUpdate);
-
-      // Clear / Apply buttons
-      const applyBtn = document.getElementById('applyFiltersBtn');
-      const clearBtn = document.getElementById('clearFiltersBtn');
-      applyBtn && applyBtn.addEventListener('click', debouncedUpdate);
-      clearBtn && clearBtn.addEventListener('click', () => {
-        if (gEl) gEl.value = "All";
-        if (wEl) wEl.value = "All";
-        if (sEl) sEl.value = "";
-        if (minEl) minEl.value = 0;
-        if (maxEl) maxEl.value = 100;
-        if (catEl) {
-          Array.from(catEl.options).forEach(opt => opt.selected = true);
-        }
-        updateScoreRangeDisplay();
-        debouncedUpdate();
-      });
-    }
-
-    function updateScoreRangeDisplay() {
-      const minEl = minScore();
-      const maxEl = maxScore();
-      const scoreEl = scoreRangeValue();
-      if (!minEl || !maxEl || !scoreEl) return;
-      scoreEl.textContent = `${minEl.value}-${maxEl.value}%`;
-    }
 
     function filterData() {
-      const gEl = groupSel();
-      const wEl = weekSel();
-      const sEl = searchIn();
-      const minEl = minScore();
-      const maxEl = maxScore();
-      const catEl = categoryFilter();
-
-      const group = gEl ? gEl.value : "All";
-      const week = wEl ? wEl.value : "All";
-      const q = sEl ? sEl.value.trim().toLowerCase() : "";
-      const minScoreVal = minEl ? parseInt(minEl.value, 10) || 0 : 0;
-      const maxScoreVal = maxEl ? parseInt(maxEl.value, 10) || 100 : 100;
-      const selectedCategories = catEl ? Array.from(catEl.selectedOptions).map(opt => opt.value) : ["Excellent","Moderate","At-risk"];
-
-      updateScoreRangeDisplay();
-
-      return DATA.filter(r => {
-        const okG = group==="All" ? true : r.DevGroup===group;
-        const okW = week==="All" ? true : String(r.Scrum)===String(week);
-        const okQ = q==="" ? true : String(r.Candidate).toLowerCase().includes(q);
-        const okScore = (typeof r.OverallScore === 'number') ? (r.OverallScore >= minScoreVal && r.OverallScore <= maxScoreVal) : false;
-        const okCategory = selectedCategories.length === 0 || selectedCategories.includes(category(r));
-
-        return okG && okW && okQ && okScore && okCategory;
-      });
+        return ALL_DATA.filter(d => {
+            const matchGroup = currentState.group.includes('All') || currentState.group.includes(d.DevGroup);
+            const matchWeek = currentState.week === 'All' || d.Week === currentState.week;
+            const matchStatus = currentState.statuses.includes(getCategory(d.OverallScore));
+            const matchSearch = d.Candidate.toLowerCase().includes(currentState.search);
+            const matchScore = d.OverallScore >= currentState.minScore;
+            return matchGroup && matchWeek && matchStatus && matchSearch && matchScore;
+        });
     }
 
-    // Enhanced KPIs with Power BI Style
-    function renderKPIs(rows) {
-      const el = document.getElementById('kpiRow');
-      if (!el) return;
-      const metrics = calculateKPIMetrics(rows);
+    // --- VISUALIZATION RENDERING (PLOTLY) ---
 
-      el.innerHTML = `
-        <div class="kpi-card rounded-lg p-4 border-t-4 border-blue-500 fade-in">
-          <div class="flex items-center justify-between">
-            <div>
-              <div class="text-sm font-medium">Total Candidates</div>
-              <div class="text-2xl font-bold mt-1">${metrics.totalCandidates}</div>
-            </div>
-            <div class="text-blue-500 bg-blue-50 p-2 rounded-lg">
-              <i data-feather="users" class="w-6 h-6"></i>
-            </div>
-          </div>
-          <div class="mt-2 text-xs">Across all groups</div>
-        </div>
+    function getTheme() {
+        const isDark = document.body.classList.contains('dark-mode');
+        return {
+            text: isDark ? '#f3f2f1' : '#201f1e',
+            grid: isDark ? '#484644' : '#e1dfdd',
+            bg: 'transparent'
+        };
+    }
+
+    function updateDashboard() {
+        const filtered = filterData();
+        let snapshot = filtered;
+        if(currentState.week === 'All') {
+             snapshot = filtered.filter(d => d.Week === 'Week 4');
+        }
+
+        const trendData = ALL_DATA.filter(d => {
+             const matchGroup = currentState.group.includes('All') || currentState.group.includes(d.DevGroup);
+             const matchSearch = d.Candidate.toLowerCase().includes(currentState.search);
+             return matchGroup && matchSearch;
+        });
+
+        renderKPIs(snapshot);
+        renderTrendChart(trendData);
+        renderDistChart(snapshot);
+        renderScatterChart(snapshot);
+        renderRadarChart(snapshot);
+        renderTable(filtered);
+        renderKanbanBoard(snapshot);
+        renderAnalytics(snapshot);
+        generateInsights(snapshot);
         
-        <div class="kpi-card rounded-lg p-4 border-t-4 border-green-500 fade-in">
-          <div class="flex items-center justify-between">
-            <div>
-              <div class="text-sm font-medium">Avg Performance</div>
-              <div class="text-2xl font-bold mt-1">${metrics.avgScore}%</div>
-            </div>
-            <div class="text-green-500 bg-green-50 p-2 rounded-lg">
-              <i data-feather="trending-up" class="w-6 h-6"></i>
-            </div>
-          </div>
-          <div class="mt-2 text-xs">
-            <span class="${metrics.trend > 0 ? 'text-green-600' : 'text-red-600'}">
-              ${metrics.trend > 0 ? '↗' : '↘'} ${Math.abs(metrics.trend)}% from baseline
-            </span>
-          </div>
-        </div>
+        feather.replace();
+    }
+
+    // [KPI, Trend, Dist, Scatter, Radar, Table, Kanban functions retained from previous version...]
+    function renderKPIs(data) {
+        if(!data.length) { 
+             ['kpiAvg','kpiRisk','kpiAtt','kpiTopName'].forEach(id => document.getElementById(id).innerText = '-');
+             return; 
+        }
+        const avgScore = (data.reduce((a,c)=>a+c.OverallScore,0) / data.length).toFixed(1);
+        const avgAtt = (data.reduce((a,c)=>a+c.Attendance,0) / data.length).toFixed(1);
+        const atRisk = data.filter(d => d.OverallScore < 60).length;
+        const top = data.reduce((p,c) => p.OverallScore > c.OverallScore ? p : c);
+
+        document.getElementById('kpiAvg').innerText = avgScore + '%';
+        document.getElementById('kpiAtt').innerText = avgAtt;
+        document.getElementById('kpiRisk').innerText = atRisk;
+        document.getElementById('kpiTopName').innerText = top.Candidate;
+        document.getElementById('kpiTopScore').innerText = top.OverallScore + '%';
+    }
+
+    function renderTrendChart(data) {
+        const groups = [...new Set(data.map(d => d.DevGroup))];
+        const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+        const theme = getTheme();
+        const colors = ['#0078d4', '#d13438', '#00cc6a', '#8764b8'];
+
+        let traces = groups.map((g, i) => {
+            const yVals = weeks.map(w => {
+                const recs = data.filter(d => d.DevGroup === g && d.Week === w);
+                return recs.length ? recs.reduce((a,b)=>a+b.OverallScore,0)/recs.length : null;
+            });
+            return {
+                x: weeks, y: yVals, type: 'scatter', mode: 'lines+markers', name: g,
+                line: { shape: 'spline', width: 3, color: colors[i%colors.length] },
+                marker: { size: 6 }
+            };
+        });
+
+        Plotly.react('trendChart', traces, {
+            paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
+            margin: { t: 10, r: 10, l: 40, b: 30 },
+            font: { family: 'Segoe UI', color: theme.text },
+            xaxis: { gridcolor: theme.grid, showgrid: false },
+            yaxis: { gridcolor: theme.grid, range: [0, 105] },
+            showlegend: true, legend: { orientation: 'h', y: 1.1 }
+        }, {displayModeBar: false, responsive: true});
+    }
+
+    function renderDistChart(data) {
+        const counts = { Excellent: 0, Moderate: 0, 'At-risk': 0 };
+        data.forEach(d => counts[getCategory(d.OverallScore)]++);
+        const theme = getTheme();
+        Plotly.react('distChart', [{
+            labels: Object.keys(counts), values: Object.values(counts),
+            type: 'pie', hole: 0.6,
+            marker: { colors: ['#107c10', '#ffb900', '#d13438'] },
+            textinfo: 'value', hoverinfo: 'label+percent'
+        }], {
+            paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
+            margin: { t: 0, b: 0, l: 0, r: 80 },
+            showlegend: true, legend: { x: 1, y: 0.5 },
+            font: { family: 'Segoe UI', color: theme.text }
+        }, {displayModeBar: false, responsive: true});
+    }
+
+    function renderScatterChart(data) {
+        const theme = getTheme();
+        const traces = [];
+        const uniqueGroups = [...new Set(data.map(d=>d.DevGroup))];
+        uniqueGroups.forEach(g => {
+            const gd = data.filter(d => d.DevGroup === g);
+            traces.push({
+                x: gd.map(d => d.TechSkills), y: gd.map(d => (d.Communication + d.Accountability + d.ProjectDelivery + d.Teamwork)/4),
+                mode: 'markers', type: 'scatter', name: g, text: gd.map(d => d.Candidate),
+                marker: { size: 10, opacity: 0.7 }
+            });
+        });
+        Plotly.react('scatterChart', traces, {
+            paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
+            margin: { t: 20, r: 10, l: 50, b: 40 },
+            xaxis: { title: 'Tech Skills', range: [0.5, 5.5], gridcolor: theme.grid },
+            yaxis: { title: 'Soft Skills Avg', range: [0.5, 5.5], gridcolor: theme.grid },
+            font: { family: 'Segoe UI', color: theme.text }, showlegend: false
+        }, {displayModeBar: false, responsive: true});
+    }
+
+    function renderRadarChart(data) {
+        if(!data.length) return;
+        const theme = getTheme();
+        const metrics = ['Tech', 'Comm', 'Acc', 'Proj', 'Prob', 'Team'];
+        const keys = ['TechSkills', 'Communication', 'Accountability', 'ProjectDelivery', 'ProblemSolving', 'Teamwork'];
+        const values = keys.map(k => data.reduce((a,b)=>a+b[k],0)/data.length);
+        Plotly.react('radarChart', [{
+            type: 'scatterpolar', r: [...values, values[0]], theta: [...metrics, metrics[0]],
+            fill: 'toself', line: { color: '#0078d4' }, name: 'Cohort Avg'
+        }], {
+            polar: {
+                radialaxis: { visible: true, range: [0, 5], gridcolor: theme.grid },
+                angularaxis: { gridcolor: theme.grid, color: theme.text },
+                bgcolor: 'transparent'
+            },
+            paper_bgcolor: 'transparent', margin: { t: 20, b: 20, l: 30, r: 30 },
+            font: { family: 'Segoe UI', color: theme.text }, showlegend: false
+        }, {displayModeBar: false, responsive: true});
+    }
+
+    function renderTable(data) {
+        const tbody = document.getElementById('candidateTableBody');
+        tbody.innerHTML = '';
+        document.getElementById('tableCount').innerText = `${data.length} rows`;
+        data.sort((a,b) => a.DevGroup.localeCompare(b.DevGroup) || a.Candidate.localeCompare(b.Candidate) || a.Week.localeCompare(b.Week));
+        data.forEach(d => {
+            const tr = document.createElement('tr');
+            const status = getCategory(d.OverallScore);
+            const badgeClass = status === 'Excellent' ? 'badge-excellent' : status === 'Moderate' ? 'badge-moderate' : 'badge-risk';
+            tr.innerHTML = `
+                <td><input type="checkbox" class="row-check" value="${d.Candidate}" onchange="checkSelection()"></td>
+                <td class="font-semibold text-blue-600 hover:underline cursor-pointer" onclick="viewCandidate('${d.Candidate}')">${d.Candidate}</td>
+                <td>${d.DevGroup}</td>
+                <td class="text-xs text-gray-500 font-mono">${d.Week}</td>
+                <td>${d.Attendance}/5</td>
+                <td><div class="flex items-center gap-2"><div class="w-16 bg-gray-200 rounded-full h-1.5 overflow-hidden"><div class="bg-blue-500 h-1.5" style="width: ${(d.TechSkills/5)*100}%"></div></div><span class="text-xs">${d.TechSkills}</span></div></td>
+                <td class="font-bold">${d.OverallScore}%</td>
+                <td><span class="status-badge ${badgeClass}">${status}</span></td>
+                <td><button class="text-gray-400 hover:text-blue-600" onclick="viewCandidate('${d.Candidate}')"><i data-feather="eye" class="w-4 h-4"></i></button></td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+
+    function renderKanbanBoard(data) {
+        const stages = { 'Training': [], 'Interview Ready': [], 'Placed': [], 'Needs Support': [] };
+        const uniqueData = {};
+        data.forEach(d => uniqueData[d.Candidate] = d); 
+        Object.values(uniqueData).forEach(d => {
+            if(stages[d.PipelineStage]) stages[d.PipelineStage].push(d);
+            else stages['Training'].push(d);
+        });
+        Object.keys(stages).forEach(key => {
+            const id = 'col' + key.split(' ')[0].replace('Needs','Support');
+            const cntId = 'cnt' + key.split(' ')[0].replace('Needs','Support');
+            const el = document.getElementById(id);
+            const cntEl = document.getElementById(cntId);
+            if(el && cntEl) {
+                cntEl.innerText = stages[key].length;
+                el.innerHTML = stages[key].map(c => `
+                    <div class="bg-white dark:bg-[#333] p-3 rounded shadow-sm border-l-4 ${c.OverallScore > 80 ? 'border-green-500' : 'border-gray-300'} cursor-grab active:cursor-grabbing" draggable="true" ondragstart="drag(event, '${c.Candidate}')">
+                        <div class="font-bold text-sm mb-1">${c.Candidate}</div>
+                        <div class="flex justify-between items-center text-xs text-gray-500">
+                            <span>${c.DevGroup}</span>
+                            <span class="font-mono bg-gray-100 dark:bg-gray-700 px-1 rounded text-black dark:text-white">${c.OverallScore}%</span>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        });
+    }
+
+    function allowDrop(ev) { ev.preventDefault(); }
+    function drag(ev, name) { ev.dataTransfer.setData("text", name); }
+    function drop(ev, newStage) {
+        ev.preventDefault();
+        const name = ev.dataTransfer.getData("text");
+        ALL_DATA.forEach(d => { if(d.Candidate === name) d.PipelineStage = newStage; });
+        updateDashboard();
+        showAlert('Updated Pipeline', `${name} moved to ${newStage}`);
+    }
+
+    // --- ANALYTICS TAB: ADVANCED VISUALS ---
+    function renderAnalytics(data) {
+        if(document.getElementById('analyticsTab').classList.contains('hidden')) return;
+        const theme = getTheme();
+
+        // 1. Group Performance Comparison (Grouped Bar)
+        const groups = [...new Set(data.map(d => d.DevGroup))];
+        const groupScores = groups.map(g => {
+            const recs = data.filter(d => d.DevGroup === g);
+            return recs.reduce((a,b) => a+b.OverallScore, 0) / recs.length;
+        });
+        Plotly.react('groupPerfChart', [{
+            x: groups, y: groupScores, type: 'bar', marker: {color: '#0078d4'}
+        }], {
+            title: 'Avg Overall Score by Group', paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
+            margin: { t: 40, l: 30, r: 10, b: 30 }, font: { family: 'Segoe UI', color: theme.text },
+            yaxis: {range: [0, 100]}
+        }, {displayModeBar: false, responsive: true});
+
+        // 2. Skill Profile by Performance Category (Stacked Bar)
+        const cats = ['Excellent', 'Moderate', 'At-risk'];
+        const skills = ['TechSkills', 'Communication', 'Accountability'];
+        const traces2 = skills.map(skill => {
+            return {
+                x: cats,
+                y: cats.map(c => {
+                    const subset = data.filter(d => getCategory(d.OverallScore) === c);
+                    return subset.length ? subset.reduce((a,b) => a+b[skill], 0) / subset.length : 0;
+                }),
+                name: skill, type: 'bar'
+            };
+        });
+        Plotly.react('skillDistChart', traces2, {
+            barmode: 'group', title: 'Avg Skill Level by Status', paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
+            margin: { t: 40, l: 30, r: 10, b: 30 }, font: { family: 'Segoe UI', color: theme.text },
+            legend: {orientation: 'h', y: -0.2}
+        }, {displayModeBar: false, responsive: true});
+
+        // 3. Performance Distribution by Group (Box Plot)
+        const boxTraces = groups.map(g => {
+            return {
+                y: data.filter(d => d.DevGroup === g).map(d => d.OverallScore),
+                type: 'box', name: g, boxpoints: 'all', jitter: 0.3, pointpos: -1.8
+            };
+        });
+        Plotly.react('distBoxChart', boxTraces, {
+            title: 'Score Variance Analysis', paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
+            margin: { t: 40, l: 30, r: 10, b: 30 }, font: { family: 'Segoe UI', color: theme.text },
+            showlegend: false
+        }, {displayModeBar: false, responsive: true});
+
+        // 4. Metric Correlation Matrix (Heatmap)
+        const metrics = ['Attendance', 'TechSkills', 'Communication', 'Accountability', 'ProjectDelivery'];
+        const z = [];
+        metrics.forEach((m1, i) => {
+            const row = [];
+            metrics.forEach((m2, j) => {
+                if(i === j) row.push(1);
+                else {
+                    // Simple Pearson correlation calculation
+                    const x = data.map(d => d[m1]);
+                    const y = data.map(d => d[m2]);
+                    const n = x.length;
+                    const sumX = x.reduce((a,b)=>a+b,0);
+                    const sumY = y.reduce((a,b)=>a+b,0);
+                    const sumXY = x.reduce((sum, xi, k) => sum + xi * y[k], 0);
+                    const sumX2 = x.reduce((sum, xi) => sum + xi*xi, 0);
+                    const sumY2 = y.reduce((sum, yi) => sum + yi*yi, 0);
+                    const numerator = (n * sumXY) - (sumX * sumY);
+                    const denominator = Math.sqrt((n * sumX2 - sumX * sumX) * (n * sumY2 - sumY * sumY));
+                    row.push(denominator === 0 ? 0 : numerator / denominator);
+                }
+            });
+            z.push(row);
+        });
+        Plotly.react('corrHeatmap', [{
+            z: z, x: metrics, y: metrics, type: 'heatmap', colorscale: 'RdBu', zmin: -1, zmax: 1
+        }], {
+            title: 'Metric Correlations', paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
+            margin: { t: 40, l: 100, r: 10, b: 80 }, font: { family: 'Segoe UI', color: theme.text }
+        }, {displayModeBar: false, responsive: true});
+
+        // 5 & 6 (Existing)
+        Plotly.react('peerChart', [{
+            x: data.map(d => d.Attendance), y: data.map(d => d.OverallScore),
+            mode: 'markers', marker: { color: data.map(d=>d.OverallScore), colorscale: 'Viridis', size: 12 },
+            text: data.map(d=>d.Candidate)
+        }], {
+            paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
+            margin: { t: 20, l: 40, r: 20, b: 40 }, font: { family: 'Segoe UI', color: theme.text },
+            xaxis: { title: 'Attendance' }, yaxis: { title: 'Overall Score' }
+        }, {displayModeBar: false, responsive: true});
+
+        let zRisk = [[0,0],[0,0]];
+        data.forEach(d => {
+            const r = d.OverallScore >= 70 ? 0 : 1; 
+            const c = d.Attendance >= 4 ? 0 : 1;
+            zRisk[r][c]++;
+        });
+        Plotly.react('riskChart', [{
+            z: zRisk, x: ['High Att', 'Low Att'], y: ['High Perf', 'Low Perf'],
+            type: 'heatmap', colorscale: 'Blues', showscale: false, text: zRisk.map(r=>r.map(v=>v)), hoverinfo: 'text'
+        }], {
+            font: { family: 'Segoe UI', color: theme.text }, paper_bgcolor: 'transparent', margin: { t: 20, b: 20, l: 80 }
+        }, {displayModeBar: false, responsive: true});
+    }
+
+    // --- AI & INSIGHTS ---
+    function generateInsights(data) {
+        if(!data.length) return;
+        const box = document.getElementById('aiInsights');
+        const avg = data.reduce((a,b)=>a+b.OverallScore,0)/data.length;
+        const techAvg = data.reduce((a,b)=>a+b.TechSkills,0)/data.length;
+        const commAvg = data.reduce((a,b)=>a+b.Communication,0)/data.length;
         
-        <div class="kpi-card rounded-lg p-4 border-t-4 border-amber-500 fade-in">
-          <div class="flex items-center justify-between">
-            <div>
-              <div class="text-sm font-medium">Work Ready</div>
-              <div class="text-2xl font-bold mt-1">${metrics.workReady}%</div>
-            </div>
-            <div class="text-amber-500 bg-amber-50 p-2 rounded-lg">
-              <i data-feather="award" class="w-6 h-6"></i>
-            </div>
-          </div>
-          <div class="mt-2 text-xs">Tech skills ≥ 4/5</div>
-        </div>
+        let msg = `<b>Cohort Analysis:</b> Average performance is <b>${avg.toFixed(1)}%</b>. `;
+        if(techAvg < commAvg) {
+            msg += `The cohort demonstrates strong communication (Avg ${commAvg.toFixed(1)}) but lags in Technical Skills (Avg ${techAvg.toFixed(1)}). Recommended: Increase coding workshops.`;
+        } else {
+             msg += `Technical proficiency is high (Avg ${techAvg.toFixed(1)}), but soft skills require attention. Recommended: Team building exercises.`;
+        }
+        box.innerHTML = msg;
+    }
+
+    // --- AI CHATBOT LOGIC START ---
+    const chatHistory = document.getElementById('chatHistory');
+    
+    function toggleAIChat() {
+        const chat = document.getElementById('aiChat');
+        chat.style.display = chat.style.display === 'flex' ? 'none' : 'flex';
+        if(chat.style.display === 'flex') {
+            document.getElementById('chatInput').focus();
+        }
+    }
+
+    function handleChatKey(e) {
+        if(e.key === 'Enter') sendChat();
+    }
+
+    function sendChat() {
+        const inp = document.getElementById('chatInput');
+        const txt = inp.value.trim();
+        if(!txt) return;
         
-        <div class="kpi-card rounded-lg p-4 border-t-4 border-red-500 fade-in">
-          <div class="flex items-center justify-between">
-            <div>
-              <div class="text-sm font-medium">Need Support</div>
-              <div class="text-2xl font-bold mt-1">${metrics.needsSupport}%</div>
-            </div>
-            <div class="text-red-500 bg-red-50 p-2 rounded-lg">
-              <i data-feather="alert-triangle" class="w-6 h-6"></i>
-            </div>
-          </div>
-          <div class="mt-2 text-xs">${metrics.atRiskCount} candidates</div>
-        </div>
+        // 1. Append User Message
+        appendMessage(txt, 'user');
+        inp.value = '';
         
-        <div class="kpi-card rounded-lg p-4 border-t-4 border-purple-500 fade-in">
-          <div class="flex items-center justify-between">
-            <div>
-              <div class="text-sm font-medium">Completion Rate</div>
-              <div class="text-2xl font-bold mt-1">${metrics.completionRate}%</div>
-            </div>
-            <div class="text-purple-500 bg-purple-50 p-2 rounded-lg">
-              <i data-feather="target" class="w-6 h-6"></i>
-            </div>
-          </div>
-          <div class="mt-2 text-xs">Project delivery ≥ 3/5</div>
-        </div>
-      `;
-      feather.replace();
+        // 2. Show Typing Indicator
+        const typingId = showTypingIndicator();
+
+        // 3. Process & Respond
+        setTimeout(() => {
+            removeTypingIndicator(typingId);
+            const response = generateSmartResponse(txt);
+            appendMessage(response.text, 'bot');
+            
+            // Execute automated action if present
+            if(response.action) {
+                try { response.action(); } catch(e) { console.error("Action failed:", e); }
+            }
+        }, 600 + Math.random() * 600); // Natural delay
+    }
+
+    function appendMessage(text, sender) {
+        const div = document.createElement('div');
+        const isUser = sender === 'user';
+        div.className = `p-3 rounded-lg text-sm max-w-[85%] mb-3 shadow-sm ${isUser ? 'chat-bubble-user self-end ml-auto' : 'chat-bubble-bot self-start mr-auto'}`;
+        div.innerHTML = text;
+        chatHistory.appendChild(div);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    }
+
+    function showTypingIndicator() {
+        const id = 'typing-' + Date.now();
+        const div = document.createElement('div');
+        div.id = id;
+        div.className = "chat-bubble-bot p-3 rounded-lg mb-3 self-start mr-auto w-16 flex items-center gap-1";
+        div.innerHTML = `<span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></span><span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.1s"></span><span class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>`;
+        chatHistory.appendChild(div);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+        return id;
+    }
+
+    function removeTypingIndicator(id) {
+        const el = document.getElementById(id);
+        if(el) el.remove();
+    }
+
+    // The "Brain" of the Chatbot
+    function generateSmartResponse(query) {
+        const q = query.toLowerCase();
+        let currentData = filterData(); // Context-aware: uses current dashboard filters
+        
+        // --- 1. Actions / Navigation ---
+        if(q.includes('reset')) {
+            return { text: "I've reset all dashboard filters to their default state.", action: resetDashboard };
+        }
+        if(q.includes('dark') || q.includes('light') || q.includes('theme')) {
+            return { text: "Toggling the display theme for you.", action: () => document.getElementById('darkModeToggle').click() };
+        }
+        if(q.includes('export') || q.includes('pdf') || q.includes('download')) {
+            return { text: "Opening the export options...", action: openExportModal };
+        }
+
+        // --- 2. Specific Candidate Lookup ---
+        const foundCandidate = ALL_DATA.find(d => q.includes(d.Candidate.toLowerCase()));
+        if(foundCandidate) {
+            return { 
+                text: `I've found <b>${foundCandidate.Candidate}</b>. They are in the ${foundCandidate.DevGroup} group. Opening their detailed profile now.`, 
+                action: () => viewCandidate(foundCandidate.Candidate) 
+            };
+        }
+
+        // --- 3. Data Queries ---
+        if(q.includes('top') || q.includes('best') || q.includes('highest')) {
+            const sorted = [...currentData].sort((a,b) => b.OverallScore - a.OverallScore);
+            const top3 = sorted.slice(0,3);
+            if(!top3.length) return { text: "No data matches your current filters." };
+            
+            let msg = "Here are the top performers based on your current view:<br><ul class='list-disc ml-4 mt-2 space-y-1'>";
+            top3.forEach(c => msg += `<li><b>${c.Candidate}</b>: ${c.OverallScore}%</li>`);
+            msg += "</ul>";
+            return { text: msg };
+        }
+
+        if(q.includes('risk') || q.includes('fail') || q.includes('low')) {
+            const risk = currentData.filter(d => d.OverallScore < 60);
+            if(risk.length === 0) return { text: "Good news! No candidates are marked 'At-Risk' in the current view." };
+            return { text: `I found <b>${risk.length} candidates</b> performing below the 60% threshold. <br>Tip: Filter status to 'At Risk' to see them.` };
+        }
+
+        if(q.includes('how many') || q.includes('count')) {
+            return { text: `There are currently <b>${currentData.length} records</b> visible in the dashboard.` };
+        }
+        
+        if(q.includes('average') || q.includes('avg') || q.includes('score')) {
+            const avg = (currentData.reduce((a,b)=>a+b.OverallScore,0) / currentData.length).toFixed(1);
+            return { text: `The average overall score for this selection is <b>${avg}%</b>.` };
+        }
+
+        if(q.includes('group') || q.includes('team')) {
+             return { text: "You can compare groups in the 'Deep Dive Analytics' tab. Would you like me to take you there?", action: () => switchTab('analytics', document.querySelectorAll('.tab')[2]) };
+        }
+
+        // --- 4. Fallback ---
+        return { text: "I didn't quite catch that. I can help you:<br>• Find a candidate (e.g., 'Show Aldo')<br>• Analyze data (e.g., 'Who is top?')<br>• Manage the view (e.g., 'Reset filters')" };
     }
     
-    function calculateKPIMetrics(rows) {
-      const totalCandidates = rows.length;
-      const avgScore = totalCandidates ? Math.round(rows.reduce((sum, r) => sum + (Number(r.OverallScore) || 0), 0) / totalCandidates) : 0;
-      const workReady = totalCandidates ? Math.round((rows.filter(r => Number(r.TechSkills) >= 4).length / totalCandidates) * 100) : 0;
-      const atRiskCount = rows.filter(r => category(r) === "At-risk").length;
-      const needsSupport = totalCandidates ? Math.round((atRiskCount / totalCandidates) * 100) : 0;
-      const completionRate = totalCandidates ? Math.round((rows.filter(r => Number(r.ProjectDelivery) >= 3).length / totalCandidates) * 100) : 0;
-      const trend = Math.random() * 10 - 5;
-
-      return {
-        totalCandidates,
-        avgScore,
-        workReady,
-        atRiskCount,
-        needsSupport,
-        completionRate,
-        trend: Math.round(trend * 10) / 10
-      };
+    function askAI(q) {
+        document.getElementById('chatInput').value = q;
+        sendChat();
     }
+    // --- AI CHATBOT LOGIC END ---
 
-    // Performance Trends Over Time
-    function renderPerformanceTrends(rows) {
-      const groups = unique(rows.map(r => r.DevGroup));
-      const weeks = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+    // --- MODALS & INTERACTIONS ---
+    function viewCandidate(name) {
+        const modal = document.getElementById('candidateModal');
+        const personData = ALL_DATA.filter(d => d.Candidate === name);
+        const latest = personData[personData.length-1];
 
-      const traces = groups.map(group => {
-        const groupData = rows.filter(r => r.DevGroup === group);
-        const baseAvg = groupData.length ? (groupData.reduce((sum, r) => sum + overallAvg(r), 0) / groupData.length) : 3;
-        const trend = weeks.map((_, i) => {
-          const variation = (Math.random() * 0.5) - 0.25;
-          return Math.max(1, Math.min(5, baseAvg + variation * (i + 1)));
+        document.getElementById('modalName').innerText = name;
+        document.getElementById('modalInitials').innerText = name.split(' ').map(n=>n[0]).join('');
+        document.getElementById('modalGroup').innerText = latest.DevGroup;
+        document.getElementById('modalBadge').className = 'status-badge ' + (latest.OverallScore > 80 ? 'badge-excellent' : latest.OverallScore > 60 ? 'badge-moderate' : 'badge-risk');
+        document.getElementById('modalBadge').innerText = getCategory(latest.OverallScore);
+
+        ['Score','Att','Tech','Proj'].forEach(k => {
+             let key = k === 'Score' ? 'OverallScore' : k === 'Att' ? 'Attendance' : k === 'Tech' ? 'TechSkills' : 'ProjectDelivery';
+             let val = latest[key];
+             if(k === 'Score') val += '%';
+             document.getElementById('modal'+k).innerText = val;
         });
+        const soft = ((latest.Communication + latest.Accountability + latest.Teamwork)/3).toFixed(1);
+        document.getElementById('modalSoft').innerText = soft;
 
-        return {
-          type: 'scatter',
-          mode: 'lines+markers',
-          name: group,
-          x: weeks,
-          y: trend,
-          line: { width: 3 },
-          marker: { size: 8 }
-        };
-      });
+        const recs = document.getElementById('modalRecs');
+        recs.innerHTML = '';
+        if(latest.Attendance < 4) recs.innerHTML += `<li class="text-red-600 font-semibold">Flagged: Low Attendance. Schedule 1:1 immediately.</li>`;
+        if(latest.TechSkills < 3) recs.innerHTML += `<li>Assign "Advanced JavaScript" Learning Module.</li>`;
+        if(latest.OverallScore > 85) recs.innerHTML += `<li class="text-green-600">High Potential: Consider for Team Lead role.</li>`;
+        if(recs.innerHTML === '') recs.innerHTML = '<li>Maintain current learning path.</li>';
 
-      const layout = {
-        margin: { l: 50, r: 30, t: 30, b: 50 },
-        xaxis: { title: 'Week' },
-        yaxis: { title: 'Average Performance Score', range: [1, 5] },
-        template: 'plotly_white',
-        showlegend: true,
-        legend: { orientation: 'h', y: -0.2 },
-        height: 320
-      };
-
-      Plotly.newPlot('performanceTrends', traces, layout, { responsive: true });
-    }
-
-    // Chart 1: Overall Category Distribution (Donut)
-    function renderOverallCategory(rows) {
-      const cats = rows.map(category);
-      const labels = ["Excellent","Moderate","At-risk"];
-      const counts = labels.map(l => cats.filter(c => c===l).length);
-      const colors = ["#10b981","#f59e0b","#ef4444"];
-      const data = [{
-        type: "pie",
-        labels: labels,
-        values: counts,
-        hole: 0.45,
-        marker: {colors: colors},
-        textinfo: "label+percent",
-        hovertemplate: "%{label}: %{value} candidates<extra></extra>"
-      }];
-      const layout = { 
-        margin: {l:20,r:20,t:10,b:10}, 
-        template: "plotly_white", 
-        showlegend: true,
-        height: 320
-      };
-      Plotly.newPlot("overallDist", data, layout, {responsive:true});
-    }
-
-    // Chart 2: Group Comparison by Category (Clustered Bar)
-    function renderGroupComparison(rows) {
-      const groups = Array.from(new Set(rows.map(r => r.DevGroup)));
-      const categories = ["Excellent","Moderate","At-risk"];
-      const colorMap = {"Excellent":"#10b981","Moderate":"#f59e0b","At-risk":"#ef4444"};
-
-      const countsByGroupCat = (group, cat) =>
-        rows.filter(r => r.DevGroup===group && category(r)===cat).length;
-
-      const traces = categories.map(cat => ({
-        type: "bar",
-        name: cat,
-        x: groups,
-        y: groups.map(g => countsByGroupCat(g, cat)),
-        marker: {color: colorMap[cat]},
-        hovertemplate: "%{x}<br>"+cat+": %{y}<extra></extra>"
-      }));
-
-      const layout = {
-        barmode: "group",
-        margin: {l:40,r:20,t:10,b:40},
-        yaxis: {title: "Candidates"},
-        xaxis: {title: "Dev group"},
-        template: "plotly_white",
-        legend: {orientation: "h", y: -0.2},
-        height: 320
-      };
-      Plotly.newPlot("groupCompare", traces, layout, {responsive:true});
-    }
-
-    // Skill Distribution by Category (defensive)
-    function renderSkillDistribution(rows) {
-      const categories = ["Excellent", "Moderate", "At-risk"];
-      const skills = ["Attendance", "Communication", "Accountability", "CreativityOwnership", 
-                     "ProjectDelivery", "TechSkills"];
-
-      const traces = categories.map(cat => {
-        const catData = rows.filter(r => category(r) === cat);
-        const skillAverages = skills.map(skill => {
-          const vals = catData.map(r => Number(r[skill]) || 0).filter(v => !isNaN(v));
-          return vals.length ? (vals.reduce((total, v) => total + v, 0) / vals.length) : 0;
-        });
-
-        return {
-          type: 'bar',
-          name: cat,
-          x: skills.map(s => s.replace(/([A-Z])/g, ' $1').trim()),
-          y: skillAverages,
-          marker: { color: colorByCategory(cat) }
-        };
-      });
-
-      const layout = {
-        barmode: 'group',
-        margin: { l: 50, r: 30, t: 30, b: 100 },
-        xaxis: { 
-          title: 'Skills',
-          tickangle: -45
-        },
-        yaxis: { 
-          title: 'Average Score',
-          range: [0, 5]
-        },
-        template: 'plotly_white',
-        showlegend: true,
-        legend: { orientation: 'h', y: -0.3 },
-        height: 320
-      };
-
-      Plotly.newPlot('skillDistribution', traces, layout, { responsive: true });
-    }
-
-    // Chart 3: Criteria Averages (Radar)
-    function renderCriteriaRadar(rows) {
-      const criteria = ["Attendance","Communication","Accountability","CreativityOwnership","ProjectDelivery","TechSkills"];
-      const labels = ["Attendance","Communication","Accountability","Creativity & Ownership","Project Delivery","Tech Skills"];
-      const means = criteria.map(c => {
-        const vals = rows.map(r => Number(r[c])).filter(v => !isNaN(v));
-        return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : 0;
-      });
-
-      const data = [{
-        type: "scatterpolar",
-        r: means,
-        theta: labels,
-        fill: "toself",
-        name: "Cohort average",
-        marker: {color: "#3b82f6"}
-      }];
-      const layout = {
-        polar: { radialaxis: { visible: true, range: [0,5] } },
-        showlegend: false,
-        margin:{l:40,r:20,t:10,b:40},
-        template:"plotly_white",
-        height: 320
-      };
-      Plotly.newPlot("criteriaRadar", data, layout, {responsive:true});
-    }
-
-    // Chart 4: Tech vs Soft Skills Scatter
-    function renderTechSoftScatter(rows) {
-      const excellentData = rows.filter(r => category(r) === "Excellent");
-      const moderateData = rows.filter(r => category(r) === "Moderate");
-      const atRiskData = rows.filter(r => category(r) === "At-risk");
-
-      const makeTrace = (arr, name, color) => ({
-        type: "scatter",
-        mode: "markers",
-        name,
-        x: arr.map(r => Number(r.TechSkills) || 0),
-        y: arr.map(r => softSkillAvg(r)),
-        text: arr.map(r => r.Candidate),
-        marker: {
-          size: 12,
-          color,
-          line: { width: 1, color: "#00000020" }
-        },
-        hovertemplate: "<b>%{text}</b><br>Tech: %{x}<br>Soft (avg): %{y:.2f}<extra></extra>"
-      });
-
-      const traces = [
-        makeTrace(excellentData, "Excellent", "#10b981"),
-        makeTrace(moderateData, "Moderate", "#f59e0b"),
-        makeTrace(atRiskData, "At Risk", "#ef4444")
-      ];
-
-      const layout = {
-        xaxis: {title: "Technical Skills", range: [0.5,5.5], gridcolor: "#e5e7eb"},
-        yaxis: {title: "Soft Skills (avg)", range: [0.5,5.5], gridcolor: "#e5e7eb"},
-        margin: {l:50,r:20,t:10,b:50},
-        template: "plotly_white",
-        showlegend: true,
-        legend: { orientation: "h", y: -0.2 },
-        height: 320
-      };
-
-      Plotly.newPlot("techSoftScatter", traces, layout, {responsive:true});
-    }
-
-    // Performance by Group (Box Plots)
-    function renderGroupBoxPlots(rows) {
-      const groups = unique(rows.map(r => r.DevGroup));
-      const traces = groups.map(group => {
-        const groupData = rows.filter(r => r.DevGroup === group);
-        const scores = groupData.map(r => overallAvg(r));
-        return {
-          type: 'box',
-          name: group,
-          y: scores,
-          boxpoints: 'all',
-          jitter: 0.3,
-          pointpos: -1.8,
-          marker: { size: 4 },
-          line: { width: 2 }
-        };
-      });
-
-      const layout = {
-        margin: { l: 50, r: 30, t: 30, b: 50 },
-        yaxis: { 
-          title: 'Overall Performance Score',
-          range: [1, 5]
-        },
-        template: 'plotly_white',
-        showlegend: true,
-        height: 320
-      };
-
-      Plotly.newPlot('groupBoxPlots', traces, layout, { responsive: true });
-    }
-
-    // Chart 5: Correlation Matrix
-    function renderCorrelationMatrix(rows) {
-      const metrics = ["Attendance", "Communication", "Accountability", "CreativityOwnership", 
-                       "ProjectDelivery", "TechSkills"];
-
-      const correlations = [];
-      for (let i = 0; i < metrics.length; i++) {
-        const row = [];
-        for (let j = 0; j < metrics.length; j++) {
-          const x = rows.map(r => Number(r[metrics[i]]) || 0);
-          const y = rows.map(r => Number(r[metrics[j]]) || 0);
-          row.push(calculateCorrelation(x, y));
-        }
-        correlations.push(row);
-      }
-
-      const data = [{
-        type: 'heatmap',
-        z: correlations,
-        x: metrics.map(m => m.replace(/([A-Z])/g, ' $1').trim()),
-        y: metrics.map(m => m.replace(/([A-Z])/g, ' $1').trim()),
-        colorscale: 'RdBu',
-        zmin: -1,
-        zmax: 1,
-        hoverongaps: false,
-        hovertemplate: '%{x} vs %{y}<br>Correlation: %{z:.2f}<extra></extra>'
-      }];
-
-      const layout = {
-        margin: {l:100,r:20,t:30,b:100},
-        template: "plotly_white",
-        height: 400,
-        xaxis: {tickangle: -45}
-      };
-
-      Plotly.newPlot("correlationMatrix", data, layout, {responsive:true});
-    }
-
-    // Numeric stable correlation
-    function calculateCorrelation(x, y) {
-      const n = Math.min(x.length, y.length);
-      if (n === 0) return 0;
-      const xs = x.slice(0, n);
-      const ys = y.slice(0, n);
-      const sum_x = xs.reduce((a, b) => a + b, 0);
-      const sum_y = ys.reduce((a, b) => a + b, 0);
-      const sum_xy = xs.reduce((a, b, i) => a + b * ys[i], 0);
-      const sum_x2 = xs.reduce((a, b) => a + b * b, 0);
-      const sum_y2 = ys.reduce((a, b) => a + b * b, 0);
-
-      const numerator = n * sum_xy - sum_x * sum_y;
-      const denominator = Math.sqrt((n * sum_x2 - sum_x * sum_x) * (n * sum_y2 - sum_y * sum_y));
-
-      return denominator === 0 ? 0 : numerator / denominator;
-    }
-
-    // Top Performers
-    function renderTopPerformers(rows) {
-      const container = document.getElementById('topPerformers');
-      if (!container) return;
-
-      const topPerformers = [...rows]
-        .sort((a, b) => overallAvg(b) - overallAvg(a))
-        .slice(0, 5);
-
-      if (topPerformers.length === 0) {
-        container.innerHTML = '<p class="text-center py-4">No data available</p>';
-        return;
-      }
-
-      container.innerHTML = topPerformers.map(candidate => {
-        const avg = overallAvg(candidate);
-        const cat = category(candidate);
-        const badgeClass = cat === 'Excellent' ? 'excellent' : (cat === 'At-risk' ? 'at-risk' : 'moderate');
-
-        return `
-          <div class="flex items-center justify-between p-3 bg-green-50 border border-green-200 rounded-lg fade-in">
-            <div class="flex items-center space-x-4">
-
-              <div class="w-3 h-3 rounded-full bg-green-500"></div>
-              <div>
-                <p class="font-medium">${candidate.Candidate}</p>
-                <p class="text-xs text-gray-600">${candidate.DevGroup}</p>
-              </div>
-            </div>
-            <div class="text-right">
-              <p class="text-sm font-bold text-green-600">${fmt(avg)}/5</p>
-              <p class="text-xs text-gray-500">${Math.round(candidate.OverallScore)}%</p>
-              <span class="status-badge ${badgeClass}">${cat}</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-    }
-
-    // At-Risk Candidates
-    function renderAtRiskCandidates(rows) {
-      const container = document.getElementById('atRiskCandidates');
-      if (!container) return;
-
-      const atRiskCandidates = rows.filter(r => category(r) === "At-risk");
-
-      if (atRiskCandidates.length === 0) {
-        container.innerHTML = `
-          <div class="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
-            <i data-feather="check-circle" class="w-6 h-6 text-green-500 mx-auto mb-2"></i>
-            <p class="text-green-700 text-sm">No at-risk candidates identified</p>
-          </div>
-        `;
-        feather.replace();
-        return;
-      }
-
-      container.innerHTML = atRiskCandidates.map(candidate => {
-        const avg = overallAvg(candidate);
-        const concerns = [];
-        if (candidate.Attendance <= 2) concerns.push('Attendance');
-        if (candidate.Communication <= 2) concerns.push('Communication');
-        if (candidate.Accountability <= 2) concerns.push('Accountability');
-        if (candidate.CreativityOwnership <= 2) concerns.push('Creativity');
-        if (candidate.ProjectDelivery <= 2) concerns.push('Project Delivery');
-        if (candidate.TechSkills <= 2) concerns.push('Tech Skills');
-
-        return `
-          <div class="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-lg fade-in">
-            <div class="flex items-center space-x-3">
-              <div class="w-3 h-3 rounded-full bg-red-500"></div>
-              <div>
-                <p class="font-medium">${candidate.Candidate}</p>
-                <p class="text-xs text-red-600">${concerns.slice(0, 2).join(', ')}${concerns.length > 2 ? '...' : ''}</p>
-              </div>
-            </div>
-            <div class="text-right">
-              <p class="text-sm font-bold text-red-600">${fmt(avg)}/5</p>
-              <p class="text-xs text-gray-500">${Math.round(candidate.OverallScore)}%</p>
-              <span class="status-badge at-risk">At Risk</span>
-            </div>
-          </div>
-        `;
-      }).join('');
-
-      feather.replace();
-    }
-
-    // Data table with color-coded rows
-    function renderTable(rows){
-      const wrap = document.getElementById("tableWrap");
-      if (!wrap) return;
-      const headers = ["Candidate","DevGroup","Scrum","Attendance","Communication","Accountability","Creativity & Ownership","Project Delivery","Tech Skills","Overall Score","Category"];
-
-      wrap.innerHTML = `
-        <table class="w-full">
-          <thead>
-            <tr class="bg-gray-50">
-              ${headers.map(h => `<th class="text-left p-3 text-xs font-medium text-gray-500 uppercase tracking-wider">${h}</th>`).join("")}
-            </tr>
-          </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
-            ${rows.map(r => {
-              const cat = category(r);
-              const cls = cat === "At-risk" ? "tr-at-risk" : (cat === "Excellent" ? "tr-excellent" : "tr-moderate");
-              const scoreClass = (r.OverallScore >= 80) ? 'text-green-600' : (r.OverallScore >= 60 ? 'text-amber-600' : 'text-red-600');
-              return `
-                <tr class="${cls} fade-in">
-                  <td class="p-3 text-sm text-gray-800">${r.Candidate}</td>
-                  <td class="p-3 text-sm text-gray-600">${r.DevGroup}</td>
-                  <td class="p-3 text-sm text-gray-600">${r.Scrum}</td>
-                  <td class="p-3 text-sm text-gray-600">${r.Attendance}</td>
-                  <td class="p-3 text-sm text-gray-600">${r.Communication}</td>
-                  <td class="p-3 text-sm text-gray-600">${r.Accountability}</td>
-                  <td class="p-3 text-sm text-gray-600">${r.CreativityOwnership}</td>
-                  <td class="p-3 text-sm text-gray-600">${r.ProjectDelivery}</td>
-                  <td class="p-3 text-sm text-gray-600">${r.TechSkills}</td>
-                  <td class="p-3 text-sm font-medium ${scoreClass}">
-                    ${Math.round(r.OverallScore)}%
-                  </td>
-                  <td class="p-3 text-sm font-medium ${cat === 'At-risk' ? 'text-red-600' : cat === 'Excellent' ? 'text-green-600' : 'text-amber-600'}">${cat}</td>
-                </tr>
-              `;
-            }).join("")}
-          </tbody>
-        </table>
-      `;
-
-      const countEl = document.getElementById('candidateCount');
-      if (countEl) countEl.textContent = rows.length;
-    }
-
-    // Generate insights
-    function generateInsights(rows) {
-      const insightsEl = document.getElementById('insightsContent');
-      if (!insightsEl) return;
-
-      if (rows.length === 0) {
-        insightsEl.innerHTML = '<p>No data available for the selected filters.</p>';
-        return;
-      }
-
-      const atRiskCount = rows.filter(r => category(r) === "At-risk").length;
-      const excellentCount = rows.filter(r => category(r) === "Excellent").length;
-      const moderateCount = rows.filter(r => category(r) === "Moderate").length;
-
-      const avgTech = rows.length ? rows.reduce((sum, r) => sum + (Number(r.TechSkills) || 0), 0) / rows.length : 0;
-      const avgSoft = rows.length ? rows.reduce((sum, r) => sum + softSkillAvg(r), 0) / rows.length : 0;
-      const avgOverallScore = rows.length ? rows.reduce((sum, r) => sum + (Number(r.OverallScore) || 0), 0) / rows.length : 0;
-
-      const lowAttendance = rows.filter(r => r.Attendance <= 2).length;
-      const lowProjectDelivery = rows.filter(r => r.ProjectDelivery <= 2).length;
-
-      let insightsHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div class="bg-blue-50 p-4 rounded-lg fade-in">
-            <h4 class="font-semibold text-blue-800 mb-2">Performance Overview</h4>
-            <ul class="text-sm text-blue-700 space-y-1">
-              <li>• ${excellentCount} candidates (${rows.length ? Math.round(excellentCount/rows.length*100) : 0}%) are performing excellently</li>
-              <li>• ${moderateCount} candidates (${rows.length ? Math.round(moderateCount/rows.length*100) : 0}%) are at moderate level</li>
-              <li>• ${atRiskCount} candidates (${rows.length ? Math.round(atRiskCount/rows.length*100) : 0}%) need immediate support</li>
-              <li>• Average overall score: ${Math.round(avgOverallScore)}%</li>
-            </ul>
-          </div>
-          
-          <div class="bg-amber-50 p-4 rounded-lg fade-in">
-            <h4 class="font-semibold text-amber-800 mb-2">Skill Analysis</h4>
-            <ul class="text-sm text-amber-700 space-y-1">
-              <li>• Average technical skills: ${fmt(avgTech)}/5</li>
-              <li>• Average soft skills: ${fmt(avgSoft)}/5</li>
-              <li>• ${lowAttendance} candidates have attendance issues</li>
-              <li>• ${lowProjectDelivery} candidates struggle with project delivery</li>
-            </ul>
-          </div>
-        </div>
+        modal.style.display = 'flex';
         
-        <div class="mt-6">
-          <h4 class="font-semibold mb-2">Recommendations</h4>
-          <div class="bg-gray-50 p-4 rounded-lg">
-            <ul class="text-sm text-gray-700 space-y-2">
-              ${atRiskCount > 0 ? 
-                `<li class="flex items-start fade-in">
-                  <span class="text-red-500 mr-2">•</span>
-                  <span>Create individual development plans for ${atRiskCount} at-risk candidates focusing on their weakest areas</span>
-                </li>` : ''}
-              ${avgTech < 3.5 ? 
-                `<li class="flex items-start fade-in">
-                  <span class="text-blue-500 mr-2">•</span>
-                  <span>Implement technical skills workshops to improve the cohort's average technical competency</span>
-                </li>` : ''}
-              ${lowAttendance > 0 ? 
-                `<li class="flex items-start fade-in">
-                  <span class="text-amber-500 mr-2">•</span>
-                  <span>Address attendance issues with ${lowAttendance} candidates through mentorship and support</span>
-                </li>` : ''}
-              <li class="flex items-start fade-in">
-                <span class="text-green-500 mr-2">•</span>
-                <span>Leverage ${excellentCount} high performers as peer mentors for knowledge sharing</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-      `;
+        setTimeout(() => {
+            const theme = getTheme();
+            Plotly.react('modalTrendChart', [{
+                x: personData.map(d=>d.Week), y: personData.map(d=>d.OverallScore),
+                type: 'scatter', mode: 'lines+markers', line: {color: '#0078d4', width: 3}
+            }], {
+                margin: {t:20,b:30,l:30,r:10}, paper_bgcolor: 'transparent', plot_bgcolor: 'transparent',
+                font: {family: 'Segoe UI', color: theme.text},
+                yaxis: {range: [0, 105]}
+            }, {displayModeBar: false});
 
-      insightsEl.innerHTML = insightsHTML;
+            const keys = ['TechSkills', 'Communication', 'Accountability', 'ProjectDelivery', 'ProblemSolving'];
+            const vals = keys.map(k => latest[k]);
+            Plotly.react('modalRadarChart', [{
+                type: 'scatterpolar', r: [...vals, vals[0]], theta: [...keys, keys[0]],
+                fill: 'toself'
+            }], {
+                margin: {t:20,b:20,l:40,r:40}, paper_bgcolor: 'transparent', 
+                font: {family: 'Segoe UI', color: theme.text},
+                polar: { radialaxis: { range: [0,5], gridcolor: theme.grid }, angularaxis: { color: theme.text } }
+            }, {displayModeBar: false});
+        }, 100);
+    }
+    
+    function closeCandidateModal() { document.getElementById('candidateModal').style.display = 'none'; }
+
+    // --- UTILS ---
+    function switchTab(id, el) {
+        document.querySelectorAll('.tab-content').forEach(d => d.classList.add('hidden'));
+        document.getElementById(id+'Tab').classList.remove('hidden');
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+        if(id === 'analytics' || id === 'kanban') {
+            setTimeout(updateDashboard, 100);
+        }
     }
 
-    // Performance filter buttons
-    function setupPerformanceFilters() {
-      const filters = document.querySelectorAll('.performance-filter');
-      filters.forEach(filter => {
-        filter.addEventListener('click', function() {
-          filters.forEach(f => f.classList.remove('active'));
-          this.classList.add('active');
-
-          const filterValue = this.getAttribute('data-filter');
-          let filteredRows = filterData();
-
-          if (filterValue !== 'all') {
-            filteredRows = filteredRows.filter(r => category(r).toLowerCase().replace(' ', '-') === filterValue);
-          }
-
-          renderKPIs(filteredRows);
-          renderTable(filteredRows);
-          generateInsights(filteredRows);
-        });
-      });
+    function checkSelection() {
+        const count = document.querySelectorAll('.row-check:checked').length;
+        const btn = document.getElementById('compareBtn');
+        if(count > 1) { btn.classList.remove('hidden'); btn.innerText = `Compare (${count})`; }
+        else btn.classList.add('hidden');
     }
 
-    // Enhanced Export functionality
-    function setupExportFunctionality() {
-      const exportBtn = document.getElementById('exportReportBtn');
-      const exportModal = document.getElementById('exportModal');
-      const closeExportModal = document.getElementById('closeExportModal');
-      const cancelExport = document.getElementById('cancelExport');
-      const confirmExport = document.getElementById('confirmExport');
-      const exportFormatBtns = document.querySelectorAll('.export-format-btn');
-
-      if (!exportBtn || !exportModal || !confirmExport) return;
-
-      let selectedFormat = 'pdf';
-
-      // Show export modal
-      exportBtn.addEventListener('click', () => {
-        exportModal.classList.remove('page-hidden');
-        exportModal.classList.add('page-visible');
-      });
-
-      // Close export modal
-      [closeExportModal, cancelExport].forEach(btn => {
-        btn && btn.addEventListener('click', () => {
-          exportModal.classList.remove('page-visible');
-          exportModal.classList.add('page-hidden');
-        });
-      });
-
-      // Select export format
-      exportFormatBtns.forEach(btn => {
-        btn.addEventListener('click', () => {
-          exportFormatBtns.forEach(b => b.classList.remove('border-blue-500', 'bg-blue-50'));
-          btn.classList.add('border-blue-500', 'bg-blue-50');
-          selectedFormat = btn.getAttribute('data-format') || 'pdf';
-        });
-      });
-
-      // Confirm export
-      confirmExport.addEventListener('click', async () => {
-        exportModal.classList.remove('page-visible');
-        exportModal.classList.add('page-hidden');
-
-        const originalText = exportBtn.innerHTML;
-        exportBtn.innerHTML = '<i data-feather="loader" class="animate-spin"></i> Exporting...';
-        exportBtn.disabled = true;
-        feather.replace();
-
-        const dataScopeInput = document.querySelector('input[name="dataScope"]:checked');
-        const dataScope = dataScopeInput ? dataScopeInput.value : 'current';
-        const includeSections = {};
-        document.querySelectorAll('.section-checkbox').forEach(checkbox => {
-          includeSections[checkbox.getAttribute('data-section')] = checkbox.checked;
-        });
-
-        try {
-          if (selectedFormat === 'pdf') {
-            await exportToPDF(dataScope, includeSections);
-          } else {
-            exportToCSV(dataScope, includeSections);
-          }
-        } catch (error) {
-          console.error('Export failed:', error);
-          alert('Export failed. Please try again.');
-        } finally {
-          exportBtn.innerHTML = originalText;
-          exportBtn.disabled = false;
-          feather.replace();
-        }
-      });
+    function compareCandidates() {
+        switchTab('analytics', document.querySelectorAll('.tab')[2]);
+        showAlert('Comparison Mode', 'Analytics filtered to selected candidates.');
     }
 
-    // Enhanced PDF Export with charts
-    async function exportToPDF(dataScope, includeSections) {
-      const { jsPDF } = window.jspdf || {};
-      if (!jsPDF) {
-        alert('PDF export library not available.');
-        return;
-      }
-      const doc = new jsPDF();
+    function showAlert(title, msg) {
+        const div = document.createElement('div');
+        div.className = "bg-white dark:bg-[#333] border-l-4 border-blue-500 shadow-lg p-3 rounded text-sm mb-2 animate-fade-in";
+        div.innerHTML = `<b>${title}</b><br><span class="text-gray-500">${msg}</span>`;
+        document.getElementById('performanceAlerts').appendChild(div);
+        setTimeout(() => div.remove(), 4000);
+    }
 
-      const exportData = dataScope === 'all' ? ALL_DATA : filterData();
-      const reportTitleInput = document.getElementById('reportTitle');
-      const reportTitle = reportTitleInput ? reportTitleInput.value || 'MICT SP Performance Analysis Report' : 'MICT SP Performance Analysis Report';
+    function resetDashboard() {
+        document.getElementById('groupSel').value = 'All';
+        document.getElementById('weekSel').value = 'Week 4';
+        document.getElementById('searchIn').value = '';
+        currentState = { group: ['All'], week: 'Week 4', statuses: ['Excellent', 'Moderate', 'At-risk'], search: '', minScore: 0, liveMode: currentState.liveMode };
+        updateDashboard();
+    }
 
-      doc.setFontSize(20);
-      doc.setTextColor(40, 40, 40);
-      doc.text(reportTitle, 105, 20, { align: 'center' });
-
-      doc.setFontSize(12);
-      doc.setTextColor(100, 100, 100);
-      doc.text(`Generated on ${new Date().toLocaleDateString()} | ${exportData.length} candidates`, 105, 30, { align: 'center' });
-
-      let yPosition = 50;
-
-      // Executive Summary
-      if (includeSections.executive) {
-        doc.setFontSize(16);
-        doc.setTextColor(40, 40, 40);
-        doc.text('Executive Summary', 20, yPosition);
-        yPosition += 8;
-
-        doc.setFontSize(10);
-        doc.setTextColor(80, 80, 80);
-
-        const atRiskCount = exportData.filter(r => category(r) === "At-risk").length;
-        const excellentCount = exportData.filter(r => category(r) === "Excellent").length;
-        const groups = unique(exportData.map(r => r.DevGroup));
-        const avgOverallScore = exportData.length ? exportData.reduce((sum, r) => sum + r.OverallScore, 0) / exportData.length : 0;
-
-        const summaryText = [
-          `This report analyzes the performance of ${exportData.length} candidates across ${groups.length} development groups.`,
-          `Key findings include:`,
-          `• ${excellentCount} candidates (${exportData.length ? Math.round(excellentCount/exportData.length*100) : 0}%) are performing excellently`,
-          `• ${atRiskCount} candidates (${exportData.length ? Math.round(atRiskCount/exportData.length*100) : 0}%) require immediate intervention`,
-          `• Average overall score: ${Math.round(avgOverallScore)}%`,
-          `• Development groups analyzed: ${groups.join(', ')}`
-        ];
-
-        summaryText.forEach(line => {
-          if (yPosition > 270) {
-            doc.addPage();
-            yPosition = 20;
-          }
-          doc.text(line, 20, yPosition, { maxWidth: 170 });
-          yPosition += 7;
-        });
-
-        yPosition += 10;
-      }
-
-      // Performance Metrics
-      if (includeSections.kpis) {
-        if (yPosition > 250) {
-          doc.addPage();
-          yPosition = 20;
-        }
-
-        doc.setFontSize(16);
-        doc.setTextColor(40, 40, 40);
-        doc.text('Performance Metrics', 20, yPosition);
-        yPosition += 8;
-
-        doc.setFontSize(10);
-        const avg = key => {
-          const vals = exportData.map(r=>Number(r[key]) || 0).filter(v=>!isNaN(v));
-          return vals.length ? vals.reduce((a,b)=>a+b,0)/vals.length : NaN;
-        };
-
-        const metrics = [
-          { label: 'Average Attendance', value: isNaN(avg("Attendance")) ? 'N/A' : fmt(avg("Attendance")) + '/5' },
-          { label: 'Average Accountability', value: isNaN(avg("Accountability")) ? 'N/A' : fmt(avg("Accountability")) + '/5' },
-          { label: 'Work Ready (Tech ≥ 4)', value: exportData.length ? Math.round((exportData.filter(r=>r.TechSkills>=4).length/exportData.length*100)) + '%' : 'N/A' },
-          { label: 'Need Support', value: exportData.length ? Math.round((exportData.filter(r=>isAtRisk(r)).length/exportData.length*100)) + '%' : 'N/A' },
-          { label: 'Average Overall Score', value: exportData.length ? Math.round(exportData.reduce((sum, r) => sum + r.OverallScore, 0) / exportData.length) + '%' : 'N/A' }
-        ];
-
-        metrics.forEach(metric => {
-          if (yPosition > 270) {
-            doc.addPage();
-            yPosition = 20;
-          }
-
-          doc.setTextColor(40, 40, 40);
-          doc.text(`${metric.label}:`, 25, yPosition);
-          doc.setTextColor(59, 130, 246);
-          doc.text(String(metric.value), 100, yPosition);
-          yPosition += 7;
-        });
-
-        yPosition += 10;
-      }
-
-      // Group Performance Summary
-      if (includeSections.kpis) {
-        if (yPosition > 250) {
-          doc.addPage();
-          yPosition = 20;
-        }
-
-        doc.setFontSize(16);
-        doc.setTextColor(40, 40, 40);
-        doc.text('Group Performance Summary', 20, yPosition);
-        yPosition += 8;
-
-        doc.setFontSize(10);
-        const groups = unique(exportData.map(r => r.DevGroup));
-
-        groups.forEach(group => {
-          if (yPosition > 270) {
-            doc.addPage();
-            yPosition = 20;
-          }
-
-          const groupData = exportData.filter(r => r.DevGroup === group);
-          const groupAtRisk = groupData.filter(r => category(r) === "At-risk").length;
-          const groupExcellent = groupData.filter(r => category(r) === "Excellent").length;
-          const groupAvgScore = groupData.length ? groupData.reduce((sum, r) => sum + r.OverallScore, 0) / groupData.length : 0;
-
-          doc.setTextColor(40, 40, 40);
-          doc.text(`${group}:`, 25, yPosition);
-          doc.setTextColor(100, 100, 100);
-          doc.text(`${groupData.length} candidates, ${groupExcellent} excellent, ${groupAtRisk} at-risk, ${Math.round(groupAvgScore)}% avg score`, 60, yPosition);
-          yPosition += 7;
-        });
-
-        yPosition += 10;
-      }
-      
-      // Charts section (descriptions)
-      if (includeSections.charts) {
-        if (yPosition > 250) {
-          doc.addPage();
-          yPosition = 20;
-        }
-
-        doc.setFontSize(16);
-        doc.setTextColor(40, 40, 40);
-        doc.text('Key Visualizations', 20, yPosition);
-        yPosition += 8;
-
-        doc.setFontSize(10);
-        doc.setTextColor(80, 80, 80);
-
-        const chartDescriptions = [
-          "Performance Distribution: Pie chart showing Excellent, Moderate, and At-risk candidates",
-          "Group Comparison: Bar chart comparing performance across development groups",
-          "Skills Radar: Radar chart showing average scores across all assessment criteria",
-          "Tech vs Soft Skills: Scatter plot comparing technical and soft skills",
-          "Correlation Matrix: Heatmap showing relationships between different skills"
-        ];
-
-        chartDescriptions.forEach(desc => {
-          if (yPosition > 270) {
-            doc.addPage();
-            yPosition = 20;
-          }
-          doc.text(`• ${desc}`, 25, yPosition, { maxWidth: 170 });
-          yPosition += 7;
-        });
-
-        yPosition += 10;
-      }
-
-      // Risk Analysis
-      if (includeSections.risk) {
-        if (yPosition > 250) {
-          doc.addPage();
-          yPosition = 20;
-        }
-
-        doc.setFontSize(16);
-        doc.setTextColor(40, 40, 40);
-        doc.text('Risk Analysis', 20, yPosition);
-        yPosition += 8;
-
-        doc.setFontSize(10);
-        const atRiskCandidates = exportData.filter(r => category(r) === "At-risk");
-
-        if (atRiskCandidates.length > 0) {
-          doc.setTextColor(239, 68, 68);
-          doc.text('At-Risk Candidates Requiring Immediate Attention:', 25, yPosition);
-          yPosition += 7;
-
-          atRiskCandidates.forEach(candidate => {
-            if (yPosition > 270) {
-              doc.addPage();
-              yPosition = 20;
-            }
-            doc.setTextColor(40, 40, 40);
-            doc.text(`${candidate.Candidate} (${candidate.DevGroup}) - ${Math.round(candidate.OverallScore)}%`, 30, yPosition);
-            doc.setTextColor(100, 100, 100);
-
-            const lowScores = [];
-            if (candidate.Attendance <= 2) lowScores.push('Attendance');
-            if (candidate.Communication <= 2) lowScores.push('Communication');
-            if (candidate.Accountability <= 2) lowScores.push('Accountability');
-            if (candidate.CreativityOwnership <= 2) lowScores.push('Creativity & Ownership');
-            if (candidate.ProjectDelivery <= 2) lowScores.push('Project Delivery');
-            if (candidate.TechSkills <= 2) lowScores.push('Technical Skills');
-
-            doc.text(`Low scores in: ${lowScores.join(', ')}`, 30, yPosition + 5);
-            yPosition += 12;
-          });
+    let liveInterval;
+    function toggleLiveMode() {
+        currentState.liveMode = !currentState.liveMode;
+        const btn = document.getElementById('liveBtn');
+        const dot = document.getElementById('liveDot');
+        
+        if(currentState.liveMode) {
+            btn.classList.add('bg-red-500', 'hover:bg-red-600');
+            dot.classList.add('bg-white', 'animate-ping');
+            dot.classList.remove('bg-gray-400');
+            
+            liveInterval = setInterval(() => {
+                const idx = Math.floor(Math.random() * ALL_DATA.length);
+                const d = ALL_DATA[idx];
+                d.OverallScore = Math.min(100, Math.max(0, d.OverallScore + (Math.random() > 0.5 ? 2 : -2)));
+                updateDashboard();
+            }, 1500);
         } else {
-          doc.setTextColor(16, 185, 129);
-          doc.text('No at-risk candidates identified', 25, yPosition);
-          yPosition += 7;
+            btn.classList.remove('bg-red-500', 'hover:bg-red-600');
+            dot.classList.remove('bg-white', 'animate-ping');
+            dot.classList.add('bg-gray-400');
+            clearInterval(liveInterval);
         }
-
-        yPosition += 10;
-      }
-
-      // Recommendations
-      if (includeSections.recommendations) {
-        if (yPosition > 250) {
-          doc.addPage();
-          yPosition = 20;
-        }
-
-        doc.setFontSize(16);
-        doc.setTextColor(40, 40, 40);
-        doc.text('Key Recommendations', 20, yPosition);
-        yPosition += 8;
-
-        doc.setFontSize(10);
-
-        const atRiskCount = exportData.filter(r => category(r) === "At-risk").length;
-        const excellentCount = exportData.filter(r => category(r) === "Excellent").length;
-        const avgTech = exportData.length ? exportData.reduce((sum, r) => sum + (Number(r.TechSkills) || 0), 0) / exportData.length : 0;
-        const lowAttendance = exportData.filter(r => r.Attendance <= 2).length;
-
-        const recommendations = [];
-
-        if (atRiskCount > 0) {
-          recommendations.push(`Create individual development plans for ${atRiskCount} at-risk candidates`);
-        }
-        if (avgTech < 3.5) {
-          recommendations.push(`Implement technical skills workshops to improve average technical competency`);
-        }
-        if (lowAttendance > 0) {
-          recommendations.push(`Address attendance issues with ${lowAttendance} candidates through mentorship`);
-        }
-        if (excellentCount > 0) {
-          recommendations.push(`Leverage ${excellentCount} high performers as peer mentors`);
-        }
-        recommendations.push(`Continue monitoring all candidates with the performance tracking system`);
-
-        recommendations.forEach(rec => {
-          if (yPosition > 270) {
-            doc.addPage();
-            yPosition = 20;
-          }
-          doc.setTextColor(80, 80, 80);
-          doc.text(`• ${rec}`, 25, yPosition, { maxWidth: 170 });
-          yPosition += 7;
-        });
-
-        yPosition += 10;
-      }
-
-      // Detailed Data
-      if (includeSections.detailed) {
-        if (yPosition > 250) {
-          doc.addPage();
-          yPosition = 20;
-        }
-
-        doc.setFontSize(16);
-        doc.setTextColor(40, 40, 40);
-        doc.text('Candidate Details (Sample)', 20, yPosition);
-        yPosition += 10;
-
-        doc.setFontSize(8);
-
-        const headers = ["Candidate", "Group", "Att", "Comm", "Acc", "Creat", "Proj", "Tech", "Score", "Category"];
-        let xPosition = 20;
-        headers.forEach(header => {
-          doc.setTextColor(40, 40, 40);
-          doc.text(header, xPosition, yPosition);
-          xPosition += 18;
-        });
-
-        yPosition += 5;
-        doc.line(20, yPosition, 200, yPosition);
-        yPosition += 5;
-
-        const sampleData = exportData.slice(0, 10);
-        sampleData.forEach(candidate => {
-          if (yPosition > 270) {
-            doc.addPage();
-            yPosition = 20;
-            xPosition = 20;
-            headers.forEach(header => {
-              doc.setTextColor(40, 40, 40);
-              doc.text(header, xPosition, yPosition);
-              xPosition += 18;
-            });
-            yPosition += 10;
-          }
-
-          xPosition = 20;
-          const values = [
-            candidate.Candidate ? candidate.Candidate.substring(0, 8) : '',
-            candidate.DevGroup ? candidate.DevGroup.substring(0, 5) : '',
-            candidate.Attendance,
-            candidate.Communication,
-            candidate.Accountability,
-            candidate.CreativityOwnership,
-            candidate.ProjectDelivery,
-            candidate.TechSkills,
-            Math.round(candidate.OverallScore) + '%',
-            category(candidate).substring(0, 1)
-          ];
-
-          values.forEach((value, index) => {
-            if (index >= 2 && index <= 7) {
-              if (value <= 2) doc.setTextColor(239, 68, 68);
-              else if (value >= 4) doc.setTextColor(16, 185, 129);
-              else doc.setTextColor(245, 158, 11);
-            } else if (index === 8) {
-              const score = parseInt(String(value));
-              if (!isNaN(score)) {
-                if (score >= 80) doc.setTextColor(16, 185, 129);
-                else if (score >= 60) doc.setTextColor(245, 158, 11);
-                else doc.setTextColor(239, 68, 68);
-              } else doc.setTextColor(80, 80, 80);
-            } else {
-              doc.setTextColor(80, 80, 80);
-            }
-
-            doc.text(String(value), xPosition, yPosition);
-            xPosition += 18;
-          });
-
-          yPosition += 5;
-        });
-      }
-
-      doc.save(`${reportTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`);
     }
 
-    // Enhanced CSV Export
-    function exportToCSV(dataScope, includeSections) {
-      const exportData = dataScope === 'all' ? ALL_DATA : filterData();
-      let csvContent = "data:text/csv;charset=utf-8,";
-      const reportTitle = document.getElementById('reportTitle') ? document.getElementById('reportTitle').value || 'MICT SP Performance Analysis Report' : 'MICT SP Performance Analysis Report';
-
-      csvContent += `${reportTitle}\r\n`;
-      csvContent += `Generated on,${new Date().toLocaleDateString()}\r\n`;
-      csvContent += `Data Scope,${dataScope === 'all' ? 'All Data' : 'Filtered View'}\r\n`;
-      csvContent += `Total Candidates,${exportData.length}\r\n`;
-      csvContent += `Development Groups,${unique(exportData.map(r => r.DevGroup)).join('; ')}\r\n`;
-      csvContent += "\r\n";
-
-      if (includeSections.executive) {
-        csvContent += "PERFORMANCE SUMMARY\r\n";
-        const atRiskCount = exportData.filter(r => category(r) === "At-risk").length;
-        const excellentCount = exportData.filter(r => category(r) === "Excellent").length;
-        const moderateCount = exportData.filter(r => category(r) === "Moderate").length;
-        const avgOverallScore = exportData.length ? exportData.reduce((sum, r) => sum + r.OverallScore, 0) / exportData.length : 0;
-
-        csvContent += `Excellent Candidates,${excellentCount},${exportData.length ? Math.round(excellentCount/exportData.length*100) : 0}%\r\n`;
-        csvContent += `Moderate Candidates,${moderateCount},${exportData.length ? Math.round(moderateCount/exportData.length*100) : 0}%\r\n`;
-        csvContent += `At-Risk Candidates,${atRiskCount},${exportData.length ? Math.round(atRiskCount/exportData.length*100) : 0}%\r\n`;
-        csvContent += `Average Overall Score,${Math.round(avgOverallScore)}%\r\n`;
-        csvContent += "\r\n";
-      }
-
-      if (includeSections.kpis) {
-        csvContent += "GROUP PERFORMANCE\r\n";
-        csvContent += "Group,Total Candidates,Excellent,Moderate,At-Risk,Avg Tech Skills,Avg Soft Skills,Avg Overall Score\r\n";
-
-        const groups = unique(exportData.map(r => r.DevGroup));
-        groups.forEach(group => {
-          const groupData = exportData.filter(r => r.DevGroup === group);
-          const excellent = groupData.filter(r => category(r) === "Excellent").length;
-          const moderate = groupData.filter(r => category(r) === "Moderate").length;
-          const atRisk = groupData.filter(r => category(r) === "At-risk").length;
-          const avgTech = groupData.length ? groupData.reduce((sum, r) => sum + (Number(r.TechSkills) || 0), 0) / groupData.length : 0;
-          const avgSoft = groupData.length ? groupData.reduce((sum, r) => sum + softSkillAvg(r), 0) / groupData.length : 0;
-          const avgOverallScore = groupData.length ? groupData.reduce((sum, r) => sum + r.OverallScore, 0) / groupData.length : 0;
-
-          csvContent += `${group},${groupData.length},${excellent},${moderate},${atRisk},${fmt(avgTech)},${fmt(avgSoft)},${Math.round(avgOverallScore)}%\r\n`;
+    function openExportModal() {
+        const doc = new jsPDF();
+        doc.text("MICT Performance Report", 14, 20);
+        doc.autoTable({
+            startY: 30,
+            head: [['Candidate', 'Group', 'Score', 'Status']],
+            body: ALL_DATA.filter(d=>d.Week==='Week 4').map(d => [d.Candidate, d.DevGroup, d.OverallScore, getCategory(d.OverallScore)])
         });
-        csvContent += "\r\n";
-      }
-
-      if (includeSections.risk) {
-        csvContent += "RISK ANALYSIS\r\n";
-        csvContent += "Candidate,Group,Overall Score,Primary Concerns\r\n";
-
-        const atRiskCandidates = exportData.filter(r => category(r) === "At-risk");
-        atRiskCandidates.forEach(candidate => {
-          const lowScores = [];
-          if (candidate.Attendance <= 2) lowScores.push('Attendance');
-          if (candidate.Communication <= 2) lowScores.push('Communication');
-          if (candidate.Accountability <= 2) lowScores.push('Accountability');
-          if (candidate.CreativityOwnership <= 2) lowScores.push('Creativity & Ownership');
-          if (candidate.ProjectDelivery <= 2) lowScores.push('Project Delivery');
-          if (candidate.TechSkills <= 2) lowScores.push('Technical Skills');
-
-          csvContent += `"${candidate.Candidate}","${candidate.DevGroup}","${Math.round(candidate.OverallScore)}%","${lowScores.join('; ')}"\r\n`;
-        });
-        csvContent += "\r\n";
-      }
-
-      if (includeSections.detailed) {
-        csvContent += "DETAILED CANDIDATE DATA\r\n";
-        const headers = ["Candidate","DevGroup","Scrum","Attendance","Communication","Accountability",
-                        "CreativityOwnership","ProjectDelivery","TechSkills","OverallScore","Category"];
-        csvContent += headers.join(",") + "\r\n";
-
-        exportData.forEach(row => {
-          const values = [
-            `"${row.Candidate}"`,
-            row.DevGroup,
-            `"${row.Scrum}"`,
-            row.Attendance,
-            row.Communication,
-            row.Accountability,
-            row.CreativityOwnership,
-            row.ProjectDelivery,
-            row.TechSkills,
-            Math.round(row.OverallScore) + '%',
-            category(row)
-          ];
-          csvContent += values.join(",") + "\r\n";
-        });
-      }
-
-      const encodedUri = encodeURI(csvContent);
-      const link = document.createElement("a");
-      link.setAttribute("href", encodedUri);
-      link.setAttribute("download", "comprehensive_performance_report.csv");
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
+        doc.save('MICT_Report.pdf');
+    }
+    
+    function openSettingsModal() { document.getElementById('settingsModal').style.display='flex'; }
+    function saveSettings() { 
+        document.getElementById('settingsModal').style.display='none'; 
+        recalculateScores();
+        updateDashboard();
     }
 
-    // Debounced updates for better performance
-    function debouncedUpdate() {
-      clearTimeout(window.updateTimeout);
-      window.updateTimeout = setTimeout(update, 100);
-    }
-
-    // Orchestrate updates
-    function update() {
-      const rows = filterData();
-      window.currentData = rows;
-
-      renderKPIs(rows);
-      renderPerformanceTrends(rows);
-      renderOverallCategory(rows);
-      renderGroupComparison(rows);
-      renderSkillDistribution(rows);
-      renderCriteriaRadar(rows);
-      renderTechSoftScatter(rows);
-      renderGroupBoxPlots(rows);
-      renderCorrelationMatrix(rows);
-      renderTopPerformers(rows);
-      renderAtRiskCandidates(rows);
-      renderTable(rows);
-      generateInsights(rows);
-    }
-
-    // --- New Function: Dataset Import ---
-    function importDataset() {
-      const fileInput = document.createElement('input');
-      fileInput.type = 'file';
-      fileInput.accept = '.json';
-      fileInput.onchange = e => {
-        const file = e.target.files[0];
-        if (!file) return;
-
-        const reader = new FileReader();
-        reader.onload = event => {
-          try {
-            const newDataset = JSON.parse(event.target.result);
-            if (Array.isArray(newDataset) && newDataset.length > 0) {
-              // Assuming the new dataset has the same structure as the existing ALL_DATA
-              window.ALL_DATA = newDataset;
-              // Re-initialize filters and update dashboard with the new data
-              initFilters();
-              update();
-              alert(`Successfully imported ${newDataset.length} records from ${file.name}.`);
-            } else {
-              alert('Error: Imported file is empty or not a valid array.');
-            }
-          } catch (error) {
-            console.error('Error parsing JSON file:', error);
-            alert('Error: Could not parse the file as JSON. Please ensure it is a valid JSON array of objects.');
-          }
-        };
-        reader.readAsText(file);
-      };
-      fileInput.click();
-    }
-
-
-
-    // Initialize the dashboard
-    function initDashboard() {
-
-      initFilters();
-      update();
-      setupPerformanceFilters();
-      setupExportFunctionality();
-      
-      // Add event listener for dataset import
-      const importBtn = document.getElementById('importDatasetBtn');
-      importBtn && importBtn.addEventListener('click', importDataset);
-
-      // Add event listeners
-      const gEl = document.getElementById('groupSel');
-      const wEl = document.getElementById('weekSel');
-      const sEl = document.getElementById('searchIn');
-      const rBtn = document.getElementById('resetBtn');
-
-      gEl && gEl.addEventListener('change', debouncedUpdate);
-      wEl && wEl.addEventListener('change', debouncedUpdate);
-      sEl && sEl.addEventListener('input', debouncedUpdate);
-      rBtn && rBtn.addEventListener('click', () => {
-        initFilters();
-        update();
-      });
-
-      const saveViewBtn = document.getElementById('saveView');
-      saveViewBtn && saveViewBtn.addEventListener('click', () => {
-        alert('View saved! In a real application, this would save your current filter state.');
-      });
-    }
-
-    // Initialize when DOM is loaded
-    document.addEventListener('DOMContentLoaded', function() {
-      const loadingIndicator = document.getElementById('loadingIndicator');
-      const mainContent = document.getElementById('mainContent');
-
-      setTimeout(() => {
-        if (typeof initDashboard === 'function') {
-          initDashboard();
-        }
-
-        if (loadingIndicator) loadingIndicator.style.display = 'none';
-        if (mainContent) mainContent.classList.remove('opacity-0');
-
-        if (typeof feather !== 'undefined') {
-          feather.replace();
-        }
-      }, 100);
-    });
   </script>
 </body>
 </html>
