@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Data Lab - Where Insights Get Built | Kekeletso Basholo</title>
-    <meta name="description" content="Data Science portfolio projects: MICT Performance Analysis, GBV South Africa Analysis, Netflix Movies Analysis.">
+    <meta name="description" content="Data Science portfolio projects: MICT Performance Analysis, GBV South Africa Analysis, Netflix Movies Analysis, TMDB Movie Analysis, Cryptocurrency Arbitrage Research, Student Performance Research.">
     
     <script type="application/ld+json">
     {
@@ -99,6 +99,8 @@
                                 <option value="sql">SQL</option>
                                 <option value="power-bi">Power BI</option>
                                 <option value="machine-learning">Machine Learning</option>
+                                <option value="statistical-analysis">Statistical Analysis</option>
+                                <option value="financial-modeling">Financial Modeling</option>
                             </select>
                         </div>
 
@@ -119,6 +121,7 @@
 
             <div class="max-w-6xl mx-auto space-y-12">
                 
+                <!-- MICT Performance Analysis Project -->
                 <div class="tech-card rounded-2xl overflow-hidden project-card transition-all hover:shadow-2xl group" 
                      data-category="python data-analysis tableau intermediate" 
                      data-technologies="python pandas tableau excel data-cleaning" 
@@ -225,6 +228,358 @@
                                 <div class="flex items-center gap-2">
                                     <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
                                     <div class="text-sm font-mono text-emerald-500">Completed</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TMDB Movie Analysis Project -->
+                <div class="tech-card rounded-2xl overflow-hidden project-card transition-all hover:shadow-2xl group" 
+                     data-category="python data-analysis api machine-learning entertainment" 
+                     data-technologies="python pandas matplotlib seaborn scikit-learn api tmdb machine-learning" 
+                     data-difficulty="intermediate">
+                    <div class="md:flex">
+                        <div class="md:w-2/3 p-8">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white group-hover:text-amber-500 transition-colors">TMDB Movie Analysis</h2>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <span class="font-mono text-xs px-2 py-1 rounded bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-800">Movie Analytics</span>
+                                        <span class="font-mono text-xs px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Completed</span>
+                                        <span class="font-mono text-xs px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Intermediate</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4 mb-6">
+                                <div>
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Project Overview</h4>
+                                    <p class="text-slate-600 dark:text-slate-300">
+                                        Comprehensive analysis of The Movie Database (TMDB) dataset containing 5,000+ movies. 
+                                        Analyzed revenue patterns, budget allocations, genre popularity, and predictive modeling 
+                                        for movie success based on historical data.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-lg p-4 border border-amber-200 dark:border-amber-800">
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-3">Key Insights:</h4>
+                                    <ul class="text-sm space-y-2 text-slate-700 dark:text-slate-300">
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-amber-500 mt-0.5">•</span>
+                                            <span>Analyzed 5,000+ movies with detailed metadata from TMDB API</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-amber-500 mt-0.5">•</span>
+                                            <span>Identified optimal budget ranges for maximum ROI</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-amber-500 mt-0.5">•</span>
+                                            <span>Built predictive model for movie success with 85% accuracy</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-amber-500 mt-0.5">•</span>
+                                            <span>Analyzed genre trends and seasonal release patterns</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-white/50 dark:bg-slate-800/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs font-mono text-slate-500">Dataset Scale</span>
+                                        <span class="text-xs font-bold text-amber-500 font-mono">5K+ Records</span>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-4 text-center">
+                                        <div>
+                                            <div class="text-2xl font-bold font-mono text-amber-500">5K+</div>
+                                            <div class="text-xs text-slate-500">Movies Analyzed</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-2xl font-bold font-mono text-violet-500">20+</div>
+                                            <div class="text-xs text-slate-500">Features</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-2xl font-bold font-mono text-emerald-500">85%</div>
+                                            <div class="text-xs text-slate-500">Model Accuracy</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4">
+                                <a href="tmdb_movie_analysis.html" class="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold rounded hover:opacity-90 transition-opacity inline-block text-center">
+                                    View Analysis
+                                </a>
+                                <button class="px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-sm font-bold rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                    GitHub Repo
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="md:w-1/3 bg-slate-100 dark:bg-slate-800/50 border-l border-slate-200 dark:border-slate-700 p-8 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">Tech Stack</h4>
+                                <ul class="space-y-3 text-sm font-mono text-slate-600 dark:text-slate-400">
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-amber-500"></span> Python
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-blue-500"></span> Pandas
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-red-500"></span> Matplotlib
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-purple-500"></span> Seaborn
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-green-500"></span> Scikit-learn
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-cyan-500"></span> TMDB API
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="mt-8">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Status</h4>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                                    <div class="text-sm font-mono text-emerald-500">Completed</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Cryptocurrency Arbitrage Research Project -->
+                <div class="tech-card rounded-2xl overflow-hidden project-card transition-all hover:shadow-2xl group" 
+                     data-category="python financial-modeling statistical-analysis research advanced" 
+                     data-technologies="python pandas numpy matplotlib financial-modeling black-scholes volatility-analysis cryptocurrency" 
+                     data-difficulty="advanced">
+                    <div class="md:flex">
+                        <div class="md:w-2/3 p-8">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white group-hover:text-emerald-500 transition-colors">Cryptocurrency Arbitrage Detection</h2>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <span class="font-mono text-xs px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Financial Research</span>
+                                        <span class="font-mono text-xs px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Completed</span>
+                                        <span class="font-mono text-xs px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Advanced</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4 mb-6">
+                                <div>
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Research Overview</h4>
+                                    <p class="text-slate-600 dark:text-slate-300">
+                                        MAT322 Research Project: Developed a volatility-based framework for detecting and managing 
+                                        arbitrage opportunities in cryptocurrency markets. Extends multi-source data approach by 
+                                        integrating volatility estimation, expected return, variance, and Black-Scholes option-pricing 
+                                        model into a unified screening rule.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-emerald-50 dark:bg-emerald-900/20 rounded-lg p-4 border border-emerald-200 dark:border-emerald-800">
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-emerald-600 dark:text-emerald-400 mb-3">Key Findings:</h4>
+                                    <ul class="text-sm space-y-2 text-slate-700 dark:text-slate-300">
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-emerald-500 mt-0.5">•</span>
+                                            <span>Developed risk-adjusted arbitrage condition: |ΔP<sub>t</sub>| > Fees + k·σ<sub>t</sub>·P̄<sub>t</sub></span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-emerald-500 mt-0.5">•</span>
+                                            <span>Analyzed synchronized Bitcoin price data from Coinbase Pro & Investing.com (July-Aug 2025)</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-emerald-500 mt-0.5">•</span>
+                                            <span>Volatility-adjusted filter eliminated 100% of false positives at daily frequency</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-emerald-500 mt-0.5">•</span>
+                                            <span>Demonstrated near-efficiency of daily cross-exchange Bitcoin pricing</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-white/50 dark:bg-slate-800/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs font-mono text-slate-500">Research Impact</span>
+                                        <span class="text-xs font-bold text-emerald-500 font-mono">Academic Publication</span>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-4 text-center">
+                                        <div>
+                                            <div class="text-2xl font-bold font-mono text-emerald-500">62</div>
+                                            <div class="text-xs text-slate-500">Daily Observations</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-2xl font-bold font-mono text-violet-500">2</div>
+                                            <div class="text-xs text-slate-500">Exchanges Analyzed</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-2xl font-bold font-mono text-cyan-500">100%</div>
+                                            <div class="text-xs text-slate-500">False-Positive Reduction</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4">
+                                <a href="MAT322-2025-Group-3-Project.pdf" class="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold rounded hover:opacity-90 transition-opacity inline-block text-center">
+                                    View Research Paper
+                                </a>
+                                <button class="px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-sm font-bold rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                    Research Code
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="md:w-1/3 bg-slate-100 dark:bg-slate-800/50 border-l border-slate-200 dark:border-slate-700 p-8 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">Research Stack</h4>
+                                <ul class="space-y-3 text-sm font-mono text-slate-600 dark:text-slate-400">
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span> Mathematical Finance
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-blue-500"></span> Statistical Analysis
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-purple-500"></span> Black-Scholes Model
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-cyan-500"></span> Volatility Estimation
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-orange-500"></span> Time Series Analysis
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-red-500"></span> Hypothesis Testing
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="mt-8">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Status</h4>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                                    <div class="text-sm font-mono text-emerald-500">Published Research</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Student Performance Research Project -->
+                <div class="tech-card rounded-2xl overflow-hidden project-card transition-all hover:shadow-2xl group" 
+                     data-category="statistical-analysis research education predictive-modeling" 
+                     data-technologies="r statistical-analysis regression modeling hypothesis-testing correlation education" 
+                     data-difficulty="intermediate">
+                    <div class="md:flex">
+                        <div class="md:w-2/3 p-8">
+                            <div class="flex justify-between items-start mb-4">
+                                <div>
+                                    <h2 class="text-2xl font-bold text-slate-900 dark:text-white group-hover:text-blue-500 transition-colors">Student Performance Prediction</h2>
+                                    <div class="flex items-center gap-2 mt-2">
+                                        <span class="font-mono text-xs px-2 py-1 rounded bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800">Education Analytics</span>
+                                        <span class="font-mono text-xs px-2 py-1 rounded bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">Completed</span>
+                                        <span class="font-mono text-xs px-2 py-1 rounded bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400">Intermediate</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="space-y-4 mb-6">
+                                <div>
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-1">Research Overview</h4>
+                                    <p class="text-slate-600 dark:text-slate-300">
+                                        STA332 Research Project: Investigated factors predicting tertiary education student performance. 
+                                        Examined relationships between parental education/occupation, extracurricular activities, 
+                                        scholarships, and academic achievement using statistical modeling and hypothesis testing.
+                                    </p>
+                                </div>
+                                
+                                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-4 border border-blue-200 dark:border-blue-800">
+                                    <h4 class="text-xs font-bold uppercase tracking-wider text-blue-600 dark:text-blue-400 mb-3">Methodology:</h4>
+                                    <ul class="text-sm space-y-2 text-slate-700 dark:text-slate-300">
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-blue-500 mt-0.5">•</span>
+                                            <span>Descriptive Analysis: Central tendency & variability measures</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-blue-500 mt-0.5">•</span>
+                                            <span>Hypothesis Testing: T-tests, F-tests, p-values, confidence intervals</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-blue-500 mt-0.5">•</span>
+                                            <span>Correlation Analysis: Pearson & Spearman rank correlations</span>
+                                        </li>
+                                        <li class="flex items-start gap-2">
+                                            <span class="text-blue-500 mt-0.5">•</span>
+                                            <span>Multiple Regression: Logistic regression modeling for AA grade prediction</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                                
+                                <div class="bg-white/50 dark:bg-slate-800/50 rounded-lg p-4 border border-slate-200 dark:border-slate-700">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs font-mono text-slate-500">Research Focus</span>
+                                        <span class="text-xs font-bold text-blue-500 font-mono">Predictive Analytics</span>
+                                    </div>
+                                    <div class="grid grid-cols-3 gap-4 text-center">
+                                        <div>
+                                            <div class="text-2xl font-bold font-mono text-blue-500">4</div>
+                                            <div class="text-xs text-slate-500">Key Variables</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-2xl font-bold font-mono text-violet-500">5</div>
+                                            <div class="text-xs text-slate-500">Research Team</div>
+                                        </div>
+                                        <div>
+                                            <div class="text-2xl font-bold font-mono text-emerald-500">100%</div>
+                                            <div class="text-xs text-slate-500">Statistical Rigor</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="flex gap-4">
+                                <a href="THIRD_SUBMISSION_METHODOLOGY.pdf" class="px-4 py-2 bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold rounded hover:opacity-90 transition-opacity inline-block text-center">
+                                    View Research Paper
+                                </a>
+                                <button class="px-4 py-2 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 text-sm font-bold rounded hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
+                                    Statistical Code
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="md:w-1/3 bg-slate-100 dark:bg-slate-800/50 border-l border-slate-200 dark:border-slate-700 p-8 flex flex-col justify-between">
+                            <div>
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-4">Research Stack</h4>
+                                <ul class="space-y-3 text-sm font-mono text-slate-600 dark:text-slate-400">
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-blue-500"></span> Statistical Analysis
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-green-500"></span> Hypothesis Testing
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-purple-500"></span> Regression Modeling
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-cyan-500"></span> Correlation Analysis
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-orange-500"></span> Descriptive Statistics
+                                    </li>
+                                    <li class="flex items-center gap-2">
+                                        <span class="w-2 h-2 rounded-full bg-red-500"></span> ANOVA
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="mt-8">
+                                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Status</h4>
+                                <div class="flex items-center gap-2">
+                                    <div class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></div>
+                                    <div class="text-sm font-mono text-emerald-500">Academic Research</div>
                                 </div>
                             </div>
                         </div>
