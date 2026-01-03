@@ -18,11 +18,12 @@
       "@type": "Person",
       "name": "Kekeletso Basholo",
       "jobTitle": "Data Analyst",
-      "url": "https://yourportfolio.com",
+      "url": "https://kekeletsobasholo.dev",
       "sameAs": [
-        "https://linkedin.com/in/yourprofile",
-        "https://github.com/yourprofile"
+        "https://www.linkedin.com/in/kekeletso-basholo-161059247/",
+        "https://github.com/kekeletso-basholo"
       ],
+      "email": "mailto:unathibasholo@gmail.com",
       "worksFor": {
         "@type": "Organization",
         "name": "CAPACITI"
@@ -34,17 +35,10 @@
     }
     </script>
 
-    <!-- Preload critical resources -->
-    <link rel="preload" href="style.css" as="style">
-    <link rel="preload" href="script.js" as="script">
-    <link rel="preload" href="components/navbar.js" as="script">
-    
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
     
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/x-icon" href="static/favicon.ico">
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
@@ -59,13 +53,103 @@
                     },
                     colors: {
                         slate: { 850: '#151e2e' }
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
                     }
                 }
             }
         }
     </script>
-    <script src="components/navbar.js"></script>
-    <script src="components/footer.js"></script>
+
+    <style>
+        /* Custom CSS from style.css */
+        .bg-grid-pattern {
+            background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px),
+                            linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+            background-size: 40px 40px;
+            mask-image: linear-gradient(to bottom, transparent, 20%, white, 80%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, 10%, white, 90%, transparent);
+        }
+        .dark .bg-grid-pattern {
+            background-image: linear-gradient(to right, #334155 1px, transparent 1px),
+                            linear-gradient(to bottom, #334155 1px, transparent 1px);
+        }
+        
+        .blob-cont {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+            transition: opacity 0.5s ease;
+        }
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            animation: blob 10s infinite;
+        }
+        .blob-1 { top: 0; left: -10%; width: 500px; height: 500px; background: #a5f3fc; animation-delay: 0s; }
+        .blob-2 { top: 10%; right: -10%; width: 400px; height: 400px; background: #ddd6fe; animation-delay: 2s; }
+        .blob-3 { bottom: -10%; left: 20%; width: 600px; height: 600px; background: #fed7aa; animation-delay: 4s; }
+        
+        .dark .blob-1 { background: #0891b2; opacity: 0.4; }
+        .dark .blob-2 { background: #7c3aed; opacity: 0.4; }
+        .dark .blob-3 { background: #ea580c; opacity: 0.4; }
+
+        .tech-card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        .dark .tech-card {
+            background: rgba(30, 41, 59, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .typewriter span {
+            border-right: 4px solid #06b6d4;
+            animation: caret 1s steps(1) infinite;
+        }
+        @keyframes caret { 50% { border-color: transparent; } }
+
+        /* Animation Classes */
+        .fade-in-section {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            will-change: opacity, transform;
+        }
+        .fade-in-section.is-visible {
+            opacity: 1;
+            transform: none;
+        }
+
+        /* Recruiter Mode Styles */
+        body.recruiter-mode .blob-cont {
+            display: none !important;
+        }
+        body.recruiter-mode .bg-grid-pattern {
+            opacity: 0.1;
+        }
+        body.recruiter-mode .tech-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            box-shadow: none;
+        }
+        body.recruiter-mode.dark .tech-card {
+            background: #0f172a;
+            border: 1px solid #334155;
+        }
+    </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 font-sans antialiased selection:bg-cyan-500/30">
     
@@ -83,11 +167,12 @@
         
         <main id="main-content" class="container mx-auto px-4 py-12">
             
-            <section class="flex flex-col items-center gap-10 mb-24 py-12">
+            <section class="flex flex-col items-center gap-10 mb-24 py-12 fade-in-section">
                 <div class="relative group">
                     <div class="absolute -inset-1 bg-gradient-to-r from-cyan-400 to-violet-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-500"></div>
-                    <div class="relative w-48 h-48 md:w-64 md:h-64 rounded-full p-1 bg-white dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700">
-                        <img src="static/certificates/picture1.jpeg" alt="Kekeletso Basholo" class="w-full h-full object-cover rounded-full">
+                    <div class="relative w-48 h-48 md:w-64 md:h-64 rounded-full p-1 bg-white dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 overflow-hidden flex items-center justify-center">
+                        <!-- Placeholder for user image if specific path not found -->
+                         <img src="static/certificates/picture1.jpeg" onerror="this.src='https://ui-avatars.com/api/?name=Kekeletso+Basholo&background=0D8ABC&color=fff&size=256'" alt="Kekeletso Basholo" class="w-full h-full object-cover rounded-full">
                     </div>
                     <div class="absolute bottom-2 right-2 bg-slate-900 dark:bg-black border border-slate-700 text-emerald-400 px-4 py-1.5 rounded-full shadow-xl flex items-center gap-2 backdrop-blur-md">
                         <span class="relative flex h-2.5 w-2.5">
@@ -119,9 +204,10 @@
                         Professional Summary
                     </div>
                     <p class="text-lg text-slate-600 dark:text-slate-300 leading-relaxed mb-6 text-center">
-                        Motivated Data Analyst with a strong foundation in mathematics, statistics and programming. 
-                        Skilled in Python, data visualization, and statistical modeling with hands-on experience in analytics projects. 
-                        Passionate about transforming raw data into actionable insights to support data-driven decision making.
+                        Data Analyst with a strong foundation in mathematics, statistics, and applied analytics. 
+                        Experienced in Python, SQL, Excel, Tableau, and statistical modeling, with hands on exposure 
+                        to real world business problems through analytics projects and industry simulations. 
+                        Adept at transforming complex datasets into clear insights that support strategic and data driven decisions.
                     </p>
                     <div class="flex flex-wrap justify-center gap-2">
                         <span class="px-3 py-1 rounded-full bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 text-xs font-mono border border-cyan-100 dark:border-cyan-800">Data Analysis</span>
@@ -142,11 +228,16 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                         Get In Touch
                     </a>
+                    <!-- Resume Download Button -->
+                    <a href="static/Kekeletso_Basholo_CV.pdf" download class="px-8 py-3 rounded-lg border border-cyan-500 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 font-medium transition-colors flex items-center justify-center gap-2">
+                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+                         Download CV
+                    </a>
                 </div>
 
                 <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-5xl mt-8">
                     <div class="tech-card p-5 rounded-xl text-center hover:border-cyan-500/50 transition-colors group">
-                        <div class="text-3xl font-bold font-mono text-slate-800 dark:text-white counter" data-target="2">0</div>
+                        <div class="text-3xl font-bold font-mono text-slate-800 dark:text-white counter" data-target="15">0</div>
                         <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mt-1">Projects</div>
                     </div>
                     <div class="tech-card p-5 rounded-xl text-center hover:border-violet-500/50 transition-colors group">
@@ -163,8 +254,167 @@
                     </div>
                 </div>
             </section>
+            
+            <section class="mb-32 max-w-6xl mx-auto fade-in-section">
+                <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-12 text-center">
+                    Featured Projects
+                </h2>
+            
+                <div class="grid md:grid-cols-3 gap-6">
+                    <div class="tech-card p-6 rounded-xl">
+                        <h3 class="font-bold text-lg mb-2">Sales Performance Dashboard</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                            Built an interactive Tableau dashboard to analyze sales trends, regional performance, 
+                            and revenue drivers using real business data.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Tableau</span>
+                            <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Excel</span>
+                        </div>
+                        <a href="projects.html" class="text-sm font-medium text-cyan-600 hover:text-cyan-700">
+                            View Project →
+                        </a>
+                    </div>
+            
+                    <div class="tech-card p-6 rounded-xl">
+                        <h3 class="font-bold text-lg mb-2">Customer Segmentation Analysis</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                            Applied clustering techniques in Python to segment customers based on behavior 
+                            and improve targeted marketing strategies.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Python</span>
+                            <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Pandas</span>
+                            <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Scikit Learn</span>
+                        </div>
+                        <a href="projects.html" class="text-sm font-medium text-cyan-600 hover:text-cyan-700">
+                            View Project →
+                        </a>
+                    </div>
+            
+                    <div class="tech-card p-6 rounded-xl">
+                        <h3 class="font-bold text-lg mb-2">Equality Score Classification</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                            Used Excel and Tableau to classify equality scores into fair and unfair categories 
+                            and draw business conclusions for stakeholders.
+                        </p>
+                        <div class="flex flex-wrap gap-2 mb-4">
+                            <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Excel</span>
+                            <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Tableau</span>
+                        </div>
+                        <a href="projects.html" class="text-sm font-medium text-cyan-600 hover:text-cyan-700">
+                            View Project →
+                        </a>
+                    </div>
+                </div>
+            </section>
 
-            <section class="mb-32">
+            <!-- End-to-End Pipeline Visualization (Feature 13) -->
+            <section class="mb-32 max-w-6xl mx-auto fade-in-section">
+                <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-12 text-center">End-to-End Data Pipeline</h2>
+                <div class="tech-card p-8 rounded-2xl overflow-x-auto">
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-6 min-w-[600px]">
+                        
+                        <!-- Step 1 -->
+                        <div class="flex flex-col items-center text-center group w-full">
+                            <div class="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4 group-hover:scale-110 transition-transform">
+                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                            </div>
+                            <h3 class="font-bold text-slate-800 dark:text-white">Ingestion</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">APIs, CSVs, SQL</p>
+                        </div>
+
+                        <!-- Arrow -->
+                        <div class="hidden md:block w-24 h-0.5 bg-slate-300 dark:bg-slate-700 relative">
+                            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 border-t-2 border-r-2 border-slate-300 dark:border-slate-700 rotate-45"></div>
+                        </div>
+                        <div class="md:hidden h-12 w-0.5 bg-slate-300 dark:bg-slate-700"></div>
+
+                        <!-- Step 2 -->
+                        <div class="flex flex-col items-center text-center group w-full">
+                            <div class="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-4 group-hover:scale-110 transition-transform">
+                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+                            </div>
+                            <h3 class="font-bold text-slate-800 dark:text-white">Processing</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Cleaning, Pandas</p>
+                        </div>
+
+                        <!-- Arrow -->
+                        <div class="hidden md:block w-24 h-0.5 bg-slate-300 dark:bg-slate-700 relative">
+                            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 border-t-2 border-r-2 border-slate-300 dark:border-slate-700 rotate-45"></div>
+                        </div>
+                        <div class="md:hidden h-12 w-0.5 bg-slate-300 dark:bg-slate-700"></div>
+
+                        <!-- Step 3 -->
+                        <div class="flex flex-col items-center text-center group w-full">
+                            <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-4 group-hover:scale-110 transition-transform">
+                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+                            </div>
+                            <h3 class="font-bold text-slate-800 dark:text-white">Storage</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Data Warehouse</p>
+                        </div>
+
+                        <!-- Arrow -->
+                        <div class="hidden md:block w-24 h-0.5 bg-slate-300 dark:bg-slate-700 relative">
+                            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 border-t-2 border-r-2 border-slate-300 dark:border-slate-700 rotate-45"></div>
+                        </div>
+                        <div class="md:hidden h-12 w-0.5 bg-slate-300 dark:bg-slate-700"></div>
+
+                        <!-- Step 4 -->
+                        <div class="flex flex-col items-center text-center group w-full">
+                            <div class="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 mb-4 group-hover:scale-110 transition-transform">
+                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                            </div>
+                            <h3 class="font-bold text-slate-800 dark:text-white">Analysis</h3>
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Tableau / PowerBI</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- AI Assisted Analysis Demo (Feature 14) -->
+            <section class="mb-32 max-w-6xl mx-auto fade-in-section">
+                <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-6 text-center">AI Data Insights Demo</h2>
+                <p class="text-center text-slate-600 dark:text-slate-400 mb-10 max-w-2xl mx-auto">
+                    A simulation of an AI-powered quick analysis tool. Upload a CSV to get instant summary statistics (Processing happens entirely in your browser).
+                </p>
+                
+                <div class="tech-card p-8 rounded-2xl">
+                    <div class="flex flex-col items-center justify-center border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-xl p-10 mb-8 transition-colors hover:border-cyan-500 dark:hover:border-cyan-500 relative bg-slate-50 dark:bg-slate-800/50">
+                        <input type="file" id="csvInput" accept=".csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                        <svg class="w-12 h-12 text-slate-400 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                        <p class="font-medium text-slate-700 dark:text-slate-300">Drop your CSV here or click to upload</p>
+                        <p class="text-xs text-slate-500 mt-2">Max file size: 2MB (Demo)</p>
+                    </div>
+
+                    <div id="analysis-results" class="hidden">
+                        <h3 class="font-bold text-lg mb-4 text-slate-800 dark:text-white flex items-center gap-2">
+                            <svg class="w-5 h-5 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                            Instant Insights
+                        </h3>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+                            <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg text-center">
+                                <div class="text-sm text-slate-500">Rows</div>
+                                <div class="text-xl font-bold font-mono" id="res-rows">-</div>
+                            </div>
+                            <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg text-center">
+                                <div class="text-sm text-slate-500">Columns</div>
+                                <div class="text-xl font-bold font-mono" id="res-cols">-</div>
+                            </div>
+                            <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg text-center col-span-2">
+                                <div class="text-sm text-slate-500">Processing Time</div>
+                                <div class="text-xl font-bold font-mono text-emerald-500" id="res-time">-</div>
+                            </div>
+                        </div>
+                        <div class="bg-slate-100 dark:bg-slate-800 p-4 rounded-lg">
+                            <div class="text-sm text-slate-500 mb-2">Column Headers detected:</div>
+                            <div class="text-xs font-mono text-slate-600 dark:text-slate-300 break-words" id="res-headers">Waiting for data...</div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="mb-32 fade-in-section">
                 <div class="flex items-end justify-between mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
                     <h2 class="text-3xl font-bold text-slate-900 dark:text-white">Technical Skills</h2>
                 </div>
@@ -186,12 +436,13 @@
                 </div>
             </section>
 
-            <section class="mb-32">
+            <section class="mb-32 fade-in-section">
                 <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-12 text-center">Certifications</h2>
-                <div class="grid md:grid-cols-2 gap-6 max-w-5xl mx-auto">
+                <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+                    <!-- IBM -->
                     <div class="tech-card p-6 rounded-xl hover:border-blue-500/50 transition-all group">
                         <div class="flex gap-4">
-                            <div class="w-12 h-12 rounded bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                            <div class="w-12 h-12 rounded bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
                             <div class="flex-1">
@@ -200,16 +451,18 @@
                                     <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-500">Oct 2025</span>
                                 </div>
                                 <p class="text-blue-600 dark:text-blue-400 text-sm font-medium mb-2">IBM / Coursera</p>
-                                <a href="static/certificates/IBM Data Analyst.pdf" target="_blank" class="inline-flex items-center text-sm font-medium text-slate-900 dark:text-white hover:text-blue-500 transition-colors">
+                                <a href="static/certificates/IBM_Data_Analyst.pdf" target="_blank" class="inline-flex items-center text-sm font-medium text-slate-900 dark:text-white hover:text-blue-500 transition-colors">
                                     View Certificate
                                     <svg class="w-3 h-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                                 </a>
                             </div>
                         </div>
                     </div>
+                    
+                    <!-- CompTIA -->
                     <div class="tech-card p-6 rounded-xl hover:border-green-500/50 transition-all group">
                         <div class="flex gap-4">
-                            <div class="w-12 h-12 rounded bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400">
+                            <div class="w-12 h-12 rounded bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400 shrink-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                             </div>
                             <div class="flex-1">
@@ -218,7 +471,30 @@
                                     <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-500">Sep 2025</span>
                                 </div>
                                 <p class="text-green-600 dark:text-green-400 text-sm font-medium mb-2">CompTIA</p>
-                                <a href="static/certificates/CompTIA Data+.pdf" target="_blank" class="inline-flex items-center text-sm font-medium text-slate-900 dark:text-white hover:text-green-500 transition-colors">
+                                <a href="static/certificates/CompTIA_Data_Plus.pdf" target="_blank" class="inline-flex items-center text-sm font-medium text-slate-900 dark:text-white hover:text-green-500 transition-colors">
+                                    View Certificate
+                                    <svg class="w-3 h-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Deloitte Job Simulation -->
+                    <div class="tech-card p-6 rounded-xl hover:border-green-500/50 transition-all group">
+                        <div class="flex gap-4">
+                            <div class="w-12 h-12 rounded bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400 shrink-0">
+                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <div class="flex-1">
+                                <div class="flex justify-between items-start">
+                                    <h3 class="font-bold text-lg text-slate-800 dark:text-white">Deloitte Data Analytics</h3>
+                                    <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-500">Dec 2025</span>
+                                </div>
+                                <p class="text-green-600 dark:text-green-400 text-sm font-medium mb-2">Deloitte / Forage</p>
+                                <p class="text-xs text-slate-500 mb-2">Job Simulation: Tableau, Excel & Forensic Analysis.</p>
+                                <a href="static/certificates/Deloitte_Data_Analytics.pdf" target="_blank" class="inline-flex items-center text-sm font-medium text-slate-900 dark:text-white hover:text-green-500 transition-colors">
                                     View Certificate
                                     <svg class="w-3 h-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                                 </a>
@@ -228,7 +504,7 @@
                 </div>
             </section>
 
-            <section class="mb-20 max-w-4xl mx-auto">
+            <section class="mb-20 max-w-4xl mx-auto fade-in-section">
                 <div class="flex items-end justify-between mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
                     <h2 class="text-3xl font-bold text-slate-900 dark:text-white">Education</h2>
                 </div>
@@ -242,23 +518,42 @@
                             <h3 class="font-bold text-slate-900 dark:text-white">BSc Mathematics & Statistical Sciences</h3>
                             <time class="font-mono text-xs text-slate-500">2025</time>
                         </div>
-                        <p class="text-cyan-600 dark:text-cyan-400 text-sm font-medium mb-2">University of Western Cape</p>
-                        <p class="text-sm text-slate-600 dark:text-slate-400">Specialized in data analysis, statistical modeling, and mathematical problem-solving with focus on real-world applications.</p>
-                        <div class="mt-4 flex flex-wrap gap-2">
-                             <span class="bg-cyan-100 dark:bg-cyan-900/30 text-cyan-800 dark:text-cyan-300 text-xs font-medium px-2.5 py-0.5 rounded">Stats Modeling</span>
-                             <span class="bg-cyan-100 dark:bg-cyan-900/30 text-cyan-800 dark:text-cyan-300 text-xs font-medium px-2.5 py-0.5 rounded">Data Analysis</span>
+                        <p class="text-cyan-600 dark:text-cyan-400 text-sm font-medium mb-4">University of Western Cape</p>
+                        
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                            Completed a rigorous dual-major program focusing on quantitative analysis, mathematical modeling, and statistical inference. 
+                            Developed strong problem-solving skills applied to real-world data scenarios.
+                        </p>
+                        
+                        <div class="mb-4">
+                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Relevant Modules:</h4>
+                            <div class="flex flex-wrap gap-2">
+                                <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs px-2 py-1 rounded">Linear Algebra</span>
+                                <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs px-2 py-1 rounded">Multivariable Calculus</span>
+                                <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs px-2 py-1 rounded">Statistical Inference</span>
+                                <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs px-2 py-1 rounded">Regression Analysis</span>
+                                <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs px-2 py-1 rounded">Discrete Mathematics</span>
+                            </div>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
+                            <a href="static/certificates/degree.pdf" target="_blank" class="inline-flex items-center text-sm font-medium text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors">
+                                View Degree Certificate
+                                <svg class="w-3 h-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                            </a>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section class="mb-20 max-w-4xl mx-auto">
+            <section class="mb-20 max-w-4xl mx-auto fade-in-section">
                 <div class="flex items-end justify-between mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
                     <h2 class="text-3xl font-bold text-slate-900 dark:text-white">Professional Experience</h2>
                 </div>
                 
                 <div class="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent dark:before:via-slate-700">
                     
+                    <!-- Role 1: CAPACITI -->
                     <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
                         <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 dark:bg-slate-800 dark:border-slate-700 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
                             <svg class="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
@@ -271,13 +566,14 @@
                             <p class="text-emerald-600 dark:text-emerald-400 text-sm font-medium mb-2">CAPACITI</p>
                             <p class="text-sm text-slate-600 dark:text-slate-400">Transforming raw data into meaningful insights to drive business decisions.</p>
                             <ul class="mt-2 text-sm list-disc list-inside text-slate-500 space-y-1">
-                                <li>Developed core skills in data analytics and applied problem solving for real business scenarios.</li>
-                                <li>Supports projects by analysing datasets, identifying insights and presenting findings in a structured and actionable way</li>
-                                <li>Collaborate in a learning environment that simulates real workplace expectations, meeting deadlines and applying industry best practices.</li>
+                                <li>Analyzed structured and unstructured datasets to extract insights supporting business decisions.</li>
+                                <li>Built dashboards and analytical summaries using Excel, Python, and visualization tools.</li>
+                                <li>Applied data cleaning, exploratory analysis, and basic modeling techniques in simulated real world projects.</li>
                             </ul>
                         </div>
                     </div>
 
+                    <!-- Role 2: Math Tutor -->
                     <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
                         <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 dark:bg-slate-800 dark:border-slate-700 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
                             <svg class="w-5 h-5 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
@@ -297,6 +593,7 @@
                         </div>
                     </div>
                     
+                    <!-- Role 3: Stats Tutor -->
                     <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
                         <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 dark:bg-slate-800 dark:border-slate-700 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
                             <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
@@ -320,7 +617,272 @@
         </main>
     </div>
 
+    <!-- Live Analytics Bar (Feature 12 - Mock) -->
+    <div class="fixed bottom-0 w-full bg-slate-900/90 dark:bg-black/90 backdrop-blur text-white py-2 px-6 z-50 text-xs flex justify-between items-center border-t border-slate-700">
+        <div class="flex gap-4">
+            <span><span class="text-emerald-400">●</span> Live Visitors: <span class="font-mono">42</span></span>
+            <span class="hidden sm:inline">Top Country: <span class="font-mono">South Africa</span></span>
+            <span class="hidden sm:inline">Most Viewed: <span class="font-mono text-cyan-400">Sales Dashboard</span></span>
+        </div>
+        <div class="opacity-50 hover:opacity-100 transition-opacity cursor-pointer text-[10px] uppercase tracking-widest">
+            Simulated Analytics
+        </div>
+    </div>
+
     <custom-footer></custom-footer>
-    <script src="script.js"></script>
+    
+    <script>
+        // Inline Components to ensure preview works without external files
+        
+        // Simple Navbar Component
+        class CustomNavbar extends HTMLElement {
+            connectedCallback() {
+                this.innerHTML = `
+                <nav class="fixed top-0 w-full z-50 transition-all duration-300 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+                    <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                        <a href="index.html" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-violet-500">KB</a>
+                        <div class="flex items-center space-x-4">
+                            <!-- Recruiter Mode Toggle (Feature 10) -->
+                            <button id="recruiter-toggle" class="text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1.5 rounded-full hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors border border-slate-200 dark:border-slate-700 flex items-center gap-1">
+                                <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                                <span class="hidden sm:inline">Recruiter Mode</span>
+                            </button>
+
+                            <div class="hidden md:flex items-center space-x-6">
+                                <a href="index.html" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Home</a>
+                                <a href="projects.html" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Projects</a>
+                                <a href="contact.html" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Contact</a>
+                            </div>
+
+                            <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-300">
+                                <svg id="theme-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </nav>
+                `;
+                
+                // Theme Toggle Logic
+                const themeBtn = this.querySelector('#theme-toggle');
+                const recruiterBtn = this.querySelector('#recruiter-toggle');
+                const html = document.documentElement;
+                const body = document.body;
+                
+                themeBtn.addEventListener('click', () => {
+                    html.classList.toggle('dark');
+                });
+
+                // Recruiter Mode Logic
+                let isRecruiterMode = false;
+                recruiterBtn.addEventListener('click', () => {
+                    isRecruiterMode = !isRecruiterMode;
+                    body.classList.toggle('recruiter-mode');
+                    if (isRecruiterMode) {
+                        recruiterBtn.classList.add('bg-cyan-100', 'text-cyan-700', 'border-cyan-300');
+                        recruiterBtn.innerHTML = `
+                             <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" /></svg>
+                             <span class="hidden sm:inline">Exit Simple Mode</span>
+                        `;
+                    } else {
+                        recruiterBtn.classList.remove('bg-cyan-100', 'text-cyan-700', 'border-cyan-300');
+                        recruiterBtn.innerHTML = `
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+                            <span class="hidden sm:inline">Recruiter Mode</span>
+                        `;
+                    }
+                });
+            }
+        }
+        customElements.define('custom-navbar', CustomNavbar);
+
+        // Enhanced Footer Component (Feature 11)
+        class CustomFooter extends HTMLElement {
+            connectedCallback() {
+                this.innerHTML = `
+                <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pt-16 pb-24 fade-in-section">
+                    <div class="container mx-auto px-4 text-center">
+                        <div class="mb-10">
+                            <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6">Quick Connect</h3>
+                            <div class="flex flex-wrap justify-center gap-4">
+                                <!-- Copy Email -->
+                                <button onclick="navigator.clipboard.writeText('unathibasholo@gmail.com'); alert('Email unathibasholo@gmail.com copied!');" class="px-6 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                    Copy Email
+                                </button>
+                                
+                                <!-- LinkedIn Quick Connect -->
+                                <a href="https://linkedin.com/in/kekeletso-basholo" target="_blank" class="px-6 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-2">
+                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
+                                    LinkedIn
+                                </a>
+
+                                <!-- Email Link -->
+                                <a href="mailto:unathibasholo@gmail.com" class="px-6 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-cyan-500 hover:text-cyan-500 transition-colors flex items-center gap-2">
+                                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                    Send Email
+                                </a>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-center gap-6 mb-6">
+                            <a href="https://linkedin.com/in/kekeletso-basholo" target="_blank" class="text-slate-400 hover:text-cyan-500 transition-colors">LinkedIn</a>
+                            <a href="https://github.com/kekeletso-basholo" target="_blank" class="text-slate-400 hover:text-cyan-500 transition-colors">GitHub</a>
+                            <a href="mailto:unathibasholo@gmail.com" class="text-slate-400 hover:text-cyan-500 transition-colors">Email</a>
+                        </div>
+
+                        <p class="text-slate-500 dark:text-slate-400 mb-4">
+                            Open to data analytics, data science, and analytics graduate opportunities.
+                        </p>
+                        <p class="text-slate-500 dark:text-slate-400 mb-4">&copy; 2025 Kekeletso Basholo. All rights reserved.</p>
+                    </div>
+                </footer>
+                `;
+            }
+        }
+        customElements.define('custom-footer', CustomFooter);
+
+        // Counters
+        const counters = document.querySelectorAll('.counter');
+        counters.forEach(counter => {
+            const updateCount = () => {
+                const target = +counter.getAttribute('data-target');
+                const count = +counter.innerText;
+                const inc = target / 200;
+                if(count < target) {
+                    counter.innerText = Math.ceil(count + inc);
+                    setTimeout(updateCount, 15);
+                } else {
+                    counter.innerText = target;
+                }
+            };
+            updateCount();
+        });
+
+        // AI Demo Logic (Client-side CSV processing)
+        const csvInput = document.getElementById('csvInput');
+        if(csvInput) {
+            csvInput.addEventListener('change', function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const text = e.target.result;
+                    const rows = text.split('\n').filter(row => row.trim() !== '');
+                    const headers = rows[0].split(',');
+                    
+                    // Simulate processing time
+                    setTimeout(() => {
+                        document.getElementById('analysis-results').classList.remove('hidden');
+                        document.getElementById('res-rows').textContent = rows.length - 1; // Subtract header
+                        document.getElementById('res-cols').textContent = headers.length;
+                        document.getElementById('res-time').textContent = '0.0' + Math.floor(Math.random() * 9 + 1) + 's';
+                        document.getElementById('res-headers').textContent = headers.slice(0, 5).join(', ') + (headers.length > 5 ? '...' : '');
+                    }, 800);
+                };
+                reader.readAsText(file);
+            });
+        }
+
+        // Charts
+        document.addEventListener('DOMContentLoaded', () => {
+            // Radar Chart
+            const ctxRadar = document.getElementById('skillsRadarChart').getContext('2d');
+            new Chart(ctxRadar, {
+                type: 'radar',
+                data: {
+                    labels: ['Python', 'SQL', 'R', 'Tableau', 'Excel', 'Statistics'],
+                    datasets: [{
+                        label: 'Skill Level',
+                        data: [85, 80, 75, 85, 90, 85],
+                        fill: true,
+                        backgroundColor: 'rgba(6, 182, 212, 0.2)',
+                        borderColor: 'rgb(6, 182, 212)',
+                        pointBackgroundColor: 'rgb(6, 182, 212)',
+                        pointBorderColor: '#fff',
+                        pointHoverBackgroundColor: '#fff',
+                        pointHoverBorderColor: 'rgb(6, 182, 212)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            angleLines: { color: 'rgba(148, 163, 184, 0.1)' },
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' },
+                            pointLabels: { color: '#94a3b8' },
+                            ticks: { display: false, beginAtZero: true, max: 100 }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Bar Chart
+            const ctxBar = document.getElementById('skillsBarChart').getContext('2d');
+            new Chart(ctxBar, {
+                type: 'bar',
+                data: {
+                    labels: ['Data Analysis', 'Machine Learning', 'Data Viz', 'Modeling'],
+                    datasets: [{
+                        label: 'Proficiency',
+                        data: [95, 70, 85, 80],
+                        backgroundColor: [
+                            'rgba(139, 92, 246, 0.6)',
+                            'rgba(168, 85, 247, 0.6)',
+                            'rgba(192, 132, 252, 0.6)',
+                            'rgba(216, 180, 254, 0.6)'
+                        ],
+                        borderColor: [
+                            'rgb(139, 92, 246)',
+                            'rgb(168, 85, 247)',
+                            'rgb(192, 132, 252)',
+                            'rgb(216, 180, 254)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: { color: 'rgba(148, 163, 184, 0.1)' },
+                            ticks: { color: '#94a3b8' }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#94a3b8' }
+                        }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+
+            // Intersection Observer for Animations
+            const observerOptions = {
+                root: null,
+                rootMargin: '0px',
+                threshold: 0.1
+            };
+
+            const observer = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('is-visible');
+                        observer.unobserve(entry.target); // Only animate once
+                    }
+                });
+            }, observerOptions);
+
+            document.querySelectorAll('.fade-in-section').forEach(section => {
+                observer.observe(section);
+            });
+        });
+    </script>
 </body>
 </html>
