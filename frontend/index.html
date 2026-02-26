@@ -37,7 +37,7 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -56,6 +56,7 @@
                     },
                     animation: {
                         'blob': 'blob 7s infinite',
+                        'float': 'float 6s ease-in-out infinite',
                     },
                     keyframes: {
                         blob: {
@@ -63,6 +64,10 @@
                             '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
                             '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
                             '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        },
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' },
                         }
                     }
                 }
@@ -71,374 +76,453 @@
     </script>
 
     <style>
-        /* Custom CSS from style.css */
+        /* Background Patterns */
         .bg-grid-pattern {
             background-image: linear-gradient(to right, #e2e8f0 1px, transparent 1px),
-                            linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
+                              linear-gradient(to bottom, #e2e8f0 1px, transparent 1px);
             background-size: 40px 40px;
-            mask-image: linear-gradient(to bottom, transparent, 20%, white, 80%, transparent);
+            mask-image: linear-gradient(to bottom, transparent, 10%, white, 90%, transparent);
             -webkit-mask-image: linear-gradient(to bottom, transparent, 10%, white, 90%, transparent);
         }
         .dark .bg-grid-pattern {
-            background-image: linear-gradient(to right, #334155 1px, transparent 1px),
-                            linear-gradient(to bottom, #334155 1px, transparent 1px);
+            background-image: linear-gradient(to right, rgba(51, 65, 85, 0.5) 1px, transparent 1px),
+                              linear-gradient(to bottom, rgba(51, 65, 85, 0.5) 1px, transparent 1px);
         }
         
+        /* Animated Blobs */
         .blob-cont {
-            position: absolute;
-            width: 100%;
-            height: 100%;
+            position: fixed;
+            width: 100vw;
+            height: 100vh;
             overflow: hidden;
             z-index: -1;
             transition: opacity 0.5s ease;
+            pointer-events: none;
         }
         .blob {
             position: absolute;
             border-radius: 50%;
             animation: blob 10s infinite;
         }
-        .blob-1 { top: 0; left: -10%; width: 500px; height: 500px; background: #a5f3fc; animation-delay: 0s; }
-        .blob-2 { top: 10%; right: -10%; width: 400px; height: 400px; background: #ddd6fe; animation-delay: 2s; }
-        .blob-3 { bottom: -10%; left: 20%; width: 600px; height: 600px; background: #fed7aa; animation-delay: 4s; }
+        .blob-1 { top: 0; left: -10%; width: 50vw; height: 50vw; max-width: 500px; max-height: 500px; background: #a5f3fc; animation-delay: 0s; }
+        .blob-2 { top: 10%; right: -10%; width: 40vw; height: 40vw; max-width: 400px; max-height: 400px; background: #ddd6fe; animation-delay: 2s; }
+        .blob-3 { bottom: -10%; left: 20%; width: 60vw; height: 60vw; max-width: 600px; max-height: 600px; background: #fed7aa; animation-delay: 4s; }
         
-        .dark .blob-1 { background: #0891b2; opacity: 0.4; }
-        .dark .blob-2 { background: #7c3aed; opacity: 0.4; }
-        .dark .blob-3 { background: #ea580c; opacity: 0.4; }
+        .dark .blob-1 { background: #0891b2; opacity: 0.3; }
+        .dark .blob-2 { background: #7c3aed; opacity: 0.3; }
+        .dark .blob-3 { background: #ea580c; opacity: 0.3; }
 
+        /* Card Styles */
         .tech-card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(12px);
             border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
         .dark .tech-card {
-            background: rgba(30, 41, 59, 0.7);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(30, 41, 59, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -2px rgba(0, 0, 0, 0.15);
+        }
+        .tech-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.15), 0 8px 10px -6px rgba(6, 182, 212, 0.1);
+        }
+        .dark .tech-card:hover {
+            border-color: rgba(6, 182, 212, 0.3);
+            box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.2), 0 8px 10px -6px rgba(6, 182, 212, 0.1);
         }
 
+        /* Typewriter Effect */
         .typewriter span {
             border-right: 4px solid #06b6d4;
             animation: caret 1s steps(1) infinite;
         }
         @keyframes caret { 50% { border-color: transparent; } }
 
-        /* Animation Classes */
+        /* Fade-in Animation */
         .fade-in-section {
             opacity: 0;
             transform: translateY(20px);
-            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+            transition: opacity 0.7s cubic-bezier(0.4, 0, 0.2, 1), transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
             will-change: opacity, transform;
         }
         .fade-in-section.is-visible {
             opacity: 1;
             transform: none;
         }
+
+        /* Timeline Connector */
+        .timeline-line::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 20px; /* Aligns with the center of the 40px icon */
+            width: 2px;
+            background: linear-gradient(to bottom, transparent, #cbd5e1 5%, #cbd5e1 95%, transparent);
+            z-index: 0;
+        }
+        .dark .timeline-line::before {
+            background: linear-gradient(to bottom, transparent, #334155 5%, #334155 95%, transparent);
+        }
+        @media (min-width: 768px) {
+            .timeline-line::before {
+                left: 50%;
+                transform: translateX(-50%);
+            }
+        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 transition-colors duration-300 font-sans antialiased selection:bg-cyan-500/30">
     
+    <!-- Background Effects -->
     <div class="fixed inset-0 z-0 pointer-events-none">
         <div class="absolute inset-0 bg-grid-pattern"></div>
-        <div class="blob-cont opacity-40 dark:opacity-20">
+        <div class="blob-cont opacity-60 dark:opacity-40">
             <div class="blob blob-1 mix-blend-multiply dark:mix-blend-screen filter blur-3xl"></div>
             <div class="blob blob-2 mix-blend-multiply dark:mix-blend-screen filter blur-3xl"></div>
             <div class="blob blob-3 mix-blend-multiply dark:mix-blend-screen filter blur-3xl"></div>
         </div>
     </div>
 
-    <div class="relative z-10">
-        <custom-navbar></custom-navbar>
-        
-        <main id="main-content" class="container mx-auto px-4 py-12">
+    <!-- Navigation -->
+    <custom-navbar></custom-navbar>
+    
+    <div class="relative z-10 pt-20"> <!-- Added pt-20 to account for fixed navbar -->
+        <main id="main-content" class="container mx-auto px-4 py-8">
             
-            <section class="flex flex-col items-center gap-10 mb-24 py-12 fade-in-section">
-                <div class="relative group">
-                    <div class="absolute -inset-1 bg-gradient-to-r from-cyan-400 to-violet-600 rounded-full blur opacity-25 group-hover:opacity-75 transition duration-500"></div>
-                    <div class="relative w-48 h-48 md:w-64 md:h-64 rounded-full p-1 bg-white dark:bg-slate-800 ring-1 ring-slate-200 dark:ring-slate-700 overflow-hidden flex items-center justify-center">
-                        <!-- Placeholder for user image if specific path not found -->
-                         <img src="static/certificates/picture1.jpeg" onerror="this.src='https://ui-avatars.com/api/?name=Kekeletso+Basholo&background=0D8ABC&color=fff&size=256'" alt="Kekeletso Basholo" class="w-full h-full object-cover rounded-full">
+            <!-- Hero Section -->
+            <section id="home" class="flex flex-col items-center gap-10 mb-32 py-12 fade-in-section">
+                <div class="relative group animate-float">
+                    <div class="absolute -inset-1.5 bg-gradient-to-r from-cyan-400 via-blue-500 to-violet-600 rounded-full blur-md opacity-30 group-hover:opacity-60 transition duration-500"></div>
+                    <div class="relative w-48 h-48 md:w-56 md:h-56 rounded-full p-1 bg-white dark:bg-slate-800 ring-2 ring-slate-100 dark:ring-slate-700 overflow-hidden flex items-center justify-center z-10">
+                        <img src="static/certificates/picture1.jpeg" onerror="this.src='https://ui-avatars.com/api/?name=Kekeletso+Basholo&background=0D8ABC&color=fff&size=256'" alt="Kekeletso Basholo" class="w-full h-full object-cover rounded-full">
                     </div>
-                    <div class="absolute bottom-2 right-2 bg-slate-900 dark:bg-black border border-slate-700 text-emerald-400 px-4 py-1.5 rounded-full shadow-xl flex items-center gap-2 backdrop-blur-md">
-                        <span class="relative flex h-2.5 w-2.5">
+                    <div class="absolute bottom-4 -right-4 md:right-0 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-800 dark:text-emerald-400 px-4 py-2 rounded-full shadow-xl flex items-center gap-2 backdrop-blur-md z-20">
+                        <span class="relative flex h-3 w-3">
                           <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                          <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                          <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                         </span>
-                        <span class="text-xs font-mono font-medium tracking-wide">Available</span>
+                        <span class="text-xs font-mono font-bold tracking-wide">Available</span>
                     </div>
                 </div>
 
                 <div class="text-center max-w-3xl">
                     <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-slate-900 dark:text-white mb-6 typewriter">
-                        <span class="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-slate-200 dark:to-slate-400">
+                        <span class="bg-clip-text text-transparent bg-gradient-to-r from-slate-900 via-slate-700 to-slate-900 dark:from-white dark:via-cyan-100 dark:to-slate-300">
                             Kekeletso Basholo
                         </span>
                     </h1>
-                    <h2 class="flex flex-wrap justify-center gap-3 md:gap-6 text-lg md:text-xl font-medium text-slate-600 dark:text-slate-400 font-mono">
-                        <span>Data Analyst</span>
-                        <span class="text-cyan-500">•</span>
-                        <span>Aspiring Data Scientist</span>
-                        <span class="text-violet-500">•</span>
-                        <span>Math and Stat Tutor</span>
+                    <h2 class="flex flex-wrap justify-center items-center gap-3 md:gap-4 text-lg md:text-xl font-medium text-slate-600 dark:text-slate-400 font-mono">
+                        <span class="bg-slate-200/50 dark:bg-slate-800/50 px-3 py-1 rounded-md">Data Analyst</span>
+                        <span class="hidden sm:inline text-cyan-500 font-black">•</span>
+                        <span class="bg-slate-200/50 dark:bg-slate-800/50 px-3 py-1 rounded-md">Aspiring Data Scientist</span>
+                        <span class="hidden sm:inline text-violet-500 font-black">•</span>
+                        <span class="bg-slate-200/50 dark:bg-slate-800/50 px-3 py-1 rounded-md">Math & Stat Tutor</span>
                     </h2>
                 </div>
 
-                <div class="w-full max-w-4xl tech-card rounded-2xl p-8 shadow-xl hover:shadow-2xl transition-all duration-300">
-                    <div class="flex items-center gap-2 mb-4 text-xs font-mono text-cyan-600 dark:text-cyan-400 uppercase tracking-wider">
-                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                <div class="w-full max-w-4xl tech-card rounded-2xl p-8 lg:p-10 relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-1 h-full bg-gradient-to-b from-cyan-400 to-violet-500 opacity-80"></div>
+                    <div class="flex items-center gap-2 mb-4 text-sm font-mono text-cyan-600 dark:text-cyan-400 uppercase tracking-wider font-bold">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                         Professional Summary
                     </div>
-                    <p class="text-lg text-slate-600 dark:text-slate-300 leading-relaxed mb-6 text-center">
+                    <p class="text-lg md:text-xl text-slate-600 dark:text-slate-300 leading-relaxed mb-8 text-left md:text-center">
                         Data Analyst with a strong foundation in mathematics, statistics, and applied analytics.
                         I turn complex datasets into actionable insights for business and decision making.
-                        Experienced in Python, SQL, Excel, Tableau, and statistical modeling, with hands on exposure 
-                        to real world business problems through analytics projects and industry simulations. 
-                        Adept at transforming complex datasets into clear insights that support strategic and data driven decisions.
+                        Experienced in Python, SQL, Excel, Tableau, and statistical modeling, with hands-on exposure 
+                        to real-world business problems through analytics projects and industry simulations. 
+                        Adept at transforming complex datasets into clear insights that support strategic and data-driven decisions.
                     </p>
-                    <div class="flex flex-wrap justify-center gap-2">
-                        <span class="px-3 py-1 rounded-full bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 text-xs font-mono border border-cyan-100 dark:border-cyan-800">Data Analysis</span>
-                        <span class="px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-xs font-mono border border-emerald-100 dark:border-emerald-800">Machine Learning</span>
-                        <span class="px-3 py-1 rounded-full bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 text-xs font-mono border border-violet-100 dark:border-violet-800">Statistical Modeling</span>
-                        <span class="px-3 py-1 rounded-full bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-xs font-mono border border-orange-100 dark:border-orange-800">Visualization</span>
+                    <div class="flex flex-wrap justify-center md:justify-center gap-3">
+                        <span class="px-4 py-1.5 rounded-full bg-cyan-50 dark:bg-cyan-900/30 text-cyan-700 dark:text-cyan-300 text-sm font-mono border border-cyan-200 dark:border-cyan-800">Data Analysis</span>
+                        <span class="px-4 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 text-sm font-mono border border-emerald-200 dark:border-emerald-800">Machine Learning</span>
+                        <span class="px-4 py-1.5 rounded-full bg-violet-50 dark:bg-violet-900/30 text-violet-700 dark:text-violet-300 text-sm font-mono border border-violet-200 dark:border-violet-800">Statistical Modeling</span>
+                        <span class="px-4 py-1.5 rounded-full bg-orange-50 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 text-sm font-mono border border-orange-200 dark:border-orange-800">Visualization</span>
                     </div>
                 </div>
 
                 <div class="flex flex-col sm:flex-row gap-4 w-full justify-center">
-                    <a href="projects.html" class="group relative px-8 py-3 rounded-lg bg-slate-900 dark:bg-white text-white dark:text-slate-900 font-semibold transition-all hover:shadow-lg overflow-hidden flex items-center justify-center">
+                    <a href="#projects" class="group relative px-8 py-3.5 rounded-xl bg-slate-900 dark:bg-cyan-500 text-white dark:text-slate-900 font-bold transition-all hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] overflow-hidden flex items-center justify-center hover:-translate-y-1">
                         <span class="relative z-10 flex items-center gap-2">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:animate-bounce" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" /></svg>
                             View My Projects
                         </span>
                     </a>
-                    <a href="contact.html" class="px-8 py-3 rounded-lg border border-slate-300 dark:border-slate-700 hover:border-slate-400 dark:hover:border-slate-500 bg-transparent font-medium transition-colors flex items-center justify-center gap-2 text-slate-700 dark:text-slate-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                    <a href="#contact" class="group px-8 py-3.5 rounded-xl border-2 border-slate-300 dark:border-slate-700 hover:border-slate-800 dark:hover:border-slate-300 bg-transparent font-bold transition-all flex items-center justify-center gap-2 text-slate-700 dark:text-slate-200 hover:-translate-y-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 group-hover:text-cyan-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                         Get In Touch
                     </a>
                     <!-- Resume Download Button -->
-                    <a href="static/Kekeletso_CV.pdf" download class="px-8 py-3 rounded-lg border border-cyan-500 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/20 font-medium transition-colors flex items-center justify-center gap-2">
+                    <a href="static/Kekeletso_CV.pdf" download class="group px-8 py-3.5 rounded-xl border-2 border-cyan-500 text-cyan-600 dark:text-cyan-400 hover:bg-cyan-50 dark:hover:bg-cyan-900/30 font-bold transition-all flex items-center justify-center gap-2 hover:-translate-y-1 hover:shadow-lg">
                          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
                          Download CV
                     </a>
                 </div>
 
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-5xl mt-8">
-                    <div class="tech-card p-5 rounded-xl text-center hover:border-cyan-500/50 transition-colors group">
-                        <div class="text-3xl font-bold font-mono text-slate-800 dark:text-white counter" data-target="15">0</div>
-                        <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mt-1">Projects</div>
+                <!-- Stats Counters -->
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-5xl mt-8">
+                    <div class="tech-card p-6 rounded-2xl text-center group">
+                        <div class="text-4xl font-black font-mono text-slate-800 dark:text-white mb-1 bg-clip-text group-hover:text-cyan-500 transition-colors"><span class="counter" data-target="15">0</span>+</div>
+                        <div class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Projects</div>
                     </div>
-                    <div class="tech-card p-5 rounded-xl text-center hover:border-violet-500/50 transition-colors group">
-                        <div class="text-3xl font-bold font-mono text-slate-800 dark:text-white counter" data-target="30">0</div>
-                        <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mt-1">Students</div>
+                    <div class="tech-card p-6 rounded-2xl text-center group">
+                        <div class="text-4xl font-black font-mono text-slate-800 dark:text-white mb-1 bg-clip-text group-hover:text-violet-500 transition-colors"><span class="counter" data-target="30">0</span>+</div>
+                        <div class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Students</div>
                     </div>
-                    <div class="tech-card p-5 rounded-xl text-center hover:border-orange-500/50 transition-colors group">
-                        <div class="text-3xl font-bold font-mono text-slate-800 dark:text-white counter" data-target="2">0</div>
-                        <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mt-1">Years Exp</div>
+                    <div class="tech-card p-6 rounded-2xl text-center group">
+                        <div class="text-4xl font-black font-mono text-slate-800 dark:text-white mb-1 bg-clip-text group-hover:text-orange-500 transition-colors"><span class="counter" data-target="2">0</span>+</div>
+                        <div class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Years Exp</div>
                     </div>
-                    <div class="tech-card p-5 rounded-xl text-center hover:border-emerald-500/50 transition-colors group">
-                        <div class="text-3xl font-bold font-mono text-slate-800 dark:text-white counter" data-target="2">0</div>
-                        <div class="text-xs font-medium text-slate-500 dark:text-slate-400 uppercase mt-1">Certs</div>
+                    <div class="tech-card p-6 rounded-2xl text-center group">
+                        <div class="text-4xl font-black font-mono text-slate-800 dark:text-white mb-1 bg-clip-text group-hover:text-emerald-500 transition-colors"><span class="counter" data-target="2">0</span>+</div>
+                        <div class="text-sm font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">Certs</div>
                     </div>
                 </div>
             </section>
             
-            <section class="mb-32 max-w-6xl mx-auto fade-in-section">
-                <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-12 text-center">
-                    Featured Projects
-                </h2>
+            <!-- Featured Projects Section -->
+            <section id="projects" class="mb-32 max-w-6xl mx-auto pt-20 -mt-20 fade-in-section">
+                <div class="flex items-end justify-between mb-12 border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                        <svg class="w-8 h-8 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+                        Featured Projects
+                    </h2>
+                </div>
             
-                <div class="grid md:grid-cols-3 gap-6">
-                    <div class="tech-card p-6 rounded-xl">
-                        <h3 class="font-bold text-lg mb-2">Sales Performance Dashboard</h3>
-                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                <div class="grid md:grid-cols-3 gap-8">
+                    <div class="tech-card p-8 rounded-2xl flex flex-col h-full group">
+                        <div class="w-12 h-12 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-6 group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3 text-slate-800 dark:text-white">Sales Performance Dashboard</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-6 flex-grow leading-relaxed">
                             Built an interactive Tableau dashboard to analyze sales trends, regional performance, 
                             and revenue drivers using real business data.
                         </p>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Tableau</span>
-                            <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Excel</span>
+                        <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                            <span class="text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">Tableau</span>
+                            <span class="text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">Excel</span>
                         </div>
-                        <a href="projects.html" class="text-sm font-medium text-cyan-600 hover:text-cyan-700">
-                            View Project →
+                        <a href="#projects" class="text-sm font-bold text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 flex items-center gap-1 group-hover:translate-x-1 transition-transform w-fit">
+                            View Details <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
                     </div>
             
-                    <div class="tech-card p-6 rounded-xl">
-                        <h3 class="font-bold text-lg mb-2">Customer Segmentation Analysis</h3>
-                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                    <div class="tech-card p-8 rounded-2xl flex flex-col h-full group">
+                        <div class="w-12 h-12 rounded-lg bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-6 group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3 text-slate-800 dark:text-white">Customer Segmentation</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-6 flex-grow leading-relaxed">
                             Applied clustering techniques in Python to segment customers based on behavior 
                             and improve targeted marketing strategies.
                         </p>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Python</span>
-                            <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Pandas</span>
-                            <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Scikit Learn</span>
+                        <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                            <span class="text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">Python</span>
+                            <span class="text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">Pandas</span>
+                            <span class="text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">Scikit Learn</span>
                         </div>
-                        <a href="projects.html" class="text-sm font-medium text-cyan-600 hover:text-cyan-700">
-                            View Project →
+                        <a href="#projects" class="text-sm font-bold text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 flex items-center gap-1 group-hover:translate-x-1 transition-transform w-fit">
+                            View Details <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
                     </div>
             
-                    <div class="tech-card p-6 rounded-xl">
-                        <h3 class="font-bold text-lg mb-2">Equality Score Classification</h3>
-                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+                    <div class="tech-card p-8 rounded-2xl flex flex-col h-full group">
+                        <div class="w-12 h-12 rounded-lg bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center text-violet-600 dark:text-violet-400 mb-6 group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" /></svg>
+                        </div>
+                        <h3 class="font-bold text-xl mb-3 text-slate-800 dark:text-white">Equality Score Classification</h3>
+                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-6 flex-grow leading-relaxed">
                             Used Excel and Tableau to classify equality scores into fair and unfair categories 
                             and draw business conclusions for stakeholders.
                         </p>
-                        <div class="flex flex-wrap gap-2 mb-4">
-                            <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Excel</span>
-                            <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Tableau</span>
+                        <div class="flex flex-wrap gap-2 mb-6 mt-auto">
+                            <span class="text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">Excel</span>
+                            <span class="text-xs font-mono font-semibold bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 px-3 py-1 rounded-full border border-slate-200 dark:border-slate-700">Tableau</span>
                         </div>
-                        <a href="projects.html" class="text-sm font-medium text-cyan-600 hover:text-cyan-700">
-                            View Project →
+                        <a href="#projects" class="text-sm font-bold text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 flex items-center gap-1 group-hover:translate-x-1 transition-transform w-fit">
+                            View Details <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </a>
                     </div>
                 </div>
             </section>
 
-            <!-- End-to-End Pipeline Visualization (Feature 13) -->
+            <!-- End-to-End Pipeline Visualization -->
             <section class="mb-32 max-w-6xl mx-auto fade-in-section">
-                <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-12 text-center">End-to-End Data Pipeline</h2>
-                <div class="tech-card p-8 rounded-2xl overflow-x-auto">
-                    <div class="flex flex-col md:flex-row items-center justify-between gap-6 min-w-[600px]">
+                <div class="flex items-end justify-center mb-12">
+                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white">End-to-End Data Pipeline</h2>
+                </div>
+                <div class="tech-card p-10 rounded-3xl overflow-x-auto shadow-xl relative">
+                    <div class="absolute inset-0 bg-gradient-to-r from-cyan-500/5 via-blue-500/5 to-purple-500/5 rounded-3xl"></div>
+                    <div class="flex flex-col md:flex-row items-center justify-between gap-6 min-w-[600px] relative z-10">
                         
                         <!-- Step 1 -->
-                        <div class="flex flex-col items-center text-center group w-full">
-                            <div class="w-16 h-16 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4 group-hover:scale-110 transition-transform">
-                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
+                        <div class="flex flex-col items-center text-center group w-full relative">
+                            <div class="w-20 h-20 rounded-2xl bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-700 flex items-center justify-center text-blue-500 mb-4 group-hover:-translate-y-2 transition-transform duration-300">
+                                <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" /></svg>
                             </div>
-                            <h3 class="font-bold text-slate-800 dark:text-white">Ingestion</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">APIs, CSVs, SQL</p>
+                            <h3 class="font-bold text-lg text-slate-800 dark:text-white">Ingestion</h3>
+                            <p class="text-sm font-mono text-slate-500 dark:text-slate-400 mt-1">APIs, CSVs, SQL</p>
                         </div>
 
                         <!-- Arrow -->
-                        <div class="hidden md:block w-24 h-0.5 bg-slate-300 dark:bg-slate-700 relative">
-                            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 border-t-2 border-r-2 border-slate-300 dark:border-slate-700 rotate-45"></div>
+                        <div class="hidden md:flex flex-col items-center justify-center w-full max-w-[100px]">
+                            <div class="w-full h-1 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-full bg-white/50 dark:bg-black/20 animate-[move_2s_linear_infinite]" style="transform: translateX(-100%);"></div>
+                            </div>
+                            <svg class="w-6 h-6 text-purple-400 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </div>
-                        <div class="md:hidden h-12 w-0.5 bg-slate-300 dark:bg-slate-700"></div>
+                        <div class="md:hidden h-12 w-0.5 bg-gradient-to-b from-blue-400 to-purple-400"></div>
 
                         <!-- Step 2 -->
                         <div class="flex flex-col items-center text-center group w-full">
-                            <div class="w-16 h-16 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center text-purple-600 dark:text-purple-400 mb-4 group-hover:scale-110 transition-transform">
-                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
+                            <div class="w-20 h-20 rounded-2xl bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-700 flex items-center justify-center text-purple-500 mb-4 group-hover:-translate-y-2 transition-transform duration-300">
+                                <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" /></svg>
                             </div>
-                            <h3 class="font-bold text-slate-800 dark:text-white">Processing</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Cleaning, Pandas</p>
+                            <h3 class="font-bold text-lg text-slate-800 dark:text-white">Processing</h3>
+                            <p class="text-sm font-mono text-slate-500 dark:text-slate-400 mt-1">Cleaning, Pandas</p>
                         </div>
 
                         <!-- Arrow -->
-                        <div class="hidden md:block w-24 h-0.5 bg-slate-300 dark:bg-slate-700 relative">
-                            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 border-t-2 border-r-2 border-slate-300 dark:border-slate-700 rotate-45"></div>
+                        <div class="hidden md:flex flex-col items-center justify-center w-full max-w-[100px]">
+                            <div class="w-full h-1 bg-gradient-to-r from-purple-400 to-emerald-400 rounded-full relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-full bg-white/50 dark:bg-black/20 animate-[move_2s_linear_infinite]" style="transform: translateX(-100%);"></div>
+                            </div>
+                            <svg class="w-6 h-6 text-emerald-400 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </div>
-                        <div class="md:hidden h-12 w-0.5 bg-slate-300 dark:bg-slate-700"></div>
+                        <div class="md:hidden h-12 w-0.5 bg-gradient-to-b from-purple-400 to-emerald-400"></div>
 
                         <!-- Step 3 -->
                         <div class="flex flex-col items-center text-center group w-full">
-                            <div class="w-16 h-16 rounded-full bg-emerald-100 dark:bg-emerald-900/30 flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-4 group-hover:scale-110 transition-transform">
-                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
+                            <div class="w-20 h-20 rounded-2xl bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-700 flex items-center justify-center text-emerald-500 mb-4 group-hover:-translate-y-2 transition-transform duration-300">
+                                <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" /></svg>
                             </div>
-                            <h3 class="font-bold text-slate-800 dark:text-white">Storage</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Data Warehouse</p>
+                            <h3 class="font-bold text-lg text-slate-800 dark:text-white">Storage</h3>
+                            <p class="text-sm font-mono text-slate-500 dark:text-slate-400 mt-1">Data Warehouse</p>
                         </div>
 
                         <!-- Arrow -->
-                        <div class="hidden md:block w-24 h-0.5 bg-slate-300 dark:bg-slate-700 relative">
-                            <div class="absolute right-0 top-1/2 -translate-y-1/2 w-2 h-2 border-t-2 border-r-2 border-slate-300 dark:border-slate-700 rotate-45"></div>
+                        <div class="hidden md:flex flex-col items-center justify-center w-full max-w-[100px]">
+                            <div class="w-full h-1 bg-gradient-to-r from-emerald-400 to-orange-400 rounded-full relative overflow-hidden">
+                                <div class="absolute top-0 left-0 w-full h-full bg-white/50 dark:bg-black/20 animate-[move_2s_linear_infinite]" style="transform: translateX(-100%);"></div>
+                            </div>
+                            <svg class="w-6 h-6 text-orange-400 mt-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
                         </div>
-                        <div class="md:hidden h-12 w-0.5 bg-slate-300 dark:bg-slate-700"></div>
+                        <div class="md:hidden h-12 w-0.5 bg-gradient-to-b from-emerald-400 to-orange-400"></div>
 
                         <!-- Step 4 -->
                         <div class="flex flex-col items-center text-center group w-full">
-                            <div class="w-16 h-16 rounded-full bg-orange-100 dark:bg-orange-900/30 flex items-center justify-center text-orange-600 dark:text-orange-400 mb-4 group-hover:scale-110 transition-transform">
-                                <svg class="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                            <div class="w-20 h-20 rounded-2xl bg-white dark:bg-slate-800 shadow-lg border border-slate-100 dark:border-slate-700 flex items-center justify-center text-orange-500 mb-4 group-hover:-translate-y-2 transition-transform duration-300">
+                                <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
                             </div>
-                            <h3 class="font-bold text-slate-800 dark:text-white">Analysis</h3>
-                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Tableau / PowerBI</p>
+                            <h3 class="font-bold text-lg text-slate-800 dark:text-white">Analysis</h3>
+                            <p class="text-sm font-mono text-slate-500 dark:text-slate-400 mt-1">Tableau / PowerBI</p>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section class="mb-32 fade-in-section">
-                <div class="flex items-end justify-between mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
-                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white">Technical Skills</h2>
+            <!-- Technical Skills Section -->
+            <section id="skills" class="mb-32 pt-20 -mt-20 fade-in-section">
+                <div class="flex items-end justify-between mb-12 border-b border-slate-200 dark:border-slate-800 pb-4 max-w-6xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                        <svg class="w-8 h-8 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" /></svg>
+                        Technical Skills
+                    </h2>
                 </div>
                 <div class="grid md:grid-cols-2 gap-8 max-w-6xl mx-auto">
-                    <div class="tech-card p-6 rounded-2xl relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan-500 to-blue-500"></div>
-                        <h3 class="text-lg font-semibold mb-6 font-mono text-slate-700 dark:text-slate-200">Skills Radar</h3>
-                        <div class="relative h-80">
+                    <div class="tech-card p-8 rounded-3xl relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-cyan-400 to-blue-500 opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                        <h3 class="text-xl font-bold mb-8 font-mono text-slate-800 dark:text-white flex items-center gap-2">
+                            <svg class="w-5 h-5 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" /></svg>
+                            Tools Radar
+                        </h3>
+                        <div class="relative h-80 w-full flex items-center justify-center">
                             <canvas id="skillsRadarChart"></canvas>
                         </div>
                     </div>
-                    <div class="tech-card p-6 rounded-2xl relative overflow-hidden">
-                        <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-violet-500 to-fuchsia-500"></div>
-                        <h3 class="text-lg font-semibold mb-6 font-mono text-slate-700 dark:text-slate-200">Proficiency Levels</h3>
-                        <div class="relative h-80">
+                    <div class="tech-card p-8 rounded-3xl relative overflow-hidden group">
+                        <div class="absolute top-0 left-0 w-full h-1.5 bg-gradient-to-r from-violet-400 to-fuchsia-500 opacity-80 group-hover:opacity-100 transition-opacity"></div>
+                        <h3 class="text-xl font-bold mb-8 font-mono text-slate-800 dark:text-white flex items-center gap-2">
+                            <svg class="w-5 h-5 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>
+                            Core Competencies
+                        </h3>
+                        <div class="relative h-80 w-full flex items-center justify-center">
                             <canvas id="skillsBarChart"></canvas>
                         </div>
                     </div>
                 </div>
             </section>
 
+            <!-- Certifications -->
             <section class="mb-32 fade-in-section">
-                <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-12 text-center">Certifications</h2>
+                <div class="flex items-end justify-between mb-12 border-b border-slate-200 dark:border-slate-800 pb-4 max-w-6xl mx-auto">
+                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                        <svg class="w-8 h-8 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" /></svg>
+                        Certifications
+                    </h2>
+                </div>
                 <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
                     <!-- IBM -->
-                    <div class="tech-card p-6 rounded-xl hover:border-blue-500/50 transition-all group">
+                    <div class="tech-card p-6 rounded-2xl hover:border-blue-500/50 transition-all group">
                         <div class="flex gap-4">
-                            <div class="w-12 h-12 rounded bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/40 dark:to-blue-800/20 border border-blue-200 dark:border-blue-800/50 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0 group-hover:scale-110 transition-transform">
+                                <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 24 24"><path d="M16 2v20h-2V2h2zm-4 0v20h-2V2h2zm-4 0v20H6V2h2zm10 0v20h-2V2h2zM4 2v20H2V2h2z"/></svg>
                             </div>
                             <div class="flex-1">
-                                <div class="flex justify-between items-start">
-                                    <h3 class="font-bold text-lg text-slate-800 dark:text-white">IBM Data Analyst</h3>
-                                    <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-500">Oct 2025</span>
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="font-bold text-lg text-slate-800 dark:text-white leading-tight">IBM Data Analyst</h3>
+                                    <span class="text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-500 uppercase tracking-wider border border-slate-200 dark:border-slate-700 whitespace-nowrap ml-2">Oct '25</span>
                                 </div>
-                                <p class="text-blue-600 dark:text-blue-400 text-sm font-medium mb-2">IBM / Coursera</p>
-                                <a href="static/certificates/IBM_Data_Analyst.pdf" target="_blank" class="inline-flex items-center text-sm font-medium text-slate-900 dark:text-white hover:text-blue-500 transition-colors">
-                                    View Certificate
-                                    <svg class="w-3 h-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                <p class="text-blue-600 dark:text-blue-400 text-sm font-semibold mb-3">IBM / Coursera</p>
+                                <a href="static/certificates/IBM_Data_Analyst.pdf" target="_blank" class="inline-flex items-center text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm group-hover:border-blue-300 dark:group-hover:border-blue-700">
+                                    View Credential
+                                    <svg class="w-3.5 h-3.5 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                                 </a>
                             </div>
                         </div>
                     </div>
                     
                     <!-- CompTIA -->
-                    <div class="tech-card p-6 rounded-xl hover:border-green-500/50 transition-all group">
+                    <div class="tech-card p-6 rounded-2xl hover:border-red-500/50 transition-all group">
                         <div class="flex gap-4">
-                            <div class="w-12 h-12 rounded bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400 shrink-0">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-red-50 to-red-100 dark:from-red-900/40 dark:to-red-800/20 border border-red-200 dark:border-red-800/50 flex items-center justify-center text-red-600 dark:text-red-400 shrink-0 group-hover:scale-110 transition-transform">
+                                <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
                             </div>
                             <div class="flex-1">
-                                <div class="flex justify-between items-start">
-                                    <h3 class="font-bold text-lg text-slate-800 dark:text-white">CompTIA Data+</h3>
-                                    <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-500">Sep 2025</span>
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="font-bold text-lg text-slate-800 dark:text-white leading-tight">CompTIA Data+</h3>
+                                    <span class="text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-500 uppercase tracking-wider border border-slate-200 dark:border-slate-700 whitespace-nowrap ml-2">Sep '25</span>
                                 </div>
-                                <p class="text-green-600 dark:text-green-400 text-sm font-medium mb-2">CompTIA</p>
-                                <a href="static/certificates/CompTIA_Data_Plus.pdf" target="_blank" class="inline-flex items-center text-sm font-medium text-slate-900 dark:text-white hover:text-green-500 transition-colors">
-                                    View Certificate
-                                    <svg class="w-3 h-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                <p class="text-red-600 dark:text-red-400 text-sm font-semibold mb-3">CompTIA</p>
+                                <a href="static/certificates/CompTIA_Data_Plus.pdf" target="_blank" class="inline-flex items-center text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-red-600 dark:hover:text-red-400 transition-colors bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm group-hover:border-red-300 dark:group-hover:border-red-700">
+                                    View Credential
+                                    <svg class="w-3.5 h-3.5 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                                 </a>
                             </div>
                         </div>
                     </div>
 
                     <!-- Deloitte Job Simulation -->
-                    <div class="tech-card p-6 rounded-xl hover:border-green-500/50 transition-all group">
+                    <div class="tech-card p-6 rounded-2xl hover:border-green-500/50 transition-all group">
                         <div class="flex gap-4">
-                            <div class="w-12 h-12 rounded bg-green-50 dark:bg-green-900/20 flex items-center justify-center text-green-600 dark:text-green-400 shrink-0">
-                                <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                </svg>
+                            <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-green-50 to-green-100 dark:from-green-900/40 dark:to-green-800/20 border border-green-200 dark:border-green-800/50 flex items-center justify-center text-green-600 dark:text-green-400 shrink-0 group-hover:scale-110 transition-transform">
+                                <svg class="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                             </div>
-                            <div class="flex-1">
-                                <div class="flex justify-between items-start">
-                                    <h3 class="font-bold text-lg text-slate-800 dark:text-white">Deloitte Data Analytics</h3>
-                                    <span class="text-xs font-mono bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-500">Dec 2025</span>
+                            <div class="flex-1 flex flex-col h-full">
+                                <div class="flex justify-between items-start mb-1">
+                                    <h3 class="font-bold text-lg text-slate-800 dark:text-white leading-tight">Deloitte Data Analytics</h3>
+                                    <span class="text-[10px] font-mono font-bold bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded text-slate-500 uppercase tracking-wider border border-slate-200 dark:border-slate-700 whitespace-nowrap ml-2">Dec '25</span>
                                 </div>
-                                <p class="text-green-600 dark:text-green-400 text-sm font-medium mb-2">Deloitte / Forage</p>
-                                <p class="text-xs text-slate-500 mb-2">Job Simulation: Tableau, Excel & Forensic Analysis.</p>
-                                <a href="static/certificates/Deloitte_Certificate.pdf" target="_blank" class="inline-flex items-center text-sm font-medium text-slate-900 dark:text-white hover:text-green-500 transition-colors">
-                                    View Certificate
-                                    <svg class="w-3 h-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                <p class="text-green-600 dark:text-green-400 text-sm font-semibold mb-2">Deloitte / Forage</p>
+                                <p class="text-xs text-slate-500 dark:text-slate-400 mb-3 flex-grow">Simulation: Tableau, Excel & Forensic Analysis.</p>
+                                <a href="static/certificates/Deloitte_Certificate.pdf" target="_blank" class="inline-flex items-center text-sm font-bold text-slate-600 dark:text-slate-400 hover:text-green-600 dark:hover:text-green-400 transition-colors bg-white dark:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 shadow-sm group-hover:border-green-300 dark:group-hover:border-green-700 w-fit">
+                                    View Credential
+                                    <svg class="w-3.5 h-3.5 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
                                 </a>
                             </div>
                         </div>
@@ -446,141 +530,251 @@
                 </div>
             </section>
 
-            <section class="mb-20 max-w-4xl mx-auto fade-in-section">
-                <div class="flex items-end justify-between mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
-                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white">Education</h2>
+            <!-- Education Timeline -->
+            <section id="education" class="mb-24 max-w-4xl mx-auto pt-20 -mt-20 fade-in-section">
+                <div class="flex items-end justify-between mb-12 border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                        <svg class="w-8 h-8 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 14l9-5-9-5-9 5 9 5z" /><path d="M12 14l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5zm0 0l6.16-3.422a12.083 12.083 0 01.665 6.479A11.952 11.952 0 0012 20.055a11.952 11.952 0 00-6.824-2.998 12.078 12.078 0 01.665-6.479L12 14zm-4 6v-7.5l4-2.222" /></svg>
+                        Education
+                    </h2>
                 </div>
                 
-                <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                    <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 dark:bg-slate-800 dark:border-slate-700 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                        <svg class="w-5 h-5 text-cyan-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
-                    </div>
-                    <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] tech-card p-6 rounded-xl shadow-sm border-l-4 border-l-cyan-500">
-                        <div class="flex justify-between items-center mb-1">
-                            <h3 class="font-bold text-slate-900 dark:text-white">BSc Mathematics & Statistical Sciences</h3>
-                            <time class="font-mono text-xs text-slate-500">2025</time>
+                <div class="space-y-12 relative timeline-line">
+                    
+                    <!-- BSc Honours -->
+                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-50 dark:border-slate-900 bg-cyan-100 dark:bg-cyan-900/50 shadow-md shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-transform group-hover:scale-110 group-hover:bg-cyan-200 dark:group-hover:bg-cyan-800">
+                            <svg class="w-5 h-5 text-cyan-600 dark:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" /></svg>
                         </div>
-                        <p class="text-cyan-600 dark:text-cyan-400 text-sm font-medium mb-4">University of Western Cape</p>
-                        
-                        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
-                            Completed a rigorous dual-major program focusing on quantitative analysis, mathematical modeling, and statistical inference. 
-                            Developed strong problem-solving skills applied to real-world data scenarios.
-                        </p>
-                        
-                        <div class="mb-4">
-                            <h4 class="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Relevant Modules:</h4>
-                            <div class="flex flex-wrap gap-2">
-                                <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs px-2 py-1 rounded">Linear Algebra</span>
-                                <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs px-2 py-1 rounded">Multivariable Calculus</span>
-                                <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs px-2 py-1 rounded">Statistical Inference</span>
-                                <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs px-2 py-1 rounded">Regression Analysis</span>
-                                <span class="bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 text-xs px-2 py-1 rounded">Discrete Mathematics</span>
+                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] tech-card p-7 rounded-2xl shadow-sm border-t-4 border-t-cyan-500 hover:border-cyan-400 transition-colors">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-bold text-lg text-slate-900 dark:text-white leading-tight">Honours in Applied Statistics</h3>
+                                <time class="font-mono text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700">2026</time>
+                            </div>
+                            <p class="text-cyan-600 dark:text-cyan-400 text-sm font-bold mb-4">University of Free State</p>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-5 leading-relaxed">
+                                Currently pursuing a focused program in Applied Statistics, strengthening skills in data analysis, 
+                                statistical modeling, and application of advanced statistical techniques in various industries.
+                            </p>
+                            <div>
+                                <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Relevant Modules</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2.5 py-1 rounded-md shadow-sm font-medium">Statistical Inference</span>
+                                    <span class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2.5 py-1 rounded-md shadow-sm font-medium">Multivariate Analysis</span>
+                                    <span class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2.5 py-1 rounded-md shadow-sm font-medium">Applied Regression</span>
+                                    <span class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2.5 py-1 rounded-md shadow-sm font-medium">Time Series Analysis</span>
+                                </div>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
+                                <a href="static/certificates/Completion_Letter.pdf" target="_blank" class="inline-flex items-center text-sm font-bold text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors">
+                                    View Enrollment / Letter
+                                    <svg class="w-4 h-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                </a>
                             </div>
                         </div>
+                    </div>
 
-                        <div class="mt-4 pt-4 border-t border-slate-200 dark:border-slate-800">
-                            <a href="static/certificates/Completion_Letter.pdf" target="_blank" class="inline-flex items-center text-sm font-medium text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors">
-                                View Degree Certificate
-                                <svg class="w-3 h-3 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
-                            </a>
+                    <!-- BSc Degree -->
+                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-50 dark:border-slate-900 bg-cyan-100 dark:bg-cyan-900/50 shadow-md shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-transform group-hover:scale-110 group-hover:bg-cyan-200 dark:group-hover:bg-cyan-800">
+                            <svg class="w-5 h-5 text-cyan-600 dark:text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 14l9-5-9-5-9 5 9 5z" /></svg>
+                        </div>
+                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] tech-card p-7 rounded-2xl shadow-sm border-t-4 border-t-cyan-500 hover:border-cyan-400 transition-colors">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-bold text-lg text-slate-900 dark:text-white leading-tight">BSc Math & Statistical Sciences</h3>
+                                <time class="font-mono text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700">2025</time>
+                            </div>
+                            <p class="text-cyan-600 dark:text-cyan-400 text-sm font-bold mb-4">University of Western Cape</p>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-5 leading-relaxed">
+                                Completed a rigorous dual-major program focusing on quantitative analysis, mathematical modeling, and statistical inference. 
+                                Developed strong problem-solving skills applied to real-world data scenarios.
+                            </p>
+                            <div>
+                                <h4 class="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-3">Relevant Modules</h4>
+                                <div class="flex flex-wrap gap-2">
+                                    <span class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2.5 py-1 rounded-md shadow-sm font-medium">Linear Algebra</span>
+                                    <span class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2.5 py-1 rounded-md shadow-sm font-medium">Multivariable Calculus</span>
+                                    <span class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2.5 py-1 rounded-md shadow-sm font-medium">Statistical Inference</span>
+                                    <span class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2.5 py-1 rounded-md shadow-sm font-medium">Regression Analysis</span>
+                                    <span class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 text-xs px-2.5 py-1 rounded-md shadow-sm font-medium">Discrete Mathematics</span>
+                                </div>
+                            </div>
+                            <div class="mt-6 pt-4 border-t border-slate-200 dark:border-slate-800">
+                                <a href="static/certificates/Completion_Letter.pdf" target="_blank" class="inline-flex items-center text-sm font-bold text-cyan-600 dark:text-cyan-400 hover:text-cyan-700 dark:hover:text-cyan-300 transition-colors">
+                                    View Degree Certificate
+                                    <svg class="w-4 h-4 ml-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" /></svg>
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <section class="mb-20 max-w-4xl mx-auto fade-in-section">
-                <div class="flex items-end justify-between mb-8 border-b border-slate-200 dark:border-slate-800 pb-4">
-                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white">Professional Experience</h2>
+            <!-- Professional Experience Timeline -->
+            <section id="experience" class="mb-32 max-w-4xl mx-auto pt-20 -mt-20 fade-in-section">
+                <div class="flex items-end justify-between mb-12 border-b border-slate-200 dark:border-slate-800 pb-4">
+                    <h2 class="text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+                        <svg class="w-8 h-8 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                        Professional Experience
+                    </h2>
                 </div>
                 
-                <div class="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-slate-300 before:to-transparent dark:before:via-slate-700">
+                <div class="space-y-12 relative timeline-line">
                     
                     <!-- Role 1: CAPACITI -->
-                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group is-active">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 dark:bg-slate-800 dark:border-slate-700 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                            <svg class="w-5 h-5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
+                    <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-50 dark:border-slate-900 bg-emerald-100 dark:bg-emerald-900/50 shadow-md shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-transform group-hover:scale-110 group-hover:bg-emerald-200 dark:group-hover:bg-emerald-800">
+                            <svg class="w-5 h-5 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg>
                         </div>
-                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] tech-card p-6 rounded-xl shadow-sm border-l-4 border-l-emerald-500">
-                            <div class="flex justify-between items-center mb-1">
-                                <h3 class="font-bold text-slate-900 dark:text-white">Data Analyst</h3>
-                                <time class="font-mono text-xs text-slate-500">July 2025 - Present</time>
+                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] tech-card p-7 rounded-2xl shadow-sm border-t-4 border-t-emerald-500 hover:border-emerald-400 transition-colors">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-bold text-lg text-slate-900 dark:text-white leading-tight">Data Analyst</h3>
+                                <time class="font-mono text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700">Jul '25 - Present</time>
                             </div>
-                            <p class="text-emerald-600 dark:text-emerald-400 text-sm font-medium mb-2">CAPACITI</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400">Transforming raw data into meaningful insights to drive business decisions.</p>
-                            <ul class="mt-2 text-sm list-disc list-inside text-slate-500 space-y-1">
-                                <li>Analyzed structured and unstructured datasets to extract insights supporting business decisions.</li>
-                                <li>Built dashboards and analytical summaries using Excel, Python, and visualization tools.</li>
-                                <li>Applied data cleaning, exploratory analysis, and basic modeling techniques in simulated real world projects.</li>
+                            <p class="text-emerald-600 dark:text-emerald-400 text-sm font-bold mb-4">CAPACITI</p>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed font-medium italic">"Transforming raw data into meaningful insights to drive business decisions."</p>
+                            <ul class="mt-2 text-sm list-none text-slate-600 dark:text-slate-400 space-y-2">
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Analyzed structured and unstructured datasets to extract insights supporting business decisions.
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Built dashboards and analytical summaries using Excel, Python, and visualization tools.
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Applied data cleaning, exploratory analysis, and basic modeling techniques in simulated real-world projects.
+                                </li>
                             </ul>
                         </div>
                     </div>
 
                     <!-- Role 2: Math Tutor -->
                     <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 dark:bg-slate-800 dark:border-slate-700 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                            <svg class="w-5 h-5 text-violet-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-50 dark:border-slate-900 bg-violet-100 dark:bg-violet-900/50 shadow-md shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-transform group-hover:scale-110 group-hover:bg-violet-200 dark:group-hover:bg-violet-800">
+                            <svg class="w-5 h-5 text-violet-600 dark:text-violet-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
                         </div>
-                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] tech-card p-6 rounded-xl shadow-sm border-l-4 border-l-violet-500">
-                            <div class="flex justify-between items-center mb-1">
-                                <h3 class="font-bold text-slate-900 dark:text-white">Mathematics Tutor</h3>
-                                <time class="font-mono text-xs text-slate-500">Feb 2025 - July 2025</time>
+                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] tech-card p-7 rounded-2xl shadow-sm border-t-4 border-t-violet-500 hover:border-violet-400 transition-colors">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-bold text-lg text-slate-900 dark:text-white leading-tight">Mathematics Tutor</h3>
+                                <time class="font-mono text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700">Feb - Jul 2025</time>
                             </div>
-                            <p class="text-violet-600 dark:text-violet-400 text-sm font-medium mb-2">University of Western Cape</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400">Helped students grasp complex mathematical concepts.</p>
-                            <ul class="mt-2 text-sm list-disc list-inside text-slate-500 space-y-1">
-                                <li>Improved student test scores by average of 25%</li>
-                                <li>Mentored 30+ students in pre-calculus and applied maths</li>
-                                <li>Assisted in exercises and tutorial sessions</li>
+                            <p class="text-violet-600 dark:text-violet-400 text-sm font-bold mb-4">University of Western Cape</p>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed font-medium italic">"Helped students grasp complex mathematical concepts."</p>
+                            <ul class="mt-2 text-sm list-none text-slate-600 dark:text-slate-400 space-y-2">
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 text-violet-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Improved student test scores by an average of 25%.
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 text-violet-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Mentored 30+ students in pre-calculus and applied maths.
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 text-violet-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Assisted in exercises and tutorial sessions.
+                                </li>
                             </ul>
                         </div>
                     </div>
                     
                     <!-- Role 3: Stats Tutor -->
                     <div class="relative flex items-center justify-between md:justify-normal md:odd:flex-row-reverse group">
-                        <div class="flex items-center justify-center w-10 h-10 rounded-full border border-white bg-slate-100 dark:bg-slate-800 dark:border-slate-700 shadow shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10">
-                            <svg class="w-5 h-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+                        <div class="flex items-center justify-center w-10 h-10 rounded-full border-4 border-slate-50 dark:border-slate-900 bg-orange-100 dark:bg-orange-900/50 shadow-md shrink-0 md:order-1 md:group-odd:-translate-x-1/2 md:group-even:translate-x-1/2 z-10 transition-transform group-hover:scale-110 group-hover:bg-orange-200 dark:group-hover:bg-orange-800">
+                            <svg class="w-5 h-5 text-orange-600 dark:text-orange-400" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
                         </div>
-                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-2.5rem)] tech-card p-6 rounded-xl shadow-sm border-l-4 border-l-orange-500">
-                            <div class="flex justify-between items-center mb-1">
-                                <h3 class="font-bold text-slate-900 dark:text-white">Statistics Tutor</h3>
-                                <time class="font-mono text-xs text-slate-500">Feb 2024 - Nov 2024</time>
+                        <div class="w-[calc(100%-4rem)] md:w-[calc(50%-3rem)] tech-card p-7 rounded-2xl shadow-sm border-t-4 border-t-orange-500 hover:border-orange-400 transition-colors">
+                            <div class="flex justify-between items-center mb-2">
+                                <h3 class="font-bold text-lg text-slate-900 dark:text-white leading-tight">Statistics Tutor</h3>
+                                <time class="font-mono text-xs font-bold text-slate-500 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md border border-slate-200 dark:border-slate-700">Feb - Nov 2024</time>
                             </div>
-                            <p class="text-orange-600 dark:text-orange-400 text-sm font-medium mb-2">University of Western Cape</p>
-                            <p class="text-sm text-slate-600 dark:text-slate-400">Guided students through statistical concepts and software applications.</p>
-                            <ul class="mt-2 text-sm list-disc list-inside text-slate-500 space-y-1">
-                                <li>Assisted lectures with grading and tutorial coordination</li>
-                                <li>Taught introductory courses in R and SAS to students in second year</li>
-                                <li>Assisted on practical and theoretical exercises in statistics</li>
+                            <p class="text-orange-600 dark:text-orange-400 text-sm font-bold mb-4">University of Western Cape</p>
+                            <p class="text-sm text-slate-600 dark:text-slate-400 mb-4 leading-relaxed font-medium italic">"Guided students through statistical concepts and software applications."</p>
+                            <ul class="mt-2 text-sm list-none text-slate-600 dark:text-slate-400 space-y-2">
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 text-orange-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Assisted lectures with grading and tutorial coordination.
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 text-orange-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Taught introductory courses in R and SAS to second-year students.
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <svg class="w-4 h-4 text-orange-500 mt-0.5 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                                    Assisted on practical and theoretical exercises in statistics.
+                                </li>
                             </ul>
                         </div>
                     </div>
                 </div>
             </section>
+
+            <!-- Contact Section -->
+            <section id="contact" class="mb-24 max-w-4xl mx-auto pt-20 -mt-20 fade-in-section">
+                <div class="tech-card p-10 rounded-3xl relative overflow-hidden group">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-cyan-400 to-violet-500"></div>
+                    <div class="text-center mb-10">
+                        <h2 class="text-3xl font-bold text-slate-900 dark:text-white mb-4">Let's Work Together</h2>
+                        <p class="text-slate-600 dark:text-slate-400 max-w-xl mx-auto">
+                            I am currently open to new opportunities in Data Analytics and Data Science. 
+                            Whether you have a question or just want to say hi, I'll try my best to get back to you!
+                        </p>
+                    </div>
+                    
+                    <form class="space-y-6 max-w-2xl mx-auto" onsubmit="event.preventDefault(); alert('Message feature demo. Please use the email or LinkedIn links below to contact me directly!');">
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2" for="name">Name</label>
+                                <input type="text" id="name" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white/50 dark:bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:text-white transition-all" placeholder="John Doe" required>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2" for="email">Email</label>
+                                <input type="email" id="email" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white/50 dark:bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:text-white transition-all" placeholder="john@example.com" required>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-bold text-slate-700 dark:text-slate-300 mb-2" for="message">Message</label>
+                            <textarea id="message" rows="4" class="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-white/50 dark:bg-slate-800/50 focus:outline-none focus:ring-2 focus:ring-cyan-500 dark:text-white transition-all resize-none" placeholder="Hello Kekeletso..." required></textarea>
+                        </div>
+                        <div class="text-center">
+                            <button type="submit" class="px-8 py-3.5 rounded-xl bg-slate-900 dark:bg-cyan-500 text-white dark:text-slate-900 font-bold transition-all hover:shadow-[0_0_20px_rgba(6,182,212,0.4)] hover:-translate-y-1 inline-flex items-center gap-2">
+                                Send Message
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" /></svg>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
         </main>
     </div>
 
-
+    <!-- Footer Components -->
     <custom-footer></custom-footer>
+
+    <!-- Scroll to Top Button -->
+    <button id="scrollToTop" class="fixed bottom-8 right-8 bg-cyan-500 text-white p-3 rounded-full shadow-lg hover:bg-cyan-600 hover:-translate-y-1 hover:shadow-cyan-500/50 transition-all opacity-0 pointer-events-none z-50">
+        <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+    </button>
     
     <script>
-        // Inline Components to ensure preview works without external files
-        
-        // Simple Navbar Component
+        // Custom Navbar Web Component
         class CustomNavbar extends HTMLElement {
             connectedCallback() {
                 this.innerHTML = `
-                <nav class="fixed top-0 w-full z-50 transition-all duration-300 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-gray-100 dark:border-gray-800">
+                <nav class="fixed top-0 w-full z-50 transition-all duration-300 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800">
                     <div class="container mx-auto px-6 py-4 flex justify-between items-center">
-                        <a href="index.html" class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-violet-500">KB</a>
-                        <div class="flex items-center space-x-4">
-
-                            <div class="hidden md:flex items-center space-x-6">
-                                <a href="index.html" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Home</a>
-                                <a href="projects.html" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Projects</a>
-                                <a href="contact.html" class="text-sm font-medium text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Contact</a>
+                        <a href="#home" class="text-2xl font-black bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-violet-500 hover:opacity-80 transition-opacity tracking-tighter">KB<span class="text-slate-800 dark:text-white">.</span></a>
+                        <div class="flex items-center space-x-2 md:space-x-6">
+                            <div class="hidden md:flex items-center space-x-6 bg-slate-100 dark:bg-slate-800 px-6 py-2 rounded-full border border-slate-200 dark:border-slate-700 shadow-sm">
+                                <a href="#home" class="text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Home</a>
+                                <a href="#projects" class="text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Projects</a>
+                                <a href="#skills" class="text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Skills</a>
+                                <a href="#experience" class="text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Experience</a>
+                                <a href="#contact" class="text-sm font-bold text-slate-600 dark:text-slate-300 hover:text-cyan-500 dark:hover:text-cyan-400 transition-colors">Contact</a>
                             </div>
 
-                            <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-slate-600 dark:text-slate-300">
+                            <button id="theme-toggle" class="p-2.5 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-colors text-slate-600 dark:text-slate-300 shadow-sm">
                                 <svg id="theme-icon" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
                                 </svg>
@@ -592,55 +786,62 @@
                 
                 // Theme Toggle Logic
                 const themeBtn = this.querySelector('#theme-toggle');
-                const recruiterBtn = this.querySelector('#recruiter-toggle');
                 const html = document.documentElement;
-                const body = document.body;
                 
+                // Check local storage for theme preference
+                if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                    html.classList.add('dark');
+                } else {
+                    html.classList.remove('dark');
+                }
+
                 themeBtn.addEventListener('click', () => {
                     html.classList.toggle('dark');
+                    if(html.classList.contains('dark')){
+                        localStorage.theme = 'dark';
+                    } else {
+                        localStorage.theme = 'light';
+                    }
                 });
             }
         }
         customElements.define('custom-navbar', CustomNavbar);
 
-        // Enhanced Footer Component (Feature 11)
+        // Custom Footer Web Component
         class CustomFooter extends HTMLElement {
             connectedCallback() {
                 this.innerHTML = `
-                <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pt-16 pb-24 fade-in-section">
+                <footer class="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 pt-16 pb-12 fade-in-section relative z-10">
                     <div class="container mx-auto px-4 text-center">
-                        <div class="mb-10">
-                            <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-6">Quick Connect</h3>
+                        <div class="mb-12">
+                            <h3 class="text-2xl font-black text-slate-800 dark:text-white mb-6 bg-clip-text text-transparent bg-gradient-to-r from-cyan-500 to-violet-500 inline-block">Connect With Me</h3>
                             <div class="flex flex-wrap justify-center gap-4">
-                                <!-- Copy Email -->
-                                <button onclick="navigator.clipboard.writeText('unathibasholo@gmail.com'); alert('Email unathibasholo@gmail.com copied!');" class="px-6 py-2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors flex items-center gap-2">
-                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+                                <button onclick="navigator.clipboard.writeText('unathibasholo@gmail.com'); alert('Email unathibasholo@gmail.com copied!');" class="px-6 py-2.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all font-bold flex items-center gap-2 border border-slate-200 dark:border-slate-700 hover:-translate-y-0.5">
+                                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
                                     Copy Email
                                 </button>
                                 
-                                <!-- LinkedIn Quick Connect -->
-                                <a href="https://www.linkedin.com/in/kekeletso-basholo-161059247/" target="_blank" class="px-6 py-2 rounded-full bg-blue-600 text-white hover:bg-blue-700 transition-colors flex items-center gap-2">
+                                <a href="https://www.linkedin.com/in/kekeletso-basholo-161059247/" target="_blank" class="px-6 py-2.5 rounded-full bg-[#0A66C2] text-white hover:bg-[#004182] transition-all font-bold flex items-center gap-2 hover:-translate-y-0.5 shadow-md shadow-blue-500/20">
                                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/></svg>
                                     LinkedIn
                                 </a>
 
-                                <!-- Email Link -->
-                                <a href="mailto:unathibasholo@gmail.com" class="px-6 py-2 rounded-full border border-slate-300 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:border-cyan-500 hover:text-cyan-500 transition-colors flex items-center gap-2">
+                                <a href="mailto:unathibasholo@gmail.com" class="px-6 py-2.5 rounded-full border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:border-cyan-500 hover:text-cyan-500 transition-all font-bold flex items-center gap-2 hover:-translate-y-0.5">
                                      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
                                     Send Email
                                 </a>
                             </div>
                         </div>
 
-                        <div class="flex justify-center gap-6 mb-6">
-                            <a href="https://www.linkedin.com/in/kekeletso-basholo-161059247/" target="_blank" class="text-slate-400 hover:text-cyan-500 transition-colors">LinkedIn</a>
-                            <a href=https:https://github.com/Unathi-2" target="_blank" class="text-slate-400 hover:text-cyan-500 transition-colors">GitHub</a>
+                        <div class="flex justify-center gap-8 mb-8 text-sm font-bold">
+                            <a href="https://www.linkedin.com/in/kekeletso-basholo-161059247/" target="_blank" class="text-slate-500 hover:text-cyan-500 transition-colors">LinkedIn</a>
+                            <a href="https://github.com/Unathi-2" target="_blank" class="text-slate-500 hover:text-cyan-500 transition-colors">GitHub</a>
                         </div>
 
-                        <p class="text-slate-500 dark:text-slate-400 mb-4">
+                        <p class="text-slate-500 dark:text-slate-400 mb-2 font-medium">
                             Open to data analytics, data science, and analytics graduate opportunities.
                         </p>
-                        <p class="text-slate-500 dark:text-slate-400 mb-4">&copy; 2025 Kekeletso Basholo. All rights reserved.</p>
+                        <p class="text-slate-400 dark:text-slate-500 text-sm font-mono">&copy; 2026 Kekeletso Basholo. All rights reserved.</p>
                     </div>
                 </footer>
                 `;
@@ -648,138 +849,153 @@
         }
         customElements.define('custom-footer', CustomFooter);
 
-        // Counters
-        const counters = document.querySelectorAll('.counter');
-        counters.forEach(counter => {
-            const updateCount = () => {
-                const target = +counter.getAttribute('data-target');
-                const count = +counter.innerText;
-                const inc = target / 200;
-                if(count < target) {
-                    counter.innerText = Math.ceil(count + inc);
-                    setTimeout(updateCount, 15);
+        // Functionality Setup
+        document.addEventListener('DOMContentLoaded', () => {
+            // Scroll to Top Logic
+            const scrollBtn = document.getElementById('scrollToTop');
+            window.addEventListener('scroll', () => {
+                if (window.scrollY > 500) {
+                    scrollBtn.classList.remove('opacity-0', 'pointer-events-none');
+                    scrollBtn.classList.add('opacity-100', 'pointer-events-auto');
                 } else {
-                    counter.innerText = target;
+                    scrollBtn.classList.add('opacity-0', 'pointer-events-none');
+                    scrollBtn.classList.remove('opacity-100', 'pointer-events-auto');
+                }
+            });
+
+            scrollBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+
+            // Counters Animation
+            const counters = document.querySelectorAll('.counter');
+            const observeCounters = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const counter = entry.target;
+                        const target = +counter.getAttribute('data-target');
+                        const updateCount = () => {
+                            const count = +counter.innerText;
+                            const inc = target / 100; // Adjust speed here
+                            if(count < target) {
+                                counter.innerText = Math.ceil(count + inc);
+                                setTimeout(updateCount, 20);
+                            } else {
+                                counter.innerText = target;
+                            }
+                        };
+                        updateCount();
+                        observeCounters.unobserve(counter);
+                    }
+                });
+            }, { threshold: 0.5 });
+
+            counters.forEach(counter => observeCounters.observe(counter));
+
+            // Setup Chart.js with responsive dark mode
+            const setupCharts = () => {
+                const isDark = document.documentElement.classList.contains('dark');
+                const gridColor = isDark ? 'rgba(255, 255, 255, 0.05)' : 'rgba(0, 0, 0, 0.05)';
+                const textColor = isDark ? '#94a3b8' : '#64748b';
+
+                // Radar Chart
+                const ctxRadar = document.getElementById('skillsRadarChart');
+                if(ctxRadar) {
+                    new Chart(ctxRadar.getContext('2d'), {
+                        type: 'radar',
+                        data: {
+                            labels: ['Python', 'SQL', 'R', 'Tableau', 'Excel', 'Statistics'],
+                            datasets: [{
+                                label: 'Skill Level',
+                                data: [85, 80, 75, 85, 90, 85],
+                                fill: true,
+                                backgroundColor: 'rgba(6, 182, 212, 0.3)',
+                                borderColor: 'rgb(6, 182, 212)',
+                                pointBackgroundColor: 'rgb(6, 182, 212)',
+                                pointBorderColor: '#fff',
+                                pointHoverBackgroundColor: '#fff',
+                                pointHoverBorderColor: 'rgb(6, 182, 212)',
+                                borderWidth: 2,
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                r: {
+                                    angleLines: { color: gridColor },
+                                    grid: { color: gridColor },
+                                    pointLabels: { color: textColor, font: { family: "'JetBrains Mono', monospace", size: 12, weight: 'bold' } },
+                                    ticks: { display: false, beginAtZero: true, max: 100 }
+                                }
+                            },
+                            plugins: { legend: { display: false } }
+                        }
+                    });
+                }
+
+                // Bar Chart
+                const ctxBar = document.getElementById('skillsBarChart');
+                if(ctxBar) {
+                    new Chart(ctxBar.getContext('2d'), {
+                        type: 'bar',
+                        data: {
+                            labels: ['Data Analysis', 'Machine Learning', 'Data Viz', 'Modeling'],
+                            datasets: [{
+                                label: 'Proficiency',
+                                data: [90, 75, 85, 80],
+                                backgroundColor: [
+                                    'rgba(139, 92, 246, 0.7)',
+                                    'rgba(168, 85, 247, 0.7)',
+                                    'rgba(192, 132, 252, 0.7)',
+                                    'rgba(216, 180, 254, 0.7)'
+                                ],
+                                borderColor: [
+                                    'rgb(139, 92, 246)',
+                                    'rgb(168, 85, 247)',
+                                    'rgb(192, 132, 252)',
+                                    'rgb(216, 180, 254)'
+                                ],
+                                borderWidth: 2,
+                                borderRadius: 6
+                            }]
+                        },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    grid: { color: gridColor, drawBorder: false },
+                                    ticks: { color: textColor, font: { family: "'JetBrains Mono', monospace" } },
+                                    max: 100
+                                },
+                                x: {
+                                    grid: { display: false, drawBorder: false },
+                                    ticks: { color: textColor, font: { family: "'JetBrains Mono', monospace", weight: 'bold' } }
+                                }
+                            },
+                            plugins: { legend: { display: false } }
+                        }
+                    });
                 }
             };
-            updateCount();
-        });
+            
+            // Timeout to allow DOM/Styles to settle
+            setTimeout(setupCharts, 100);
 
-        // AI Demo Logic (Client-side CSV processing)
-        const csvInput = document.getElementById('csvInput');
-        if(csvInput) {
-            csvInput.addEventListener('change', function(e) {
-                const file = e.target.files[0];
-                if (!file) return;
-
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const text = e.target.result;
-                    const rows = text.split('\n').filter(row => row.trim() !== '');
-                    const headers = rows[0].split(',');
-                    
-                    // Simulate processing time
-                    setTimeout(() => {
-                        document.getElementById('analysis-results').classList.remove('hidden');
-                        document.getElementById('res-rows').textContent = rows.length - 1; // Subtract header
-                        document.getElementById('res-cols').textContent = headers.length;
-                        document.getElementById('res-time').textContent = '0.0' + Math.floor(Math.random() * 9 + 1) + 's';
-                        document.getElementById('res-headers').textContent = headers.slice(0, 5).join(', ') + (headers.length > 5 ? '...' : '');
-                    }, 800);
-                };
-                reader.readAsText(file);
-            });
-        }
-
-        // Charts
-        document.addEventListener('DOMContentLoaded', () => {
-            // Radar Chart
-            const ctxRadar = document.getElementById('skillsRadarChart').getContext('2d');
-            new Chart(ctxRadar, {
-                type: 'radar',
-                data: {
-                    labels: ['Python', 'SQL', 'R', 'Tableau', 'Excel', 'Statistics'],
-                    datasets: [{
-                        label: 'Skill Level',
-                        data: [85, 80, 75, 85, 90, 85],
-                        fill: true,
-                        backgroundColor: 'rgba(6, 182, 212, 0.2)',
-                        borderColor: 'rgb(6, 182, 212)',
-                        pointBackgroundColor: 'rgb(6, 182, 212)',
-                        pointBorderColor: '#fff',
-                        pointHoverBackgroundColor: '#fff',
-                        pointHoverBorderColor: 'rgb(6, 182, 212)'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        r: {
-                            angleLines: { color: 'rgba(148, 163, 184, 0.1)' },
-                            grid: { color: 'rgba(148, 163, 184, 0.1)' },
-                            pointLabels: { color: '#94a3b8' },
-                            ticks: { display: false, beginAtZero: true, max: 100 }
-                        }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-
-            // Bar Chart
-            const ctxBar = document.getElementById('skillsBarChart').getContext('2d');
-            new Chart(ctxBar, {
-                type: 'bar',
-                data: {
-                    labels: ['Data Analysis', 'Machine Learning', 'Data Viz', 'Modeling'],
-                    datasets: [{
-                        label: 'Proficiency',
-                        data: [75, 70, 75, 70],
-                        backgroundColor: [
-                            'rgba(139, 92, 246, 0.6)',
-                            'rgba(168, 85, 247, 0.6)',
-                            'rgba(192, 132, 252, 0.6)',
-                            'rgba(216, 180, 254, 0.6)'
-                        ],
-                        borderColor: [
-                            'rgb(139, 92, 246)',
-                            'rgb(168, 85, 247)',
-                            'rgb(192, 132, 252)',
-                            'rgb(216, 180, 254)'
-                        ],
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            grid: { color: 'rgba(148, 163, 184, 0.1)' },
-                            ticks: { color: '#94a3b8' }
-                        },
-                        x: {
-                            grid: { display: false },
-                            ticks: { color: '#94a3b8' }
-                        }
-                    },
-                    plugins: { legend: { display: false } }
-                }
-            });
-
-            // Intersection Observer for Animations
+            // Intersection Observer for Fade-in Animations
             const observerOptions = {
                 root: null,
                 rootMargin: '0px',
-                threshold: 0.1
+                threshold: 0.15
             };
 
             const observer = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
                         entry.target.classList.add('is-visible');
-                        observer.unobserve(entry.target); // Only animate once
+                        observer.unobserve(entry.target);
                     }
                 });
             }, observerOptions);
