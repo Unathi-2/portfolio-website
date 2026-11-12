@@ -9,6 +9,20 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><script src="https://cdn.tailwindcss.com"></script>
 <style>
 :root{--paper:#f7f8fa;--ink:#101827;--line:#e2e8f0;--accent:#0e9488}*{box-sizing:border-box}html{scroll-behavior:smooth;scroll-padding-top:90px}body{margin:0;background:var(--paper);color:var(--ink);font-family:Manrope,sans-serif}.wrap{width:min(1100px,calc(100% - 36px));margin:auto}.section{padding:80px 0}.eyebrow{font:500 12px 'DM Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}.card{background:white;border:1px solid var(--line);border-radius:18px;padding:24px;transition:transform .2s}.card:hover{transform:translateY(-3px)}.pill{display:inline-block;border:1px solid var(--line);border-radius:30px;padding:7px 11px;font:12px 'DM Mono',monospace;color:#475569}.btn{display:inline-block;border-radius:9px;padding:12px 17px;font-size:14px;font-weight:700;text-decoration:none}.btn-main{background:var(--ink);color:white}.btn-alt{border:1px solid #cbd5e1;color:var(--ink);background:white}.project-card{display:grid;grid-template-columns:minmax(110px,.72fr) minmax(0,1.28fr);gap:16px;align-items:center;padding:16px}.project-card img{width:100%;height:100%;min-height:150px;max-height:205px;object-fit:cover;border-radius:11px;background:#10243a}.project-card h3{font-size:19px;line-height:1.2;font-weight:800;margin:14px 0 9px}.project-card p{font-size:13px;line-height:1.65}.project-card .project-tags{font-size:11px;color:#64748b;margin:12px 0}.gridbg{background-image:linear-gradient(#94a3b81a 1px,transparent 1px),linear-gradient(90deg,#94a3b81a 1px,transparent 1px);background-size:36px 36px}@media(max-width:650px){.section{padding:58px 0}}
+
+/* Phase 1: consistent dark theme for the redesigned portfolio pages */
+:root{color-scheme:light}
+html.dark{color-scheme:dark}
+html.dark body{background:#0b1220!important;color:#e5edf7!important}
+html.dark .card,html.dark .case{background:#111c2e!important;border-color:#263449!important;color:#e5edf7}
+html.dark .card p,html.dark .case p,html.dark .case .summary{color:#b6c3d4}
+html.dark .case h2,html.dark .case h3,html.dark .card h2,html.dark .card h3{color:#f8fafc}
+html.dark .pill,html.dark .tag{color:#cbd5e1;border-color:#334155}
+html.dark .note{background:#172338!important;color:#dbeafe!important;border-color:#334155!important}
+html.dark .border{border-color:#334155!important}
+html.dark a:not(.btn){text-underline-offset:3px}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto!important}*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
+
 </style>
 </head>
 <body>
