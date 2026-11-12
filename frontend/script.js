@@ -50,8 +50,9 @@ document.addEventListener('DOMContentLoaded', function() {
 /* --- 1. Dark Mode Logic (FIXED) --- */
 function initDarkMode() {
     // Check storage or system preference
-    if (localStorage.getItem('theme') === 'dark' || 
-       (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+    let savedTheme = null;
+    try { savedTheme = localStorage.getItem('portfolio-theme'); } catch (error) {}
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
         document.documentElement.classList.add('dark');
     } else {
         document.documentElement.classList.remove('dark');
@@ -66,7 +67,7 @@ function initDarkMode() {
         if(toggleBtn) {
             document.documentElement.classList.toggle('dark');
             const isDark = document.documentElement.classList.contains('dark');
-            localStorage.setItem('theme', isDark ? 'dark' : 'light');
+            try { localStorage.setItem('portfolio-theme', isDark ? 'dark' : 'light'); } catch (error) {}
             
             // Update charts color if they exist
             if(typeof updateChartsTheme === 'function') updateChartsTheme();
